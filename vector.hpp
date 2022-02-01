@@ -136,7 +136,6 @@ template<
          * Container Objects
         */
         T *n;
-        T *A;
 
     public:
         /**
