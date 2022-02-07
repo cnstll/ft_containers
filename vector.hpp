@@ -5,6 +5,7 @@
 #include <exception>
 #include <stdexcept>
 #include <iterator>
+#include <cstddef>
 
 namespace ft {
 
@@ -72,7 +73,8 @@ template<
         //vector(InputIt first, InputIt last, const Allocator &alloc = Allocator());
         vector(const vector &other) { this->n = other.n; };
 
-        void    ctorElements(vector &dest, vector &src, size_type size) {
+    private:
+        void    copyElements(T *dest, T *src, size_type size) {
 
             for (size_type i = 0; i < size; i++){
 
@@ -82,15 +84,15 @@ template<
 
         void deepCopy(const vector &other) {
 
-            if (other.capacity())
-            {
-                this->n_allocator = other.n_allocator.allocate(n, other.capacity());
-                this->n = this->n_allocator;
-                ctorElements(this->n, other.n);
-                this->currentCapacity = other.currentCapacity;
-                this->currentSize = other.currentSize;
-            }
+            this->n_allocator = other.n_allocator.allocate(n, other.capacity());
+            this->n = this->n_allocator;
+            ctorElements(this->n, other.n, this->size());
+            this->currentCapacity = other.currentCapacity;
+            this->currentSize = other.currentSize;
+            
         };
+
+    public:
 
         vector &operator=(const vector &other) {
 
@@ -101,9 +103,9 @@ template<
         // Destructs the vector. The destructors of the elements are called and the used storage is deallocated.
         // Note, that if the elements are pointers, the pointed-to objects are not destroyed.
         ~vector(){
-            for (size_type i = 0; i < currentSize; i++){
-                n_allocator.destroy(&n[i]);
-            }
+            //for (size_type i = 0; i < currentSize; i++){
+            //    n_allocator.destroy(&n[i]);
+            //}
             if (currentCapacity > 0)
                 n_allocator.deallocate(n, currentCapacity); 
         };
@@ -113,21 +115,21 @@ template<
         */
         //Returns a reference to the element at specified location pos. Bounds checking is performed.
         reference at( size_type pos ){
-            //if !(pos < size())
-            //throw std::out_of_range;
-            return &n[pos];
+            if (!(pos < size()))
+                throw std::out_of_range("index out of range");
+            return (*this)[pos];
         };
 
         const_reference at( size_type pos ) const {
 
-            //if !(pos < size())
-            //throw std::out_of_range;
-            return &n[pos];
+            if (!(pos < size()))
+                throw std::out_of_range("index out of range");
+            return (*this)[pos];
         };
 
         //Returns a reference to the element at specified location pos. No bounds checking is performed.
-        //reference operator[]( size_type pos ){ return *(begin() + pos * sizeof(size_type)); };
-        //const_reference operator[]( size_type pos ) const{ return const *begin(); };
+        reference operator[]( size_type pos ){ return *(n + pos); };
+        const_reference operator[]( size_type pos ) const{ return *(n + pos); };
 
         // Returns a reference to the first element in the container. Calling front on an empty container is undefined.
         //reference front() { return *begin(); };
@@ -146,7 +148,7 @@ template<
         //template< class InputIt > void assign( InputIt first, InputIt last );
 
         //Returns the allocator associated with the container.
-        //allocator_type get_allocator() const {};
+        allocator_type get_allocator() const { return this->n_allocator; };
 
         /**
          * Capacity 
@@ -196,43 +198,45 @@ template<
         */
         void push_back( const T& value ){
 
-            //currentCapacity : 0
-            //currentSize : 0 
-            //currentCapacity : 1
-            //currentSize : 1 
-            //currentCapacity : 2
-            //currentSize : 2 
-            //currentCapacity : 4
-            //currentSize : 3 
-
+            if (size() + 1 >= max_size())
+                throw std::length_error(NULL);
             if (currentCapacity == 0) 
             {
-                currentSize++;
-                currentCapacity++;
-                n = n_allocator.allocate(currentCapacity);
-                n_allocator.construct(&n[0], value);
+                try {
+                    n = n_allocator.allocate(currentCapacity + 1);
+                    n_allocator.construct(&n[0], value);
+                    currentSize++;
+                    currentCapacity++;
+                } catch (...) {};
             }
             else
             {
                 size_type savedCapacity = currentCapacity;
-                while (currentSize >= currentCapacity)
+                if (currentSize >= currentCapacity)
                     currentCapacity *= 2;
                 if (currentCapacity != savedCapacity)
-                    n = n_allocator.allocate(currentCapacity);
+                {
+                    try {
+                        T *tmp_n = n_allocator.allocate(currentCapacity);
+                        copyElements(tmp_n, n, currentSize);
+                        n_allocator.deallocate(n, savedCapacity); 
+                        n = tmp_n;
+                    } catch (...) {
+                        currentCapacity = savedCapacity;
+                    }
+
+                }
                 n_allocator.construct(&n[currentSize], value);
                 currentSize++;
             }
-            std::cout << "capacity : " << currentCapacity << " -- size : " << currentSize << std::endl;
+            //std::cout << "capacity : " << currentCapacity << " -- size : " << currentSize << " -- added value: " << n[currentSize - 1] << std::endl;
 
         };
 
         void pop_back(){
 
-            if (currentSize - 1 >= 0)
-            {
-                currentSize--;
-                //n_allocator.destroy(&n[currentSize]);
-            }
+            currentSize--;
+            n_allocator.destroy(&n[currentSize]);
         };
 
 
