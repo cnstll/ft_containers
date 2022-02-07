@@ -37,40 +37,76 @@ template<
         /**
          * Typefs Member types
         */
-        typedef typename T value_type;
-        typedef typename Allocator allocator_type;
+        typedef T value_type;
+        typedef Allocator allocator_type;
         typedef typename Allocator::pointer pointer;
         typedef typename Allocator::const_pointer const_pointer;
-        typedef typename std::size_t size_type;
-        typedef typename std::ptrdiff_t difference_type;
-        typedef typename value_type &reference;
-        typedef typename const value_type &const_reference;
+        typedef std::size_t size_type;
+        typedef std::ptrdiff_t difference_type;
+        typedef value_type &reference;
+        typedef const value_type &const_reference;
 
         // ! Add Ite
         /**
          * Member functions
         */
         // Default constructor. Constructs an empty container with a default-constructed allocator.
-        vector(void){
+        vector(void) : currentSize(0), currentCapacity(0) {};
 
-            return;
-        };
         //Constructs an empty container with the given allocator alloc.
-        explicit vector(const Allocator &alloc) { std::cout << "Constructor" << std::endl; };
+        explicit vector(const Allocator &alloc)
+            : n_allocator(alloc), currentSize(0), currentCapacity(0) {};
         // Constructs the container with count copies of elements with value value.
-        explicit vector(size_type count, const T &value = T(), const Allocator &alloc = Allocator());
-        // Constructs the container with the contents of the range [first, last)
-        template <class InputIt>
-        vector(InputIt first, InputIt last, const Allocator &alloc = Allocator());
-        vector(const vector &other) { this->c = other.c; };
-        vector &operator=(const vector &other)
+        explicit vector(size_type count, const T &value = T(), const Allocator &alloc = Allocator())
+            : n_allocator(alloc), currentSize(count), currentCapacity(count)
         {
-            this->c = other.c;
+            n = n_allocator.allocate(count);
+            currentSize = count;
+            currentCapacity = count;
+            for (size_type i = 0; i < count; i++) {
+                n_allocator.construct(&n[i], value);
+                //n[i] = value;
+            }
+        }; // Constructs the container with the contents of the range [first, last)
+        //template <class InputIt>
+        //vector(InputIt first, InputIt last, const Allocator &alloc = Allocator());
+        vector(const vector &other) { this->n = other.n; };
+
+        void    ctorElements(vector &dest, vector &src, size_type size) {
+
+            for (size_type i = 0; i < size; i++){
+
+                dest[i] = src[i];
+            }
+        };
+
+        void deepCopy(const vector &other) {
+
+            if (other.capacity())
+            {
+                this->n_allocator = other.n_allocator.allocate(n, other.capacity());
+                this->n = this->n_allocator;
+                ctorElements(this->n, other.n);
+                this->currentCapacity = other.currentCapacity;
+                this->currentSize = other.currentSize;
+            }
+        };
+
+        vector &operator=(const vector &other) {
+
+            if (other != this)
+                deepCopy(other);
             return *this;
         };
         // Destructs the vector. The destructors of the elements are called and the used storage is deallocated.
         // Note, that if the elements are pointers, the pointed-to objects are not destroyed.
-        ~vector(){};
+        ~vector(){
+            for (size_type i = 0; i < currentSize; i++){
+                n_allocator.destroy(&n[i]);
+            }
+            if (currentCapacity > 0)
+                n_allocator.deallocate(n, currentCapacity); 
+        };
 
         /**
          * Element access 
@@ -79,65 +115,137 @@ template<
         reference at( size_type pos ){
             //if !(pos < size())
             //throw std::out_of_range;
-            return &a[pos];
+            return &n[pos];
         };
 
         const_reference at( size_type pos ) const {
 
             //if !(pos < size())
             //throw std::out_of_range;
-            return const &a[pos];
+            return &n[pos];
         };
 
         //Returns a reference to the element at specified location pos. No bounds checking is performed.
-        reference operator[]( size_type pos ){ return *begin(); };
-        const_reference operator[]( size_type pos ) const{ return const *begin(); };
+        //reference operator[]( size_type pos ){ return *(begin() + pos * sizeof(size_type)); };
+        //const_reference operator[]( size_type pos ) const{ return const *begin(); };
 
         // Returns a reference to the first element in the container. Calling front on an empty container is undefined.
-        reference front() { return *(end() - 1); };
-        const_reference front() const{ return const *(end() - 1); };
+        //reference front() { return *begin(); };
+        //const_reference front() const{ return const *begin(); };
 
+        //reference back() { return *(end() - 1); };
+        //const_reference back() const{ return const *(end() - 1); };
         // Returns pointer to the underlying array serving as element storage.
         // The pointer is such that range [data(); data() + size()) is always a valid range, even if the container is empty (data() is not dereferenceable in that case).
-        T* data() { return this->a; };
-        const T* data() const { return const this->a; };
+        T* data() { return this->n; };
+        const T* data() const { return this->n; };
 
         //Replaces the contents with count copies of value value
-        void assign( size_type count, const T& value ){};
+        //void assign( size_type count, const T& value ){};
         //Replaces the contents with copies of those in the range [first, last). The behavior is undefined if either argument is an iterator into *this.
-        template< class InputIt > void assign( InputIt first, InputIt last );
+        //template< class InputIt > void assign( InputIt first, InputIt last );
 
         //Returns the allocator associated with the container.
-        allocator_type get_allocator() const {};
+        //allocator_type get_allocator() const {};
 
         /**
          * Capacity 
         */
-        bool empty() const { return (begin() == end()); };
+        bool empty() const { return (currentSize == 0); };
         // ! Difference between size() and max_size() ??
         // Returns the number of elements in the container, i.e. std::distance(begin(), end())
-        size_type size() const { return (std::distance(begin(), end())) };
+        size_type size() const { return currentSize; };
 
         // Returns the maximum number of elements the container is able to hold due to system or library implementation limitations,
         // i.e. std::distance(begin(), end()) for the largest container.
-        size_type max_size() const{ return size(); };
-        void reserve( size_type new_cap ){
-            if(new_cap > this->capacity())
-                a.allocate(this->capacity());// reallocate
-            
-        };
-        size_type capacity() const {};
+        size_type max_size() const{ return n_allocator.max_size(); };
+
+//        void reserve( size_type new_cap ){
+//            if(new_cap > this->capacity())
+//                a.allocate(this->capacity());// reallocate
+//            
+//        };
+        size_type capacity() const { return currentCapacity;};
+
+        /**
+         * Iterators 
+        */
+
+//        iterator begin(){
+//            iterator *it = n;
+//            return it;
+//        };
+//
+//        const_iterator begin(){
+//            const_iterator *it = n;
+//            return it;
+//        };
+//
+//        iterator end(){
+//            iterator *it = (n + size());
+//            return it;
+//        };
+//
+//        const_iterator end(){
+//            const_iterator *it = (n + size());
+//            return it;
+//
+//        };
         /**
          * Modifiers 
         */
+        void push_back( const T& value ){
+
+            //currentCapacity : 0
+            //currentSize : 0 
+            //currentCapacity : 1
+            //currentSize : 1 
+            //currentCapacity : 2
+            //currentSize : 2 
+            //currentCapacity : 4
+            //currentSize : 3 
+
+            if (currentCapacity == 0) 
+            {
+                currentSize++;
+                currentCapacity++;
+                n = n_allocator.allocate(currentCapacity);
+                n_allocator.construct(&n[0], value);
+            }
+            else
+            {
+                size_type savedCapacity = currentCapacity;
+                while (currentSize >= currentCapacity)
+                    currentCapacity *= 2;
+                if (currentCapacity != savedCapacity)
+                    n = n_allocator.allocate(currentCapacity);
+                n_allocator.construct(&n[currentSize], value);
+                currentSize++;
+            }
+            std::cout << "capacity : " << currentCapacity << " -- size : " << currentSize << std::endl;
+
+        };
+
+        void pop_back(){
+
+            if (currentSize - 1 >= 0)
+            {
+                currentSize--;
+                //n_allocator.destroy(&n[currentSize]);
+            }
+        };
+
 
     private:
         /**
          * Container Objects
         */
+        Allocator n_allocator;
+        size_t currentSize;
+        size_t currentCapacity;
         T *n;
 
-    public:
+    //public:
         /**
          * Non member functions that require access to the protected Member Object "c" 
         */
