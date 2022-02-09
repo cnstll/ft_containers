@@ -11,6 +11,7 @@ rm -f your_${TESTED_CONTAINER}_output.log your_${TESTED_CONTAINER} stl_${TESTED_
 
 cp ./${ROOT_DIR}${TESTED_CONTAINER}.hpp .
 cp ./${ROOT_DIR}test_${TESTED_CONTAINER}.cpp .
+cp ./${ROOT_DIR}iterator.hpp .
 
 c++ -DACTIVE_NAMESPACE="std" -g -fsanitize=address -Wall -Wextra -Werror test_${TESTED_CONTAINER}.cpp -o stl_vector
 if [ $? != 0 ]
