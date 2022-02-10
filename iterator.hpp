@@ -88,7 +88,7 @@ class vectorIterator : public ft::iterator<random_access_iterator_tag, T>
   /*Supports the arithmetic operators + and - between an iterator and an integer value, or subtracting an iterator from another.*/
     vectorIterator operator+(difference_type n) {T* tmp = p; return tmp += n;}
     vectorIterator operator-(difference_type n) {T* tmp = p; return tmp -= n;}
-    difference_type operator-(const vectorIterator &It) {return It->p - this->p;}
+    difference_type operator-(const vectorIterator &It) {return this->p - It.p;}
   /*Supports compound assignment operations += and -= */
     vectorIterator& operator+=(difference_type n) {
       difference_type m = n;
