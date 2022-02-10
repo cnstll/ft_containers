@@ -57,6 +57,9 @@ int main (void){
         try {
             s1.at(s1.size());
         } catch (std::exception &e) { std::cerr << e.what() << std::endl; }
+        try {
+            s1.at(42);
+        } catch (std::exception &e) { std::cerr << e.what() << std::endl; }
 
         std::cout << "Vector is empty ? : " << s1.empty() << std::endl;
 	    std::cout << "Vector size ? : " << s1.size() << std::endl;
@@ -190,14 +193,15 @@ int main (void){
     }
     {
         std::cout << "Testing simple iterator ctor" << std::endl;
-        ft::vector<int>::iterator it1; 
-        ft::vector<int>::iterator it2(it1); 
-        ft::vector<int>::iterator it3 = it1; 
+        ACTIVE_NAMESPACE::vector<int>::iterator it1; 
+        ACTIVE_NAMESPACE::vector<int>::iterator it2(it1); 
+        ACTIVE_NAMESPACE::vector<int>::iterator it3 = it1; 
+        *it3;  
     }
     {
         std::cout << "Testing simple iterator begin/end" << std::endl;
-        ft::vector<int> v1; 
-        ft::vector<int>::iterator it1; 
+        ACTIVE_NAMESPACE::vector<int> v1; 
+        ACTIVE_NAMESPACE::vector<int>::iterator it1; 
         v1.push_back(42);
         v1.push_back(21);
         v1.push_back(10);
@@ -210,8 +214,69 @@ int main (void){
         std::cout << "Call to front returns : " << v1.front() << std::endl;
         std::cout << "Call to back returns : " << v1.back() << std::endl;
         std::cout << "Call Range ctor " << *it1 << std::endl;
-        ft::vector<int> v2(v1.begin(), v1.end()); 
+        ACTIVE_NAMESPACE::vector<int> v2(v1.begin(), v1.end()); 
         std::cout << "Call to front returns : " << v2.front() << std::endl;
         std::cout << "Call to back returns : " << v2.back() << std::endl;
+    }
+    {
+        std::cout << "Testing iterator operation" << std::endl;
+        ACTIVE_NAMESPACE::vector<int> v1; 
+        ACTIVE_NAMESPACE::vector<int>::iterator it1; 
+        v1.push_back(42);
+        v1.push_back(21);
+        v1.push_back(10);
+        it1 = v1.begin();
+        std::cout << "Value at beginning of vector: " << *it1 << std::endl;
+        std::cout << "Value at vector " << ": " << *it1 << std::endl;
+        std::cout << "Value at vector " << ": " << *(it1 + 1) << std::endl;
+        std::cout << "Value at vector " << ": " << *(++it1 - 1) << std::endl;
+        std::cout << "Value at vector " << ": " << (it1 - v1.begin()) << std::endl;
+    }
+    {
+        std::cout << "Testing looping on reserve calls" << std::endl;
+        ACTIVE_NAMESPACE::vector<int> v1; 
+        std::size_t i = 0;
+        std::size_t max = 100;
+        v1.push_back(42);
+        v1.push_back(21);
+        v1.push_back(10);
+        while (i < max) {
+            v1.reserve(i);
+            std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+            ++i;
+        }
+        std::cout << "Call to front returns : " << v1.front() << std::endl;
+        std::cout << "Call to back returns : " << v1.back() << std::endl;
+    }
+    {
+        std::cout << "Testing reserve call with max_size" << std::endl;
+        ACTIVE_NAMESPACE::vector<int> v1; 
+        try {
+            v1.reserve(v1.max_size() + 1);
+        }
+        catch (std::exception &e){ std::cerr << e.what() << std::endl; };
+    }
+    {
+        std::cout << "Testing clear" << std::endl;
+        std::size_t sz = 42;
+        // ! Erreur de compilation si le type n'est pas précisé pour la size -> pb overload avec le range ctor
+        ACTIVE_NAMESPACE::vector<int> v1(sz, 21);  
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        v1.clear();
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        ACTIVE_NAMESPACE::vector<int> v2;  
+        v1.clear();
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+
+    }
+    {
+        std::cout << "Testing insert on empty vector" << std::endl;
+        ACTIVE_NAMESPACE::vector<int> v1;  
+        ACTIVE_NAMESPACE::vector<int>::iterator it1 = v1.end();
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        std::cout << "Value inserted : " << *(v1.insert(it1, 42)) << std::endl;
+        ACTIVE_NAMESPACE::vector<int>::iterator it2 = v1.end();
+        std::cout << "Value inserted : " << *(v1.insert(it2, 42)) << std::endl;
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
     }
 };

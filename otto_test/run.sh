@@ -14,25 +14,23 @@ cp ./${ROOT_DIR}test_${TESTED_CONTAINER}.cpp .
 cp ./${ROOT_DIR}iterator.hpp .
 
 c++ -DACTIVE_NAMESPACE="std" -g -fsanitize=address -Wall -Wextra -Werror test_${TESTED_CONTAINER}.cpp -o stl_vector
+#c++ -DACTIVE_NAMESPACE="std" -Wall -Wextra -Werror test_${TESTED_CONTAINER}.cpp -o stl_vector
 if [ $? != 0 ]
 then   
-    echo -e "${RED} >> COMPILATION ERROR ${RESET}"
-    exit 1
-fi
-c++ -DACTIVE_NAMESPACE="ft" -g -fsanitize=address -Wall -Wextra -Werror test_${TESTED_CONTAINER}.cpp -o your_vector
-if [ $? != 0 ]
-then
-    echo -e "${RED} >> COMPILATION ERROR ${RESET}"
+    echo -e "${RED} >> COMPILATION ERROR FROM ORIGINAL LIB${RESET}"
     exit 1
 fi
 
-echo -e "${YELLOW}STDERROR OUTPUT...${RESET}"
-echo -e "${YELLOW}STL STDERROR: ${RESET}"
+c++ -DACTIVE_NAMESPACE="ft" -g -fsanitize=address -Wall -Wextra -Werror test_${TESTED_CONTAINER}.cpp -o your_vector
+#c++ -DACTIVE_NAMESPACE="ft" -Wall -Wextra -Werror test_${TESTED_CONTAINER}.cpp -o your_vector
+
+#echo -e "${YELLOW}STDERROR OUTPUT...${RESET}"
+#echo -e "${YELLOW}STL STDERROR: ${RESET}"
 ./stl_vector > stl_${TESTED_CONTAINER}_output.log
-echo -e "${YELLOW}YOUR STDERROR: ${RESET}"
+#echo -e "${YELLOW}YOUR STDERROR: ${RESET}"
 ./your_vector > your_${TESTED_CONTAINER}_output.log
 
-echo
+#echo
 diff  stl_${TESTED_CONTAINER}_output.log your_${TESTED_CONTAINER}_output.log > ${DIFF_FILE}
 
 if [ -s "$DIFF_FILE" ]
