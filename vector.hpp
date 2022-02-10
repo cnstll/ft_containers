@@ -1,11 +1,12 @@
 #ifndef VECTOR_HPP
 #define VECTOR_HPP
 #include "iterator.hpp"
+#include <cstddef>
 #include <iostream>
 #include <memory>
 #include <exception>
 #include <stdexcept>
-#include <cstddef>
+#include <sstream>
 
 namespace ft {
 
@@ -93,6 +94,7 @@ template<
         vector(const vector &other) { *this = other; };
 
     private:
+
         void    copyElements(T *dest, T *src, size_type size) {
 
             for (size_type i = 0; i < size; i++){
@@ -116,8 +118,8 @@ template<
     public:
 
         vector &operator=(const vector &other) {
-
-            deepCopy(other);
+            if (this != &other)
+                deepCopy(other);
             return *this;
         };
         // Destructs the vector. The destructors of the elements are called and the used storage is deallocated.
@@ -136,15 +138,23 @@ template<
         */
         //Returns a reference to the element at specified location pos. Bounds checking is performed.
         reference at( size_type pos ){
-            if (!(pos < size()))
-                throw std::out_of_range("index out of range");
+            if (!(pos < size())){
+                std::stringstream sstm_err;
+                sstm_err << "vector::_M_range_check: __n (which is " << pos << ") >= "; 
+                sstm_err << "this->size() (which is " << currentSize << ")"; 
+                throw std::out_of_range(sstm_err.str());
+            }
             return (*this)[pos];
         };
 
         const_reference at( size_type pos ) const {
 
-            if (!(pos < size()))
-                throw std::out_of_range("index out of range");
+            if (!(pos < size())){
+                std::stringstream sstm_err;
+                sstm_err << "vector::_M_range_check: __n (which is " << pos << ") >= "; 
+                sstm_err << "this->size() (which is " << currentSize << ")"; 
+                throw std::out_of_range(sstm_err.str());
+            }
             return (*this)[pos];
         };
 
@@ -180,7 +190,7 @@ template<
 // # To Do
 //        const_iterator begin(){ const_iterator it = n; return it; };
 //
-        iterator end(){ iterator it = (n + size()); return it; };
+        iterator end() { iterator it = (n + size()); return it; };
         //const iterator end(){ const iterator it = (n + size()); return it; };
         //reverse_iterator rbegin() { reverse_iterator it = (n + size); return it };
         //const_reverse_iterator rbegin() { const_reverse_iterator it = (n + size); return it };
@@ -195,7 +205,7 @@ template<
 
         // Returns the maximum number of elements the container is able to hold due to system or library implementation limitations,
         // i.e. std::distance(begin(), end()) for the largest container.
-        size_type max_size() const{ return n_allocator.max_size(); };
+        size_type max_size() const { return n_allocator.max_size(); };
 
 //        void reserve( size_type new_cap ){
 //            if(new_cap > this->capacity())
@@ -204,10 +214,101 @@ template<
 //        };
         size_type capacity() const { return currentCapacity;};
         /**
+         * Increase the capacity of the vector to a value that's greater or equal to new_cap.
+         * If new_cap is greater than the current capacity(), new storage is allocated, otherwise the function does nothing.
+         */
+        void reserve( size_type new_cap ){
+            if (new_cap > max_size())
+                throw std::length_error("vector::reserve");
+            else if (new_cap > currentCapacity) {
+                try {
+                    T* tmp_n = n_allocator.allocate(new_cap);
+                    copyElements(tmp_n, n, currentSize);
+                    n_allocator.deallocate(n, currentCapacity); 
+                    n = tmp_n;
+                    currentCapacity = new_cap;
+                }
+                catch(...) {};
+            }
+        };
+        /**
          * Modifiers 
         */
-        void push_back( const T& value ){
+        /**
+         * Increase the capacity of the vector to a value that's greater or equal to new_cap.
+         * If new_cap is greater than the current capacity(), new storage is allocated, otherwise the function does nothing.
+         */
+        void clear(){
 
+            while (0 < currentSize) {
+                n_allocator.destroy(&n[--currentSize]);
+            }
+            currentSize = 0;
+        };
+    private:
+        void    ctorElements(T *dest, iterator start, iterator end) {
+
+            iterator it = start;
+            while (it != end) {
+                n_allocator.construct(dest, *it);
+                dest++;
+                it++;
+            }
+        };
+    public:
+        /**
+         * Inserts elements at the specified location in the container.
+         * Causes reallocation if the new size() is greater than the old capacity().
+         * If the new size() is greater than capacity(), all iterators and references are invalidated.
+         * Otherwise, only the iterators and references before the insertion point remain valid.
+         * The past-the-end iterator is also invalidated.
+         */
+        iterator insert( iterator pos, const T& value ) {
+
+            if (currentSize + 1 >= max_size())
+                throw std::length_error(NULL);
+            if (currentCapacity == 0) 
+            {
+                try {
+                    n = n_allocator.allocate(currentCapacity + 1);
+                    n_allocator.construct(&*n, value);
+                    iterator itToValue(&*n);
+                    currentCapacity++;
+                    currentSize++;
+                    return (itToValue);
+                } catch (...) {};
+            }
+            else
+            {
+                size_type savedCapacity = currentCapacity;
+                if (currentSize >= currentCapacity)
+                    currentCapacity *= 2;
+                if (currentCapacity != savedCapacity)
+                {
+                    try {
+                        T *tmp_n = n_allocator.allocate(currentCapacity);
+                        if (currentSize > 1)
+                            ctorElements(tmp_n, begin(), pos - 1);
+                        n_allocator.construct(&(*(pos - 1)), value);
+                        iterator itToValue = pos - 1;
+                        if (currentSize > 1)
+                            ctorElements(tmp_n, pos, end());
+                        n_allocator.deallocate(n, savedCapacity); 
+                        n = tmp_n;
+                        currentSize++;
+                        return itToValue;
+                    } catch (...) {
+                        currentCapacity = savedCapacity;
+                    }
+                }
+            }
+            return pos;
+        };
+        //void insert( iterator pos, size_type count, const T& value );
+        //template< class InputIt >
+        //void insert( iterator pos, InputIt first, InputIt last );
+
+        void push_back( const T& value ) {
             if (size() + 1 >= max_size())
                 throw std::length_error(NULL);
             if (currentCapacity == 0) 
@@ -239,13 +340,11 @@ template<
                 n_allocator.construct(&n[currentSize], value);
                 currentSize++;
             }
-            //std::cout << "capacity : " << currentCapacity << " -- size : " << currentSize << " -- added value: " << n[currentSize - 1] << std::endl;
-
         };
 
-        void pop_back(){
+        void pop_back() {
 
-            currentSize--;
+            --currentSize;
             n_allocator.destroy(&n[currentSize]);
         };
 
