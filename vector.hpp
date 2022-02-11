@@ -7,6 +7,7 @@
 #include <exception>
 #include <stdexcept>
 #include <sstream>
+#include <type_traits>
 
 namespace ft {
 
@@ -71,9 +72,11 @@ template<
                 //n[i] = value;
             }
         };
+        // ! Replace enable_if from std and is_integral
         // Constructs the container with the contents of the range [first, last)
         template <class InputIt>
-        vector(InputIt first, InputIt last, const Allocator &alloc = Allocator()) {
+        vector(InputIt first, InputIt last, const Allocator &alloc = Allocator(),
+        typename std::enable_if<!std::is_integral<InputIt>::value>::type* = 0) {
 
             size_type counter = 0;
             InputIt it = first;
@@ -87,7 +90,9 @@ template<
             n = n_allocator.allocate(currentCapacity);
             size_type i = 0;
             while (i < counter) {
-                n_allocator.construct(&n[i++], *first++);
+                n_allocator.construct(n + i, *first);
+                ++first;
+                ++i;
             }
         };
         // Copy Construct
@@ -235,8 +240,6 @@ template<
          * Modifiers 
         */
         /**
-         * Increase the capacity of the vector to a value that's greater or equal to new_cap.
-         * If new_cap is greater than the current capacity(), new storage is allocated, otherwise the function does nothing.
          */
         void clear(){
 
@@ -255,6 +258,19 @@ template<
                 it++;
             }
         };
+
+        template <typename InputIt>
+        size_type _distance(InputIt start, InputIt end) {
+           size_type distance = 0;
+           InputIt it = start;
+
+           while (it != end){
+               distance++;
+               it++;
+           }
+           return distance;
+        };
+
     public:
         /**
          * Inserts elements at the specified location in the container.
@@ -264,88 +280,143 @@ template<
          * The past-the-end iterator is also invalidated.
          */
         iterator insert( iterator pos, const T& value ) {
-
-            if (currentSize + 1 >= max_size())
-                throw std::length_error(NULL);
-            if (currentCapacity == 0) 
-            {
-                try {
-                    n = n_allocator.allocate(currentCapacity + 1);
-                    n_allocator.construct(&*n, value);
-                    iterator itToValue(&*n);
-                    currentCapacity++;
-                    currentSize++;
-                    return (itToValue);
-                } catch (...) {};
-            }
-            else
-            {
-                size_type savedCapacity = currentCapacity;
-                if (currentSize >= currentCapacity)
-                    currentCapacity *= 2;
-                if (currentCapacity != savedCapacity)
-                {
-                    try {
-                        T *tmp_n = n_allocator.allocate(currentCapacity);
-                        if (currentSize > 1)
-                            ctorElements(tmp_n, begin(), pos - 1);
-                        n_allocator.construct(&(*(pos - 1)), value);
-                        iterator itToValue = pos - 1;
-                        if (currentSize > 1)
-                            ctorElements(tmp_n, pos, end());
-                        n_allocator.deallocate(n, savedCapacity); 
-                        n = tmp_n;
-                        currentSize++;
-                        return itToValue;
-                    } catch (...) {
-                        currentCapacity = savedCapacity;
-                    }
-                }
-            }
-            return pos;
+            size_type d1 = _distance<iterator>(begin(), pos);
+            insert(pos, 1, value);
+            return iterator(n + d1);
         };
-        //void insert( iterator pos, size_type count, const T& value );
-        //template< class InputIt >
-        //void insert( iterator pos, InputIt first, InputIt last );
+
+        void insert( iterator pos, size_type count, const T& value ) {
+
+            if (currentSize + count >= max_size())
+                throw std::length_error(NULL);
+            size_type savedCapacity = currentCapacity;
+            if (currentCapacity == 0) 
+                currentCapacity+= count;
+            while (currentSize + count > currentCapacity)
+                currentCapacity *= 2;
+            try {
+                T *tmp_n = n_allocator.allocate(currentCapacity);
+                size_type index = 0;
+                size_type d1 = _distance<iterator>(begin(), pos);
+                size_type d2 = _distance<iterator>(pos, end());
+                while (index < d1){
+                    n_allocator.construct(tmp_n + index, n[index]);
+                    index++;
+                }
+                while (index < d1 + count){
+                    n_allocator.construct(tmp_n + index, value);
+                    index++;
+                }
+                while (index < d1 + d2 + count){
+                    n_allocator.construct(tmp_n + index, n[index - count]);
+                    index++;
+                }
+                n_allocator.deallocate(n, savedCapacity);
+                n = tmp_n; 
+                currentSize+= count;
+            } catch (...) {
+                currentCapacity = savedCapacity;
+            }
+        };
+        // ! Replace enable_if from std and is_integral
+        template< class InputIt >
+        void insert( iterator pos, InputIt first, InputIt last, 
+               typename std::enable_if<!std::is_integral<InputIt>::value>::type* = 0){
+
+            size_type d_range = _distance<InputIt>(first, last);
+            size_type count = d_range;
+            if (currentSize + count >= max_size())
+                throw std::length_error(NULL);
+            size_type savedCapacity = currentCapacity;
+            if (currentCapacity == 0) 
+                currentCapacity+= count;
+            while (currentSize + count > currentCapacity)
+                currentCapacity *= 2;
+            try {
+                T *tmp_n = n_allocator.allocate(currentCapacity);
+                size_type index = 0;
+                size_type d1 = _distance<iterator>(begin(), pos);
+                size_type d2 = _distance<iterator>(pos, end());
+                while (index < d1){
+                    n_allocator.construct(tmp_n + index, n[index]);
+                    ++index;
+                }
+                while (index < d1 + count){
+                    n_allocator.construct(tmp_n + index, *(last - d_range));
+                    --d_range;
+                    ++index;
+                }
+                while (index < d1 + d2 + count){
+                    n_allocator.construct(tmp_n + index, n[index - count]);
+                    ++index;
+                }
+                n_allocator.deallocate(n, savedCapacity);
+                n = tmp_n; 
+                currentSize+= count;
+            } catch (...) {
+                currentCapacity = savedCapacity;
+            }
+        };
+
+        /**
+         * Removes the element at pos.
+         * Removes the elements in the range [first, last).
+         * Invalidates iterators and references at or after the point of the erase, including the end() iterator.
+         * The iterator pos must be valid and dereferenceable. 
+         * Thus the end() iterator (which is valid, but is not dereferenceable) cannot be used as a value for pos.
+         * The iterator first does not need to be dereferenceable if first==last: erasing an empty range is a no-op.
+         */
+        iterator erase( iterator pos ) {
+
+            try {
+                    size_type index = _distance<iterator>(begin(), pos);
+                    while (index < currentSize - 1){
+                        n[index] =  n[index + 1];
+                        index++;
+                    }
+                    --currentSize;
+                } catch (...) {}
+            if (pos == end() - 1)   
+                return (end());
+            else
+                return pos;
+        };
+
+        iterator erase( iterator first, iterator last ) {
+
+            size_type d_range = _distance<iterator>(first, last);
+            if (d_range == 0)
+                return (last);
+            bool endIsLast = 0;
+            iterator after_removed_el;
+            if (last == end())
+                endIsLast = 1;
+            try {
+                    size_type d1 = _distance<iterator>(begin(), first);
+                    size_type index = d1;
+                    while (index < currentSize - d_range){
+                        n[index] =  n[index + d_range];
+                        index++;
+                    }
+                    after_removed_el = begin() + d1;
+                    while (index < currentSize){
+                        n_allocator.destroy(&n[index]);
+                        index++;
+                    }
+                    currentSize -= d_range;
+                } catch (...) {}
+            if (endIsLast)
+                return (end());
+            return (after_removed_el);
+        };
 
         void push_back( const T& value ) {
-            if (size() + 1 >= max_size())
-                throw std::length_error(NULL);
-            if (currentCapacity == 0) 
-            {
-                try {
-                    n = n_allocator.allocate(currentCapacity + 1);
-                    n_allocator.construct(&n[0], value);
-                    currentSize++;
-                    currentCapacity++;
-                } catch (...) {};
-            }
-            else
-            {
-                size_type savedCapacity = currentCapacity;
-                if (currentSize >= currentCapacity)
-                    currentCapacity *= 2;
-                if (currentCapacity != savedCapacity)
-                {
-                    try {
-                        T *tmp_n = n_allocator.allocate(currentCapacity);
-                        copyElements(tmp_n, n, currentSize);
-                        n_allocator.deallocate(n, savedCapacity); 
-                        n = tmp_n;
-                    } catch (...) {
-                        currentCapacity = savedCapacity;
-                    }
-
-                }
-                n_allocator.construct(&n[currentSize], value);
-                currentSize++;
-            }
+            insert(end(), value);
         };
 
         void pop_back() {
 
-            --currentSize;
-            n_allocator.destroy(&n[currentSize]);
+            n_allocator.destroy(&n[--currentSize]);
         };
 
 
