@@ -219,7 +219,7 @@ int main (void){
         std::cout << "Call to back returns : " << v2.back() << std::endl;
     }
     {
-        std::cout << "Testing iterator operation" << std::endl;
+        std::cout << "Testing iterator operation and comparisons" << std::endl;
         ACTIVE_NAMESPACE::vector<int> v1; 
         ACTIVE_NAMESPACE::vector<int>::iterator it1; 
         v1.push_back(42);
@@ -227,10 +227,90 @@ int main (void){
         v1.push_back(10);
         it1 = v1.begin();
         std::cout << "Value at beginning of vector: " << *it1 << std::endl;
-        std::cout << "Value at vector " << ": " << *it1 << std::endl;
-        std::cout << "Value at vector " << ": " << *(it1 + 1) << std::endl;
-        std::cout << "Value at vector " << ": " << *(++it1 - 1) << std::endl;
-        std::cout << "Value at vector " << ": " << (it1 - v1.begin()) << std::endl;
+        std::cout << "Value at vector : " << *it1 << std::endl;
+        std::cout << "Value at vector : " << *(it1 + 1) << std::endl;
+        std::cout << "Value at vector : " << *(++it1) << std::endl;
+        it1++;
+        std::cout << "Value at vector : " << *it1 << std::endl;
+        it1--;
+        std::cout << "Value at vector : " << *it1 << std::endl;
+        std::cout << "Value at vector : " << *(--it1) << std::endl;
+        it1+=1;
+        std::cout << "Value at vector : " << *it1 << std::endl;
+        it1-=1;
+        std::cout << "Value at vector : " << *it1 << std::endl;
+        std::cout << "Value at vector : " << it1[0] << std::endl;
+        std::cout << "Value at vector : " << it1[1] << std::endl;
+        std::cout << "Value at vector : " << it1[2] << std::endl;
+        std::cout << "Value at vector : " << (it1 - v1.begin()) << std::endl;
+        //ACTIVE_NAMESPACE::vector<int>::iterator it2; 
+        //std::cout << "Iterator comparison result : " << (it2 > it1) << std::endl;
+        //std::cout << "Iterator comparison result : " << (it2 < it1) << std::endl;
+        //std::cout << "Iterator comparison result : " << (it2 <= it1) << std::endl;
+        //std::cout << "Iterator comparison result : " << (it2 >= it1) << std::endl;
+        //std::cout << "Iterator comparison result : " << (it2 == it1) << std::endl;
+        //std::cout << "Iterator comparison result : " << (it2 != it1) << std::endl;
+    }
+    {
+        std::cout << "Testing simple iterator ctor for strings" << std::endl;
+        ACTIVE_NAMESPACE::vector<std::string>::iterator it1; 
+        ACTIVE_NAMESPACE::vector<std::string>::iterator it2(it1); 
+        ACTIVE_NAMESPACE::vector<std::string>::iterator it3 = it1; 
+        *it3;  
+    }
+    {
+        std::cout << "Testing simple iterator begin/end for strings" << std::endl;
+        ACTIVE_NAMESPACE::vector<std::string> v1; 
+        ACTIVE_NAMESPACE::vector<std::string>::iterator it1; 
+        v1.push_back("banana");
+        v1.push_back("papaya");
+        v1.push_back("apple");
+    
+        it1 = v1.begin();
+        std::cout << "Value at beginning of vector: " << *it1 << std::endl;
+        while (it1 != v1.end()) {
+            std::cout << "Value at vector " << ": " << *it1 << std::endl;
+            it1++;
+        }
+        std::cout << "Call to front returns : " << v1.front() << std::endl;
+        std::cout << "Call to back returns : " << v1.back() << std::endl;
+    //std::cout << "Call Range ctor " << *it1 << std::endl;
+        ACTIVE_NAMESPACE::vector<std::string> v2(v1.begin(), v1.end()); 
+        std::cout << "Call to front returns : " << v2.front() << std::endl;
+        std::cout << "Call to back returns : " << v2.back() << std::endl;
+    }
+    {
+        std::cout << "Testing iterator operation and comparisons for strings" << std::endl;
+        ACTIVE_NAMESPACE::vector<std::string> v1; 
+        ACTIVE_NAMESPACE::vector<std::string>::iterator it1; 
+        v1.push_back("banana");
+        v1.push_back("papaya");
+        v1.push_back("apple");
+        it1 = v1.begin();
+        std::cout << "Value at beginning of vector: " << *it1 << std::endl;
+        std::cout << "Value at vector : " << *it1 << std::endl;
+        std::cout << "Value at vector : " << *(it1 + 1) << std::endl;
+        std::cout << "Value at vector : " << *(++it1) << std::endl;
+        it1++;
+        std::cout << "Value at vector : " << *it1 << std::endl;
+        it1--;
+        std::cout << "Value at vector : " << *it1 << std::endl;
+        std::cout << "Value at vector : " << *(--it1) << std::endl;
+        it1+=1;
+        std::cout << "Value at vector : " << *it1 << std::endl;
+        it1-=1;
+        std::cout << "Value at vector : " << *it1 << std::endl;
+        std::cout << "Value at vector : " << it1[0] << std::endl;
+        std::cout << "Value at vector : " << it1[1] << std::endl;
+        std::cout << "Value at vector : " << it1[2] << std::endl;
+        std::cout << "Value at vector : " << (it1 - v1.begin()) << std::endl;
+        ACTIVE_NAMESPACE::vector<std::string>::iterator it2; 
+        //std::cout << "Iterator comparison result : " << (it2 > it1) << std::endl;
+        //std::cout << "Iterator comparison result : " << (it2 < it1) << std::endl;
+        //std::cout << "Iterator comparison result : " << (it2 <= it1) << std::endl;
+        //std::cout << "Iterator comparison result : " << (it2 >= it1) << std::endl;
+        std::cout << "Iterator comparison result : " << (it2 == it1) << std::endl;
+        std::cout << "Iterator comparison result : " << (it2 != it1) << std::endl;
     }
     {
         std::cout << "Testing looping on reserve calls" << std::endl;
@@ -270,13 +350,232 @@ int main (void){
 
     }
     {
-        std::cout << "Testing insert on empty vector" << std::endl;
+        std::cout << "Testing simple insert on int" << std::endl;
         ACTIVE_NAMESPACE::vector<int> v1;  
         ACTIVE_NAMESPACE::vector<int>::iterator it1 = v1.end();
         std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
-        std::cout << "Value inserted : " << *(v1.insert(it1, 42)) << std::endl;
+        std::cout << "Value inserted : " << *(v1.insert(it1, 2)) << std::endl;
         ACTIVE_NAMESPACE::vector<int>::iterator it2 = v1.end();
-        std::cout << "Value inserted : " << *(v1.insert(it2, 42)) << std::endl;
+        std::cout << "Value inserted : " << *(v1.insert(it2, 3)) << std::endl;
         std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        ACTIVE_NAMESPACE::vector<int>::iterator it3 = v1.begin();
+        std::cout << "Value inserted : " << *(v1.insert(it3, 1)) << std::endl;
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        it3 = v1.end();
+        --it3;
+        --it3;
+        std::cout << "Value inserted : " << *(v1.insert(it3, 42)) << std::endl;
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        it1 = v1.begin();
+        while (it1 != v1.end()){
+            std::cout << "Value inserted : " << *it1 << std::endl;
+            it1++;
+        }
+    }
+    {
+        std::cout << "Testing simple insert on str" << std::endl;
+        ACTIVE_NAMESPACE::vector<std::string> v1;  
+        ACTIVE_NAMESPACE::vector<std::string>::iterator it1 = v1.end();
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        std::cout << "Value inserted : " << *(v1.insert(it1, "apple")) << std::endl;
+        ACTIVE_NAMESPACE::vector<std::string>::iterator it2 = v1.end();
+        std::cout << "Value inserted : " << *(v1.insert(it2, "banana")) << std::endl;
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        ACTIVE_NAMESPACE::vector<std::string>::iterator it3 = v1.begin();
+        std::cout << "Value inserted : " << *(v1.insert(it3, "cacao")) << std::endl;
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        it3 = v1.end();
+        --it3;
+        --it3;
+        std::cout << "Value inserted : " << *(v1.insert(it3, "chips")) << std::endl;
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        it1 = v1.begin();
+        while (it1 != v1.end()){
+            std::cout << "Value inserted : " << *it1 << std::endl;
+            it1++;
+        }
+    }
+    {
+        std::cout << "Testing insert count values on int" << std::endl;
+        ACTIVE_NAMESPACE::vector<int> v1;  
+        ACTIVE_NAMESPACE::vector<int>::iterator it1 = v1.begin();
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        v1.insert(it1, 5, 42);
+        it1 = v1.begin() + 2;
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        v1.insert(it1, 5, 21);
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        it1 = v1.end();
+        v1.insert(it1, 5, 10);
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        it1 = v1.begin();
+        v1.insert(it1, 5, 5);
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        it1 = v1.begin();
+        while (it1 != v1.end()){
+            std::cout << "Value inserted : " << *it1 << std::endl;
+            it1++;
+        }
+    }
+    {
+        std::cout << "Testing insert count values on str" << std::endl;
+        ACTIVE_NAMESPACE::vector<std::string> v1;  
+        ACTIVE_NAMESPACE::vector<std::string>::iterator it1 = v1.begin();
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        v1.insert(it1, 5, "apple");
+        it1 = v1.begin() + 2;
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        v1.insert(it1, 5, "banana");
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        it1 = v1.end();
+        v1.insert(it1, 5, "caffafle");
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        it1 = v1.begin();
+        v1.insert(it1, 5, "cacao");
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        it1 = v1.begin();
+        while (it1 != v1.end()){
+            std::cout << "Value inserted : " << *it1 << std::endl;
+            it1++;
+        }
+    }
+    {
+        std::cout << "Testing insert a range of value on int" << std::endl;
+        ACTIVE_NAMESPACE::vector<int> v1;
+        ACTIVE_NAMESPACE::vector<int> v2(5, 42);
+        ACTIVE_NAMESPACE::vector<int> v3(5, 21);
+        ACTIVE_NAMESPACE::vector<int> v4(5, 10);
+        ACTIVE_NAMESPACE::vector<int>::iterator it1 = v1.begin();
+        ACTIVE_NAMESPACE::vector<int>::iterator range_begin = v2.begin();
+        ACTIVE_NAMESPACE::vector<int>::iterator range_end = v2.end();
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        v1.insert(it1, range_begin, range_end);
+        it1 = v1.begin() + 2;
+        range_begin = v3.begin();
+        range_end = v3.end();
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        v1.insert(it1, range_begin, range_end);
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        it1 = v1.end();
+        range_begin = v4.begin();
+        range_end = v4.end();
+        v1.insert(it1, range_begin, range_end);
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        it1 = v1.begin();
+        v1.insert(it1, range_begin, range_end);
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        it1 = v1.begin();
+        while (it1 != v1.end()){
+            std::cout << "Value inserted : " << *it1 << std::endl;
+            it1++;
+        }
+    }
+    {
+        std::cout << "Testing erase a value from int vector" << std::endl;
+        ACTIVE_NAMESPACE::vector<int> v1(5, 42);
+        ACTIVE_NAMESPACE::vector<int>::iterator it1 = v1.begin();
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        std::cout << "Iterator following last removed el: " << *(v1.erase(it1)) << std::endl;
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        it1 = v1.begin();
+        while (it1 != v1.end()){
+            std::cout << "value in vector after erase : " << *it1 << std::endl;
+            it1++;
+        }
+        it1 = v1.begin() + 2;
+        std::cout << "Iterator following last removed el: " << *(v1.erase(it1)) << std::endl;
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        it1 = v1.begin();
+        while (it1 != v1.end()){
+            std::cout << "value in vector after erase : " << *it1 << std::endl;
+            it1++;
+        }
+        it1 = v1.end() - 1;
+        std::cout << "Iterator following last removed el is v1.end(): " << (v1.erase(it1) == v1.end()) << std::endl;
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        it1 = v1.begin();
+        while (it1 != v1.end()){
+            std::cout << "value in vector after erase : " << *it1 << std::endl;
+            it1++;
+        }
+    }
+    {
+        std::cout << "Testing erase a value from str vector" << std::endl;
+        ACTIVE_NAMESPACE::vector<std::string> v1(5, "banana");
+        ACTIVE_NAMESPACE::vector<std::string>::iterator it1 = v1.begin();
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        std::cout << "Iterator following last removed el: " << *(v1.erase(it1)) << std::endl;
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        it1 = v1.begin();
+        while (it1 != v1.end()){
+            std::cout << "value in vector after erase : " << *it1 << std::endl;
+            it1++;
+        }
+        it1 = v1.begin() + 2;
+        std::cout << "Iterator following last removed el: " << *(v1.erase(it1)) << std::endl;
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        it1 = v1.begin();
+        while (it1 != v1.end()){
+            std::cout << "value in vector after erase : " << *it1 << std::endl;
+            it1++;
+        }
+        it1 = v1.end() - 1;
+        std::cout << "Iterator following last removed el is v1.end(): " << (v1.erase(it1) == v1.end()) << std::endl;
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        it1 = v1.begin();
+        while (it1 != v1.end()){
+            std::cout << "value in vector after erase : " << *it1 << std::endl;
+            it1++;
+        }
+    }
+    {
+        std::cout << "Testing erase a range of values from int vector" << std::endl;
+        ACTIVE_NAMESPACE::vector<int> v1;
+        std::size_t i = 0;
+        while (i < 20){
+            v1.push_back(i);
+            i++;
+        }
+        ACTIVE_NAMESPACE::vector<int>::iterator it1 = v1.begin();
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        std::cout << "Iterator following last removed el: " << *(v1.erase(it1, it1 + 1)) << std::endl;
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        it1 = v1.begin();
+        while (it1 != v1.end()){
+            std::cout << "value in vector after erase : " << *it1 << std::endl;
+            it1++;
+        }
+        it1 = v1.begin() + 7;
+        std::cout << "Iterator following last removed el: " << *(v1.erase(it1, v1.end())) << std::endl;
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        it1 = v1.begin();
+        while (it1 != v1.end()){
+            std::cout << "value in vector after erase : " << *it1 << std::endl;
+            it1++;
+        }
+        it1 = v1.end();
+        std::cout << "Iterator following last removed el is v1.end(): " << (v1.erase(it1 - 4, it1) == v1.end()) << std::endl;
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        it1 = v1.begin();
+        while (it1 != v1.end()){
+            std::cout << "value in vector after erase : " << *it1 << std::endl;
+            it1++;
+        }
+        it1 = v1.end();
+        std::cout << "Iterator following last removed el is v1.end(): " << (v1.erase(it1, it1) == v1.end()) << std::endl;
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        it1 = v1.begin();
+        while (it1 != v1.end()){
+            std::cout << "value in vector after erase : " << *it1 << std::endl;
+            it1++;
+        }
+        it1 = v1.begin();
+        std::cout << "Iterator following last removed el: " << *(v1.erase(it1, it1)) << std::endl;
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        it1 = v1.begin();
+        while (it1 != v1.end()){
+            std::cout << "value in vector after erase : " << *it1 << std::endl;
+            it1++;
+        }
     }
 };

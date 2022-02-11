@@ -13,6 +13,7 @@ cp ./${ROOT_DIR}${TESTED_CONTAINER}.hpp .
 cp ./${ROOT_DIR}test_${TESTED_CONTAINER}.cpp .
 cp ./${ROOT_DIR}iterator.hpp .
 
+#c++ -DACTIVE_NAMESPACE="std" -g -fsanitize=address -Wall -Wextra -Werror -std=c++98 test_${TESTED_CONTAINER}.cpp -o stl_vector
 c++ -DACTIVE_NAMESPACE="std" -g -fsanitize=address -Wall -Wextra -Werror test_${TESTED_CONTAINER}.cpp -o stl_vector
 #c++ -DACTIVE_NAMESPACE="std" -Wall -Wextra -Werror test_${TESTED_CONTAINER}.cpp -o stl_vector
 if [ $? != 0 ]
@@ -21,6 +22,7 @@ then
     exit 1
 fi
 
+#c++ -DACTIVE_NAMESPACE="ft" -g -fsanitize=address -Wall -Wextra -Werror -std=c++98 test_${TESTED_CONTAINER}.cpp -o your_vector
 c++ -DACTIVE_NAMESPACE="ft" -g -fsanitize=address -Wall -Wextra -Werror test_${TESTED_CONTAINER}.cpp -o your_vector
 #c++ -DACTIVE_NAMESPACE="ft" -Wall -Wextra -Werror test_${TESTED_CONTAINER}.cpp -o your_vector
 
