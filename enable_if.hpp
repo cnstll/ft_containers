@@ -5,8 +5,7 @@ namespace ft {
 
 template <bool Cond, class T = void> struct enable_if{
 
-  public:
-    type T;
+  typedef T type;
 };
 
 }; //namespace

@@ -1,15 +1,17 @@
 #ifndef IS_INTEGRAL_HPP
 #define IS_INTEGRAL_HPP
+#define <type_traits>
 
 namespace ft {
 
-template< class T > struct is_integral {
+template < class T > struct is_integral : pbulic std::integral_constant {
 
-  typedef typename std::integral_constant::operator operator;
+  //typedef bool value_type;
+  //typedef typename std::integral_constant<bool, value> type;
+  //typedef typename std::integral_constant::operator operator;
 
-  public:
-    operator value_type();
-    type T;
+  const operator value_type(){ return value; };
+  value_type value;
 };
 
 }; //namespace
