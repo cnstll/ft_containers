@@ -1,5 +1,5 @@
-#include "vector.hpp"
 #include "iterator.hpp"
+#include "vector.hpp"
 #include <iostream> 
 #include <vector>
 #include <string>
@@ -23,10 +23,10 @@ int main (void){
         int number = 1;
         std::size_t pos = 0;
         std::size_t max_size = 5;
-        //ACTIVE_NAMESPACE::vector<int> tw1(5, 21);
-        ACTIVE_NAMESPACE::vector<int> s1;
-        //ACTIVE_NAMESPACE::vector<int> s2(tw1);
-        //ACTIVE_NAMESPACE::vector<int> s3(5, 42);
+        //NAMESPACE::vector<int> tw1(5, 21);
+        NAMESPACE::vector<int> s1;
+        //NAMESPACE::vector<int> s2(tw1);
+        //NAMESPACE::vector<int> s3(5, 42);
 
         // test Push_back
         std::cout << "Testing multiple push_back calls" << std::endl;
@@ -81,19 +81,19 @@ int main (void){
     {
         //Testing copyCtor for int
         std::cout << "Testing copy ctor an empty vector" << std::endl;
-        ACTIVE_NAMESPACE::vector<int> s1;
-        ACTIVE_NAMESPACE::vector<int> s2(s1);
+        NAMESPACE::vector<int> s1;
+        NAMESPACE::vector<int> s2(s1);
         std::cout << "Done" << std::endl;
     }
     {
         //Testing copyCtor for int
         int pos = 0;
         std::cout << "Testing copy ctor with one el vector" << std::endl;
-        ACTIVE_NAMESPACE::vector<int> s1;
+        NAMESPACE::vector<int> s1;
         s1.push_back(42);
         s1.push_back(42);
         std::cout << "Size : " << s1.size() << " -- Capacity : " << s1.capacity() << std::endl;
-        ACTIVE_NAMESPACE::vector<int> s2(s1);
+        NAMESPACE::vector<int> s2(s1);
         std::cout << "Element at pos " << pos << " ? : " << s1.at(pos) << std::endl;
         std::cout << "Size : " << s1.size() << " -- Capacity : " << s1.capacity() << std::endl;
         std::cout << "Element at pos " << pos << " ? : " << s2.at(pos) << std::endl;
@@ -108,11 +108,11 @@ int main (void){
         //Testing operator= for int
         int pos = 0;
         std::cout << "Testing copy ctor with one el vector" << std::endl;
-        ACTIVE_NAMESPACE::vector<int> s1;
+        NAMESPACE::vector<int> s1;
         s1.push_back(42);
         s1.push_back(42);
         std::cout << "Size : " << s1.size() << " -- Capacity : " << s1.capacity() << std::endl;
-        ACTIVE_NAMESPACE::vector<int> s2;
+        NAMESPACE::vector<int> s2;
         s2 = s1;
         std::cout << "Element at pos " << pos << " ? : " << s1.at(pos) << std::endl;
         std::cout << "Size : " << s1.size() << " -- Capacity : " << s1.capacity() << std::endl;
@@ -127,9 +127,9 @@ int main (void){
     {
         //Testing operator= for int on empty vectors
         std::cout << "Testing copy ctor with one el vector" << std::endl;
-        ACTIVE_NAMESPACE::vector<int> s1;
+        NAMESPACE::vector<int> s1;
         std::cout << "Size : " << s1.size() << " -- Capacity : " << s1.capacity() << std::endl;
-        ACTIVE_NAMESPACE::vector<int> s2;
+        NAMESPACE::vector<int> s2;
         s2 = s1;
         std::cout << "Size : " << s1.size() << " -- Capacity : " << s1.capacity() << std::endl;
         std::cout << "Size : " << s2.size() << " -- Capacity : " << s2.capacity() << std::endl;
@@ -138,10 +138,10 @@ int main (void){
         std::string element = "hello";
         std::size_t pos = 0;
         std::size_t max_size = 100;
-        //ACTIVE_NAMESPACE::vector<std::string> tw1(5, 21);
-        ACTIVE_NAMESPACE::vector<std::string> s1;
-        //ACTIVE_NAMESPACE::vector<std::string> s2(tw1);
-        //ACTIVE_NAMESPACE::vector<std::string> s3(5, 42);
+        //NAMESPACE::vector<std::string> tw1(5, 21);
+        NAMESPACE::vector<std::string> s1;
+        //NAMESPACE::vector<std::string> s2(tw1);
+        //NAMESPACE::vector<std::string> s3(5, 42);
 
         // test Push_back
         std::cout << "Testing multiple push_back calls" << std::endl;
@@ -193,15 +193,16 @@ int main (void){
     }
     {
         std::cout << "Testing simple iterator ctor" << std::endl;
-        ACTIVE_NAMESPACE::vector<int>::iterator it1; 
-        ACTIVE_NAMESPACE::vector<int>::iterator it2(it1); 
-        ACTIVE_NAMESPACE::vector<int>::iterator it3 = it1; 
-        *it3;  
+        NAMESPACE::vector<int>::iterator it1; 
+        //NAMESPACE::vector<int>::iterator it2(it1); 
+        NAMESPACE::vector<int>::iterator it3 = it1; 
+        NAMESPACE::vector<int> v1; 
+        *it3;
     }
     {
         std::cout << "Testing simple iterator begin/end" << std::endl;
-        ACTIVE_NAMESPACE::vector<int> v1; 
-        ACTIVE_NAMESPACE::vector<int>::iterator it1; 
+        NAMESPACE::vector<int> v1; 
+        NAMESPACE::vector<int>::iterator it1; 
         v1.push_back(42);
         v1.push_back(21);
         v1.push_back(10);
@@ -214,14 +215,14 @@ int main (void){
         std::cout << "Call to front returns : " << v1.front() << std::endl;
         std::cout << "Call to back returns : " << v1.back() << std::endl;
         std::cout << "Call Range ctor " << *it1 << std::endl;
-        ACTIVE_NAMESPACE::vector<int> v2(v1.begin(), v1.end()); 
+        NAMESPACE::vector<int> v2(v1.begin(), v1.end()); 
         std::cout << "Call to front returns : " << v2.front() << std::endl;
         std::cout << "Call to back returns : " << v2.back() << std::endl;
     }
     {
         std::cout << "Testing iterator operation and comparisons" << std::endl;
-        ACTIVE_NAMESPACE::vector<int> v1; 
-        ACTIVE_NAMESPACE::vector<int>::iterator it1; 
+        NAMESPACE::vector<int> v1; 
+        NAMESPACE::vector<int>::iterator it1; 
         v1.push_back(42);
         v1.push_back(21);
         v1.push_back(10);
@@ -243,7 +244,7 @@ int main (void){
         std::cout << "Value at vector : " << it1[1] << std::endl;
         std::cout << "Value at vector : " << it1[2] << std::endl;
         std::cout << "Value at vector : " << (it1 - v1.begin()) << std::endl;
-        //ACTIVE_NAMESPACE::vector<int>::iterator it2; 
+        //NAMESPACE::vector<int>::iterator it2; 
         //std::cout << "Iterator comparison result : " << (it2 > it1) << std::endl;
         //std::cout << "Iterator comparison result : " << (it2 < it1) << std::endl;
         //std::cout << "Iterator comparison result : " << (it2 <= it1) << std::endl;
@@ -253,15 +254,15 @@ int main (void){
     }
     {
         std::cout << "Testing simple iterator ctor for strings" << std::endl;
-        ACTIVE_NAMESPACE::vector<std::string>::iterator it1; 
-        ACTIVE_NAMESPACE::vector<std::string>::iterator it2(it1); 
-        ACTIVE_NAMESPACE::vector<std::string>::iterator it3 = it1; 
+        NAMESPACE::vector<std::string>::iterator it1; 
+        //NAMESPACE::vector<std::string>::iterator it2(it1); 
+        NAMESPACE::vector<std::string>::iterator it3 = it1; 
         *it3;  
     }
     {
         std::cout << "Testing simple iterator begin/end for strings" << std::endl;
-        ACTIVE_NAMESPACE::vector<std::string> v1; 
-        ACTIVE_NAMESPACE::vector<std::string>::iterator it1; 
+        NAMESPACE::vector<std::string> v1; 
+        NAMESPACE::vector<std::string>::iterator it1; 
         v1.push_back("banana");
         v1.push_back("papaya");
         v1.push_back("apple");
@@ -275,14 +276,14 @@ int main (void){
         std::cout << "Call to front returns : " << v1.front() << std::endl;
         std::cout << "Call to back returns : " << v1.back() << std::endl;
     //std::cout << "Call Range ctor " << *it1 << std::endl;
-        ACTIVE_NAMESPACE::vector<std::string> v2(v1.begin(), v1.end()); 
+        NAMESPACE::vector<std::string> v2(v1.begin(), v1.end()); 
         std::cout << "Call to front returns : " << v2.front() << std::endl;
         std::cout << "Call to back returns : " << v2.back() << std::endl;
     }
     {
         std::cout << "Testing iterator operation and comparisons for strings" << std::endl;
-        ACTIVE_NAMESPACE::vector<std::string> v1; 
-        ACTIVE_NAMESPACE::vector<std::string>::iterator it1; 
+        NAMESPACE::vector<std::string> v1; 
+        NAMESPACE::vector<std::string>::iterator it1; 
         v1.push_back("banana");
         v1.push_back("papaya");
         v1.push_back("apple");
@@ -304,7 +305,7 @@ int main (void){
         std::cout << "Value at vector : " << it1[1] << std::endl;
         std::cout << "Value at vector : " << it1[2] << std::endl;
         std::cout << "Value at vector : " << (it1 - v1.begin()) << std::endl;
-        ACTIVE_NAMESPACE::vector<std::string>::iterator it2; 
+        NAMESPACE::vector<std::string>::iterator it2; 
         //std::cout << "Iterator comparison result : " << (it2 > it1) << std::endl;
         //std::cout << "Iterator comparison result : " << (it2 < it1) << std::endl;
         //std::cout << "Iterator comparison result : " << (it2 <= it1) << std::endl;
@@ -314,7 +315,7 @@ int main (void){
     }
     {
         std::cout << "Testing looping on reserve calls" << std::endl;
-        ACTIVE_NAMESPACE::vector<int> v1; 
+        NAMESPACE::vector<int> v1; 
         std::size_t i = 0;
         std::size_t max = 100;
         v1.push_back(42);
@@ -330,7 +331,7 @@ int main (void){
     }
     {
         std::cout << "Testing reserve call with max_size" << std::endl;
-        ACTIVE_NAMESPACE::vector<int> v1; 
+        NAMESPACE::vector<int> v1; 
         try {
             v1.reserve(v1.max_size() + 1);
         }
@@ -340,25 +341,25 @@ int main (void){
         std::cout << "Testing clear" << std::endl;
         std::size_t sz = 42;
         // ! Erreur de compilation si le type n'est pas précisé pour la size -> pb overload avec le range ctor
-        ACTIVE_NAMESPACE::vector<int> v1(sz, 21);  
+        NAMESPACE::vector<int> v1(sz, 21);  
         std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
         v1.clear();
         std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
-        ACTIVE_NAMESPACE::vector<int> v2;  
+        NAMESPACE::vector<int> v2;  
         v1.clear();
         std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
 
     }
     {
         std::cout << "Testing simple insert on int" << std::endl;
-        ACTIVE_NAMESPACE::vector<int> v1;  
-        ACTIVE_NAMESPACE::vector<int>::iterator it1 = v1.end();
+        NAMESPACE::vector<int> v1;  
+        NAMESPACE::vector<int>::iterator it1 = v1.end();
         std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
         std::cout << "Value inserted : " << *(v1.insert(it1, 2)) << std::endl;
-        ACTIVE_NAMESPACE::vector<int>::iterator it2 = v1.end();
+        NAMESPACE::vector<int>::iterator it2 = v1.end();
         std::cout << "Value inserted : " << *(v1.insert(it2, 3)) << std::endl;
         std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
-        ACTIVE_NAMESPACE::vector<int>::iterator it3 = v1.begin();
+        NAMESPACE::vector<int>::iterator it3 = v1.begin();
         std::cout << "Value inserted : " << *(v1.insert(it3, 1)) << std::endl;
         std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
         it3 = v1.end();
@@ -374,14 +375,14 @@ int main (void){
     }
     {
         std::cout << "Testing simple insert on str" << std::endl;
-        ACTIVE_NAMESPACE::vector<std::string> v1;  
-        ACTIVE_NAMESPACE::vector<std::string>::iterator it1 = v1.end();
+        NAMESPACE::vector<std::string> v1;  
+        NAMESPACE::vector<std::string>::iterator it1 = v1.end();
         std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
         std::cout << "Value inserted : " << *(v1.insert(it1, "apple")) << std::endl;
-        ACTIVE_NAMESPACE::vector<std::string>::iterator it2 = v1.end();
+        NAMESPACE::vector<std::string>::iterator it2 = v1.end();
         std::cout << "Value inserted : " << *(v1.insert(it2, "banana")) << std::endl;
         std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
-        ACTIVE_NAMESPACE::vector<std::string>::iterator it3 = v1.begin();
+        NAMESPACE::vector<std::string>::iterator it3 = v1.begin();
         std::cout << "Value inserted : " << *(v1.insert(it3, "cacao")) << std::endl;
         std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
         it3 = v1.end();
@@ -397,8 +398,8 @@ int main (void){
     }
     {
         std::cout << "Testing insert count values on int" << std::endl;
-        ACTIVE_NAMESPACE::vector<int> v1;  
-        ACTIVE_NAMESPACE::vector<int>::iterator it1 = v1.begin();
+        NAMESPACE::vector<int> v1;  
+        NAMESPACE::vector<int>::iterator it1 = v1.begin();
         std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
         v1.insert(it1, 5, 42);
         it1 = v1.begin() + 2;
@@ -419,8 +420,8 @@ int main (void){
     }
     {
         std::cout << "Testing insert count values on str" << std::endl;
-        ACTIVE_NAMESPACE::vector<std::string> v1;  
-        ACTIVE_NAMESPACE::vector<std::string>::iterator it1 = v1.begin();
+        NAMESPACE::vector<std::string> v1;  
+        NAMESPACE::vector<std::string>::iterator it1 = v1.begin();
         std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
         v1.insert(it1, 5, "apple");
         it1 = v1.begin() + 2;
@@ -441,13 +442,13 @@ int main (void){
     }
     {
         std::cout << "Testing insert a range of value on int" << std::endl;
-        ACTIVE_NAMESPACE::vector<int> v1;
-        ACTIVE_NAMESPACE::vector<int> v2(5, 42);
-        ACTIVE_NAMESPACE::vector<int> v3(5, 21);
-        ACTIVE_NAMESPACE::vector<int> v4(5, 10);
-        ACTIVE_NAMESPACE::vector<int>::iterator it1 = v1.begin();
-        ACTIVE_NAMESPACE::vector<int>::iterator range_begin = v2.begin();
-        ACTIVE_NAMESPACE::vector<int>::iterator range_end = v2.end();
+        NAMESPACE::vector<int> v1;
+        NAMESPACE::vector<int> v2(5, 42);
+        NAMESPACE::vector<int> v3(5, 21);
+        NAMESPACE::vector<int> v4(5, 10);
+        NAMESPACE::vector<int>::iterator it1 = v1.begin();
+        NAMESPACE::vector<int>::iterator range_begin = v2.begin();
+        NAMESPACE::vector<int>::iterator range_end = v2.end();
         std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
         v1.insert(it1, range_begin, range_end);
         it1 = v1.begin() + 2;
@@ -472,8 +473,8 @@ int main (void){
     }
     {
         std::cout << "Testing erase a value from int vector" << std::endl;
-        ACTIVE_NAMESPACE::vector<int> v1(5, 42);
-        ACTIVE_NAMESPACE::vector<int>::iterator it1 = v1.begin();
+        NAMESPACE::vector<int> v1(5, 42);
+        NAMESPACE::vector<int>::iterator it1 = v1.begin();
         std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
         std::cout << "Iterator following last removed el: " << *(v1.erase(it1)) << std::endl;
         std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
@@ -501,8 +502,8 @@ int main (void){
     }
     {
         std::cout << "Testing erase a value from str vector" << std::endl;
-        ACTIVE_NAMESPACE::vector<std::string> v1(5, "banana");
-        ACTIVE_NAMESPACE::vector<std::string>::iterator it1 = v1.begin();
+        NAMESPACE::vector<std::string> v1(5, "banana");
+        NAMESPACE::vector<std::string>::iterator it1 = v1.begin();
         std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
         std::cout << "Iterator following last removed el: " << *(v1.erase(it1)) << std::endl;
         std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
@@ -530,13 +531,13 @@ int main (void){
     }
     {
         std::cout << "Testing erase a range of values from int vector" << std::endl;
-        ACTIVE_NAMESPACE::vector<int> v1;
+        NAMESPACE::vector<int> v1;
         std::size_t i = 0;
         while (i < 20){
             v1.push_back(i);
             i++;
         }
-        ACTIVE_NAMESPACE::vector<int>::iterator it1 = v1.begin();
+        NAMESPACE::vector<int>::iterator it1 = v1.begin();
         std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
         std::cout << "Iterator following last removed el: " << *(v1.erase(it1, it1 + 1)) << std::endl;
         std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
@@ -578,4 +579,199 @@ int main (void){
             it1++;
         }
     }
-};
+    {
+        std::cout << "Testing erase a range of values from std::string vector" << std::endl;
+        NAMESPACE::vector<std::string> v1;
+        std::size_t i = 0;
+        std::string el = "apples";
+        while (i < 20){
+            v1.push_back(el);
+            i++;
+        }
+        NAMESPACE::vector<std::string>::iterator it1 = v1.begin();
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        std::cout << "Iterator following last removed el: " << *(v1.erase(it1, it1 + 1)) << std::endl;
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        it1 = v1.begin();
+        while (it1 != v1.end()){
+            std::cout << "value in vector after erase : " << *it1 << std::endl;
+            it1++;
+        }
+        it1 = v1.begin() + 7;
+        std::cout << "Iterator following last removed el: " << *(v1.erase(it1, v1.end())) << std::endl;
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        it1 = v1.begin();
+        while (it1 != v1.end()){
+            std::cout << "value in vector after erase : " << *it1 << std::endl;
+            it1++;
+        }
+        it1 = v1.end();
+        std::cout << "Iterator following last removed el is v1.end(): " << (v1.erase(it1 - 4, it1) == v1.end()) << std::endl;
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        it1 = v1.begin();
+        while (it1 != v1.end()){
+            std::cout << "value in vector after erase : " << *it1 << std::endl;
+            it1++;
+        }
+        it1 = v1.end();
+        std::cout << "Iterator following last removed el is v1.end(): " << (v1.erase(it1, it1) == v1.end()) << std::endl;
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        it1 = v1.begin();
+        while (it1 != v1.end()){
+            std::cout << "value in vector after erase : " << *it1 << std::endl;
+            it1++;
+        }
+        it1 = v1.begin();
+        std::cout << "Iterator following last removed el: " << *(v1.erase(it1, it1)) << std::endl;
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        it1 = v1.begin();
+        while (it1 != v1.end()){
+            std::cout << "value in vector after erase : " << *it1 << std::endl;
+            it1++;
+        }
+    }
+    {
+        std::cout << "Testing resize int vector" << std::endl;
+        NAMESPACE::vector<int> v1;
+        std::size_t i = 0;
+        while (i < 20){
+            v1.push_back(i);
+            i++;
+        }
+        NAMESPACE::vector<int>::iterator it1 = v1.begin();
+        v1.resize(30, 42);
+        it1 = v1.begin();
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        while (it1 != v1.end()){
+            std::cout << "value in vector after resize : " << *it1 << std::endl;
+            it1++;
+        }
+        v1.resize(20, 42);
+        it1 = v1.begin();
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        while (it1 != v1.end()){
+            std::cout << "value in vector after resize : " << *it1 << std::endl;
+            it1++;
+        }
+        v1.resize(10, 42);
+        it1 = v1.begin();
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        while (it1 != v1.end()){
+            std::cout << "value in vector after resize : " << *it1 << std::endl;
+            it1++;
+        }
+    }
+    {
+        std::cout << "Testing resize str vector" << std::endl;
+        NAMESPACE::vector<std::string> v1;
+        std::size_t i = 0;
+        std::string el = "potato";
+        while (i < 20){
+            v1.push_back(el);
+            i++;
+        }
+        NAMESPACE::vector<std::string>::iterator it1 = v1.begin();
+        v1.resize(30, "banana");
+        it1 = v1.begin();
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        while (it1 != v1.end()){
+            std::cout << "value in vector after resize : " << *it1 << std::endl;
+            it1++;
+        }
+        v1.resize(20, "banana");
+        it1 = v1.begin();
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        while (it1 != v1.end()){
+            std::cout << "value in vector after resize : " << *it1 << std::endl;
+            it1++;
+        }
+        v1.resize(10, "banana");
+        it1 = v1.begin();
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        while (it1 != v1.end()){
+            std::cout << "value in vector after resize : " << *it1 << std::endl;
+            it1++;
+        }
+    }
+    {
+        std::cout << "Testing swap int vector" << std::endl;
+        NAMESPACE::vector<int> v1;
+        NAMESPACE::vector<int> v2(10, 42);
+        NAMESPACE::vector<int>::iterator it2 = v2.begin();
+        std::size_t i = 0;
+        while (i < 20){
+            v1.push_back(i);
+            i++;
+        }
+        NAMESPACE::vector<int>::iterator it1 = v1.begin();
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        std::cout << "Size : " << v2.size() << " -- Capacity : " << v2.capacity() << std::endl;
+        v1.swap(v2);
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        std::cout << "Size : " << v2.size() << " -- Capacity : " << v2.capacity() << std::endl;
+        //it1 = v1.begin();
+        while (it1 != v2.end()){
+            std::cout << "value in vector after swap : " << *it1 << std::endl;
+            it1++;
+        }
+        //it2 = v2.begin();
+        while (it2 != v1.end()){
+            std::cout << "value in vector after swap : " << *it2 << std::endl;
+            it2++;
+        }
+    }
+    {
+        std::cout << "Testing swap int vector" << std::endl;
+        NAMESPACE::vector<std::string> v1;
+        NAMESPACE::vector<std::string> v2(10, "world");
+        NAMESPACE::vector<std::string>::iterator it2 = v2.begin();
+        std::size_t i = 0;
+        while (i < 20){
+            v1.push_back("hello");
+            i++;
+        }
+        NAMESPACE::vector<std::string>::iterator it1 = v1.begin();
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        std::cout << "Size : " << v2.size() << " -- Capacity : " << v2.capacity() << std::endl;
+        v1.swap(v2);
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        std::cout << "Size : " << v2.size() << " -- Capacity : " << v2.capacity() << std::endl;
+        //it1 = v1.begin();
+        while (it1 != v2.end()){
+            std::cout << "value in vector after swap : " << *it1 << std::endl;
+            it1++;
+        }
+        //it2 = v2.begin();
+        while (it2 != v1.end()){
+            std::cout << "value in vector after swap : " << *it2 << std::endl;
+            it2++;
+        }
+    }
+    {
+        std::cout << "Testing external swap int vector" << std::endl;
+        NAMESPACE::vector<int> v1;
+        NAMESPACE::vector<int> v2(10, 42);
+        NAMESPACE::vector<int>::iterator it2 = v2.begin();
+        std::size_t i = 0;
+        while (i < 20){
+            v1.push_back(i);
+            i++;
+        }
+        NAMESPACE::vector<int>::iterator it1 = v1.begin();
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        std::cout << "Size : " << v2.size() << " -- Capacity : " << v2.capacity() << std::endl;
+        NAMESPACE::swap(v1, v2);
+        std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
+        std::cout << "Size : " << v2.size() << " -- Capacity : " << v2.capacity() << std::endl;
+        //it1 = v1.begin();
+        while (it1 != v2.end()){
+            std::cout << "value in vector after swap : " << *it1 << std::endl;
+            it1++;
+        }
+        //it2 = v2.begin();
+        while (it2 != v1.end()){
+            std::cout << "value in vector after swap : " << *it2 << std::endl;
+            it2++;
+        }
+    }
+    };

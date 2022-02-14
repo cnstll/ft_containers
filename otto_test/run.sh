@@ -13,18 +13,22 @@ cp ./${ROOT_DIR}${TESTED_CONTAINER}.hpp .
 cp ./${ROOT_DIR}test_${TESTED_CONTAINER}.cpp .
 cp ./${ROOT_DIR}iterator.hpp .
 
-#c++ -DACTIVE_NAMESPACE="std" -g -fsanitize=address -Wall -Wextra -Werror -std=c++98 test_${TESTED_CONTAINER}.cpp -o stl_vector
-c++ -DACTIVE_NAMESPACE="std" -g -fsanitize=address -Wall -Wextra -Werror test_${TESTED_CONTAINER}.cpp -o stl_vector
-#c++ -DACTIVE_NAMESPACE="std" -Wall -Wextra -Werror test_${TESTED_CONTAINER}.cpp -o stl_vector
+#c++ -DACTIVE_NAMESPACE="ft" -g -fsanitize=address -Wall -Wextra -Werror -std=c++98 test_${TESTED_CONTAINER}.cpp -o your_vector
+c++ -Wall -Wextra -Werror -g3 -fsanitize=address test_${TESTED_CONTAINER}.cpp -o your_vector -D NAMESPACE="ft" 
+#c++ -DACTIVE_NAMESPACE="ft" -Wall -Wextra -Werror test_${TESTED_CONTAINER}.cpp -o your_vector
 if [ $? != 0 ]
-then   
+then
     echo -e "${RED} >> COMPILATION ERROR FROM ORIGINAL LIB${RESET}"
     exit 1
 fi
-
-#c++ -DACTIVE_NAMESPACE="ft" -g -fsanitize=address -Wall -Wextra -Werror -std=c++98 test_${TESTED_CONTAINER}.cpp -o your_vector
-c++ -DACTIVE_NAMESPACE="ft" -g -fsanitize=address -Wall -Wextra -Werror test_${TESTED_CONTAINER}.cpp -o your_vector
-#c++ -DACTIVE_NAMESPACE="ft" -Wall -Wextra -Werror test_${TESTED_CONTAINER}.cpp -o your_vector
+#c++ -DACTIVE_NAMESPACE="std" -g -fsanitize=address -Wall -Wextra -Werror -std=c++98 test_${TESTED_CONTAINER}.cpp -o stl_vector
+c++ -Wall -Wextra -Werror -g3 -fsanitize=address test_${TESTED_CONTAINER}.cpp -o stl_vector -D NAMESPACE="std" 
+#c++ -DACTIVE_NAMESPACE="std" -Wall -Wextra -Werror test_${TESTED_CONTAINER}.cpp -o stl_vector
+if [ $? != 0 ]
+then
+    echo -e "${RED} >> COMPILATION ERROR FROM ORIGINAL LIB${RESET}"
+    exit 1
+fi
 
 #echo -e "${YELLOW}STDERROR OUTPUT...${RESET}"
 #echo -e "${YELLOW}STL STDERROR: ${RESET}"
