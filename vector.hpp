@@ -11,6 +11,7 @@
 
 namespace ft {
 
+// ! TODO: Rewrite specs for vector  - atm its stack specs
 /**
  *  The std::stack class is a container adaptor that gives the programmer the functionality of a stack - specifically,
  *  a LIFO (last-in, first-out) data structure.
@@ -419,6 +420,44 @@ template<
             n_allocator.destroy(&n[--currentSize]);
         };
 
+        /**
+         * Resizes the container to contain count elements.
+         * If the current size is greater than count, the container is reduced to its first count elements.
+         * If the current size is less than count, additional copies of value are appended.
+        */
+        void resize( size_type count, T value = T() ) {
+            (void)value;
+            if (count <= currentSize){
+                while (count < currentSize)        
+                    pop_back();
+            }
+            else {
+                insert(end(), count - currentSize, value);
+            }
+        };
+
+        template <typename _T>
+        void baseSwap(_T &a, _T &b) {
+        
+        	_T temp = a;
+        	a = b;
+        	b = temp;
+        };
+        /**
+         * Exchanges the contents of the container with those of other.
+         * Does not invoke any move, copy, or swap operations on individual elements.
+         * All iterators and references remain valid. The past-the-end iterator is invalidated.
+         */
+        void swap( vector& other ){
+
+            baseSwap(this->n, other.n);
+            baseSwap(this->n_allocator, other.n_allocator);
+            baseSwap(this->currentCapacity, other.currentCapacity);
+            baseSwap(this->currentSize, other.currentSize);
+        };
+
+        template< class _T, class _Alloc >
+        friend void swap( vector<_T, _Alloc>& lhs, vector<_T, _Alloc>& rhs );
 
     private:
         /**
@@ -464,6 +503,8 @@ template<
 //template< class T, class Container >
 //    bool operator>=( const ft::vector<T,Container>& lhs, const ft::vector<T,Container>& rhs ) { return !(lhs < rhs); };
 //
+template< class _T, class _Alloc >
+void swap( ft::vector<_T, _Alloc>& lhs, ft::vector<_T, _Alloc>& rhs ){ lhs.swap(rhs); };
 }; // namespace
 
 #endif
