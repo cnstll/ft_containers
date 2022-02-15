@@ -3,18 +3,6 @@
 #include <iostream> 
 #include <vector>
 #include <string>
-//template <typename T>
-//void sprint_vector(ft::vector<T> const &vec){
-//
-//    typename ft::vector<T>::const_iterator it = vec.begin();
-//
-//    while (it != vec.end())
-//    {
-//        std::cout << *it << " ";
-//        it++;
-//    }
-//    std::cout << "\n";
-//};
 
 int main (void){
 
@@ -68,15 +56,6 @@ int main (void){
 
         std::cout << "Size of allocator ? : " << sizeof(s1.get_allocator()) << std::endl;
         //s3 = s1;
-        // std::cout << "TESTING OPERATORS" << std::endl;
-        // s3.pop_back();
-        // std::cout << "Poped one element from copied stack" << std::endl;
-        // std::cout << "s1 < s3: " << (s1 < s3) << std::endl;
-        // std::cout << "s1 > s3: " << (s1 > s3) << std::endl;
-        // std::cout << "s1 == s3: " << (s1 == s3) << std::endl;
-        // std::cout << "s1 != s3: " << (s1 != s3) << std::endl;
-        // std::cout << "s1 <= s3: " << (s1 != s3) << std::endl;
-        // std::cout << "s1 >= s3: " << (s1 != s3) << std::endl;
     }
     {
         //Testing copyCtor for int
@@ -774,4 +753,53 @@ int main (void){
             it2++;
         }
     }
+    //{
+    //    NAMESPACE::vector<int> s1;
+    //    NAMESPACE::vector<int> s2;
+    //    NAMESPACE::vector<int> s3(5, 42);
+    //    NAMESPACE::vector<int> s4(5, 42);
+    //    NAMESPACE::vector<int> s5(4, 42);
+    //    NAMESPACE::vector<int> s6(5, 21);
+
+    //    std::cout << "TESTING OPERATORS both empty vector" << std::endl;
+    //    std::cout << "s1 < s2: " << (s1 < s2) << std::endl;
+    //    std::cout << "s1 > s2: " << (s1 > s2) << std::endl;
+    //    std::cout << "s1 == s2: " << (s1 == s2) << std::endl;
+    //    std::cout << "s1 != s2: " << (s1 != s2) << std::endl;
+    //    std::cout << "s1 <= s2: " << (s1 != s2) << std::endl;
+    //    std::cout << "s1 >= s2: " << (s1 != s2) << std::endl;
+
+    //    std::cout << "TESTING OPERATORS one empty vector" << std::endl;
+    //    std::cout << "s1 < s3: " << (s1 < s3) << std::endl;
+    //    std::cout << "s1 > s3: " << (s1 > s3) << std::endl;
+    //    std::cout << "s1 == s3: " << (s1 == s3) << std::endl;
+    //    std::cout << "s1 != s3: " << (s1 != s3) << std::endl;
+    //    std::cout << "s1 <= s3: " << (s1 != s3) << std::endl;
+    //    std::cout << "s1 >= s3: " << (s1 != s3) << std::endl;
+
+    //    std::cout << "TESTING OPERATORS non empty" << std::endl;
+    //    std::cout << "s6 < s3: " << (s6 < s3) << std::endl;
+    //    std::cout << "s6 > s3: " << (s6 > s3) << std::endl;
+    //    std::cout << "s6 == s3: " << (s6 == s3) << std::endl;
+    //    std::cout << "s6 != s3: " << (s6 != s3) << std::endl;
+    //    std::cout << "s6 <= s3: " << (s6 != s3) << std::endl;
+    //    std::cout << "s6 >= s3: " << (s6 != s3) << std::endl;
+
+    //    std::cout << "TESTING OPERATORS one vector is a subset of the other" << std::endl;
+    //    std::cout << "s5 < s3: " << (s5 < s3) << std::endl;
+    //    std::cout << "s5 > s3: " << (s5 > s3) << std::endl;
+    //    std::cout << "s5 == s3: " << (s5 == s3) << std::endl;
+    //    std::cout << "s5 != s3: " << (s5 != s3) << std::endl;
+    //    std::cout << "s5 <= s3: " << (s5 != s3) << std::endl;
+    //    std::cout << "s5 >= s3: " << (s5 != s3) << std::endl;
+
+
+    //    std::cout << "TESTING OPERATORS equal vectors" << std::endl;
+    //    std::cout << "s4 < s3: " << (s4 < s3) << std::endl;
+    //    std::cout << "s4 > s3: " << (s4 > s3) << std::endl;
+    //    std::cout << "s4 == s3: " << (s4 == s3) << std::endl;
+    //    std::cout << "s4 != s3: " << (s4 != s3) << std::endl;
+    //    std::cout << "s4 <= s3: " << (s4 != s3) << std::endl;
+    //    std::cout << "s4 >= s3: " << (s4 != s3) << std::endl;
+    //}
     };
