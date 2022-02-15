@@ -1,5 +1,10 @@
 #ifndef VECTOR_HPP
 #define VECTOR_HPP
+#include "enable_if.hpp" 
+#include "is_integral.hpp" 
+#include "integral_constant.hpp" 
+#include "lexicographical_compare.hpp" 
+#include "remove_cv.hpp" 
 #include "iterator.hpp"
 #include <cstddef>
 #include <iostream>
@@ -7,7 +12,6 @@
 #include <exception>
 #include <stdexcept>
 #include <sstream>
-#include <type_traits>
 
 namespace ft {
 
@@ -73,11 +77,10 @@ template<
                 //n[i] = value;
             }
         };
-        // ! Replace enable_if from std and is_integral
         // Constructs the container with the contents of the range [first, last)
         template <class InputIt>
         vector(InputIt first, InputIt last, const Allocator &alloc = Allocator(),
-        typename std::enable_if<!std::is_integral<InputIt>::value>::type* = 0) {
+        typename ft::enable_if<!ft::is_integral<InputIt>::value>::type* = 0) {
 
             size_type counter = 0;
             InputIt it = first;
@@ -168,6 +171,7 @@ template<
         reference operator[]( size_type pos ){ return *(n + pos); };
         const_reference operator[]( size_type pos ) const{ return *(n + pos); };
 
+        // ! DO CONST ITERATORS
         // Returns a reference to the first element in the container. Calling front on an empty container is undefined.
         reference front() { return *begin(); };
         //const_reference front() const{ return const *begin(); };
@@ -192,6 +196,7 @@ template<
          * Iterators 
         */
 
+        // ! DO CONST ITERATORS AND REVERSE
         iterator begin() { iterator it = n; return it; };
 // # To Do
 //        const_iterator begin(){ const_iterator it = n; return it; };
@@ -213,11 +218,6 @@ template<
         // i.e. std::distance(begin(), end()) for the largest container.
         size_type max_size() const { return n_allocator.max_size(); };
 
-//        void reserve( size_type new_cap ){
-//            if(new_cap > this->capacity())
-//                a.allocate(this->capacity());// reallocate
-//            
-//        };
         size_type capacity() const { return currentCapacity;};
         /**
          * Increase the capacity of the vector to a value that's greater or equal to new_cap.
@@ -240,8 +240,6 @@ template<
         /**
          * Modifiers 
         */
-        /**
-         */
         void clear(){
 
             while (0 < currentSize) {
@@ -319,10 +317,9 @@ template<
                 currentCapacity = savedCapacity;
             }
         };
-        // ! Replace enable_if from std and is_integral
         template< class InputIt >
         void insert( iterator pos, InputIt first, InputIt last, 
-               typename std::enable_if<!std::is_integral<InputIt>::value>::type* = 0){
+               typename ft::enable_if<!ft::is_integral<InputIt>::value>::type* = 0){
 
             size_type d_range = _distance<InputIt>(first, last);
             size_type count = d_range;
@@ -435,7 +432,7 @@ template<
                 insert(end(), count - currentSize, value);
             }
         };
-
+    private:
         template <typename _T>
         void baseSwap(_T &a, _T &b) {
         
@@ -443,6 +440,7 @@ template<
         	a = b;
         	b = temp;
         };
+    public:
         /**
          * Exchanges the contents of the container with those of other.
          * Does not invoke any move, copy, or swap operations on individual elements.
@@ -468,16 +466,16 @@ template<
         size_t currentCapacity;
         T *n;
 
-    //public:
+    public:
         /**
-         * Non member functions that require access to the protected Member Object "c" 
+         * Non member functions that require access to the protected Member Object "n" 
         */
 
-//        template <class _T, class _Container>
-//        friend bool operator<(const ft::vector<_T, _Container> &lhs, const ft::vector<_T, _Container> &rhs);
-//
-//        template <class _T, class _Container>
-//        friend bool operator==(const ft::vector<_T, _Container> &lhs, const ft::vector<_T, _Container> &rhs);
+        template <class _T, class _Container>
+        friend bool operator<(const ft::vector<_T, _Container> &lhs, const ft::vector<_T, _Container> &rhs);
+
+        //template <class _T, class _Container>
+        //friend bool operator==(const ft::vector<_T, _Container> &lhs, const ft::vector<_T, _Container> &rhs);
 };
 // TODO: look into EqualityComparable requirement https://en.cppreference.com/w/cpp/named_req/EqualityComparable
 /**
@@ -485,24 +483,26 @@ template<
 */
 
 // Operator "<" and "==" are used to build the other operator overloads to limit the use of "friend" functions
-//template< class T, class Container >
-//    bool operator<( const ft::vector<T,Container>& lhs, const ft::vector<T,Container>& rhs ) { return (lhs.c < rhs.c); };
-//
-//template< class T, class Container >
-//    bool operator==( const ft::vector<T,Container>& lhs, const ft::vector<T,Container>& rhs ) { return (lhs.c == rhs.c); };
-//
-//template< class T, class Container >
-//    bool operator!=( const ft::vector<T,Container>& lhs, const ft::vector<T,Container>& rhs ) { return !(lhs == rhs); };
-//
-//template< class T, class Container >
-//    bool operator<=( const ft::vector<T,Container>& lhs, const ft::vector<T,Container>& rhs ) { return !(rhs < lhs); };
-//
-//template< class T, class Container >
-//bool operator>( const ft::vector<T,Container>& lhs, const ft::vector<T,Container>& rhs ) { return (rhs < lhs); };
-//
-//template< class T, class Container >
-//    bool operator>=( const ft::vector<T,Container>& lhs, const ft::vector<T,Container>& rhs ) { return !(lhs < rhs); };
-//
+template< class T, class Container >
+    bool operator<( const ft::vector<T,Container>& lhs, const ft::vector<T,Container>& rhs ) {
+        return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), lhs.end()); 
+    };
+
+template< class T, class Container >
+    bool operator==( const ft::vector<T,Container>& lhs, const ft::vector<T,Container>& rhs ) { return !(lhs < rhs) && !(rhs < lhs); };
+
+template< class T, class Container >
+    bool operator!=( const ft::vector<T,Container>& lhs, const ft::vector<T,Container>& rhs ) { return (lhs < rhs) || (rhs < lhs); };
+
+template< class T, class Container >
+    bool operator<=( const ft::vector<T,Container>& lhs, const ft::vector<T,Container>& rhs ) { return !(rhs < lhs); };
+
+template< class T, class Container >
+bool operator>( const ft::vector<T,Container>& lhs, const ft::vector<T,Container>& rhs ) { return (rhs < lhs); };
+
+template< class T, class Container >
+    bool operator>=( const ft::vector<T,Container>& lhs, const ft::vector<T,Container>& rhs ) { return !(lhs < rhs); };
+
 template< class _T, class _Alloc >
 void swap( ft::vector<_T, _Alloc>& lhs, ft::vector<_T, _Alloc>& rhs ){ lhs.swap(rhs); };
 }; // namespace

@@ -12,6 +12,11 @@ rm -f your_${TESTED_CONTAINER}_output.log your_${TESTED_CONTAINER} stl_${TESTED_
 cp ./${ROOT_DIR}${TESTED_CONTAINER}.hpp .
 cp ./${ROOT_DIR}test_${TESTED_CONTAINER}.cpp .
 cp ./${ROOT_DIR}iterator.hpp .
+cp ./${ROOT_DIR}enable_if.hpp .
+cp ./${ROOT_DIR}is_integral.hpp .
+cp ./${ROOT_DIR}integral_constant.hpp .
+cp ./${ROOT_DIR}remove_cv.hpp .
+cp ./${ROOT_DIR}lexicographical_compare.hpp .
 
 #c++ -DACTIVE_NAMESPACE="ft" -g -fsanitize=address -Wall -Wextra -Werror -std=c++98 test_${TESTED_CONTAINER}.cpp -o your_vector
 c++ -Wall -Wextra -Werror -g3 -fsanitize=address test_${TESTED_CONTAINER}.cpp -o your_vector -D NAMESPACE="ft" 
