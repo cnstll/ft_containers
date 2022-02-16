@@ -207,6 +207,7 @@ int main (void){
         v1.push_back(10);
         it1 = v1.begin();
         std::cout << "Value at beginning of vector: " << *it1 << std::endl;
+        std::cout << "Value at beginning of vector: " << it1[0] << std::endl;
         std::cout << "Value at vector : " << *it1 << std::endl;
         std::cout << "Value at vector : " << *(it1 + 1) << std::endl;
         std::cout << "Value at vector : " << *(++it1) << std::endl;
@@ -223,13 +224,67 @@ int main (void){
         std::cout << "Value at vector : " << it1[1] << std::endl;
         std::cout << "Value at vector : " << it1[2] << std::endl;
         std::cout << "Value at vector : " << (it1 - v1.begin()) << std::endl;
-        //NAMESPACE::vector<int>::iterator it2; 
-        //std::cout << "Iterator comparison result : " << (it2 > it1) << std::endl;
-        //std::cout << "Iterator comparison result : " << (it2 < it1) << std::endl;
-        //std::cout << "Iterator comparison result : " << (it2 <= it1) << std::endl;
-        //std::cout << "Iterator comparison result : " << (it2 >= it1) << std::endl;
-        //std::cout << "Iterator comparison result : " << (it2 == it1) << std::endl;
-        //std::cout << "Iterator comparison result : " << (it2 != it1) << std::endl;
+        NAMESPACE::vector<int>::iterator it2; 
+        std::cout << "Iterator comparison result : " << (it2 > it1) << std::endl;
+        std::cout << "Iterator comparison result : " << (it2 < it1) << std::endl;
+        std::cout << "Iterator comparison result : " << (it2 <= it1) << std::endl;
+        std::cout << "Iterator comparison result : " << (it2 >= it1) << std::endl;
+        std::cout << "Iterator comparison result : " << (it2 == it1) << std::endl;
+        std::cout << "Iterator comparison result : " << (it2 != it1) << std::endl;
+    }
+    {
+        std::cout << "Testing simple iterator begin/end" << std::endl;
+        NAMESPACE::vector<int> v1; 
+        NAMESPACE::vector<int>::const_iterator it1; 
+        v1.push_back(42);
+        v1.push_back(21);
+        v1.push_back(10);
+        it1 = v1.begin();
+        std::cout << "Value at beginning of vector: " << *it1 << std::endl;
+        while (it1 != v1.end()) {
+            std::cout << "Value at vector " << ": " << *it1 << std::endl;
+            it1++;
+        }
+        std::cout << "Call to front returns : " << v1.front() << std::endl;
+        std::cout << "Call to back returns : " << v1.back() << std::endl;
+        std::cout << "Call Range ctor " << *it1 << std::endl;
+        NAMESPACE::vector<int> v2(v1.begin(), v1.end()); 
+        std::cout << "Call to front returns : " << v2.front() << std::endl;
+        std::cout << "Call to back returns : " << v2.back() << std::endl;
+    }
+    {
+        std::cout << "Testing const iterator operation and comparisons" << std::endl;
+        NAMESPACE::vector<int> v1; 
+        NAMESPACE::vector<int>::const_iterator it1; 
+        v1.push_back(42);
+        v1.push_back(21);
+        v1.push_back(10);
+        it1 = v1.begin();
+        std::cout << "Value at beginning of vector: " << *it1 << std::endl;
+        std::cout << "Value at beginning of vector: " << it1[0] << std::endl;
+        std::cout << "Value at vector : " << *it1 << std::endl;
+        std::cout << "Value at vector : " << *(it1 + 1) << std::endl;
+        std::cout << "Value at vector : " << *(++it1) << std::endl;
+        it1++;
+        std::cout << "Value at vector : " << *it1 << std::endl;
+        it1--;
+        std::cout << "Value at vector : " << *it1 << std::endl;
+        std::cout << "Value at vector : " << *(--it1) << std::endl;
+        it1+=1;
+        std::cout << "Value at vector : " << *it1 << std::endl;
+        it1-=1;
+        std::cout << "Value at vector : " << *it1 << std::endl;
+        std::cout << "Value at vector : " << it1[0] << std::endl;
+        std::cout << "Value at vector : " << it1[1] << std::endl;
+        std::cout << "Value at vector : " << it1[2] << std::endl;
+        std::cout << "Value at vector : " << (it1 - v1.begin()) << std::endl;
+        NAMESPACE::vector<int>::const_iterator it2; 
+        std::cout << "Iterator comparison result : " << (it2 > it1) << std::endl;
+        std::cout << "Iterator comparison result : " << (it2 < it1) << std::endl;
+        std::cout << "Iterator comparison result : " << (it2 <= it1) << std::endl;
+        std::cout << "Iterator comparison result : " << (it2 >= it1) << std::endl;
+        std::cout << "Iterator comparison result : " << (it2 == it1) << std::endl;
+        std::cout << "Iterator comparison result : " << (it2 != it1) << std::endl;
     }
     {
         std::cout << "Testing simple iterator ctor for strings" << std::endl;

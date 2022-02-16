@@ -130,6 +130,83 @@ bool operator<=(const vectorIterator<T>& lhs, const vectorIterator<T>& rhs) { re
 template <typename T>
 bool operator>=(const vectorIterator<T>& lhs, const vectorIterator<T>& rhs) { return !operator<(rhs, lhs); };
 
+template <class T> 
+class constVectorIterator : public ft::iterator<random_access_iterator_tag, T>
+{
+  public:
+    typedef random_access_iterator_tag iterator_category;
+    typedef std::ptrdiff_t difference_type;
+    typedef const T value_type;
+    typedef const T* pointer;
+    typedef const T& reference;
+  /* Is default-constructible, copy-constructible, copy-assignable and destructible */
+    constVectorIterator() {}
+    constVectorIterator(T* i) : p(i) {}
+    constVectorIterator(const constVectorIterator& src) {*this = src;}
+    constVectorIterator(const vectorIterator<T>& src) {*this = src;}
+    constVectorIterator &operator=(const constVectorIterator& rhs) { 
+      this->p = rhs.p; 
+      return *this;
+    }
+    ~constVectorIterator() {}
+
+  /*Can be dereferenced as an lvalue (if in a dereferenceable state).*/
+    reference operator*() const {return *p;}
+    pointer operator->() const {return p;}
+
+  /*Supports the offset dereference operator ([])	*/
+    reference operator[](difference_type n) const {return *(p + n);}
+  /*Can be incremented (if in a dereferenceable state).*/
+    constVectorIterator& operator++() {++p; return *this;}
+    constVectorIterator operator++(int) {constVectorIterator tmp(*this); operator++(); return tmp;}
+
+  /*Can be incremented (if in a dereferenceable state).*/
+    constVectorIterator& operator--() {--p; return *this;}
+    constVectorIterator operator--(int) {constVectorIterator tmp(*this); operator--(); return tmp;}
+  /*Supports the arithmetic operators + and - between an iterator and an integer value, or subtracting an iterator from another.*/
+    constVectorIterator operator+(difference_type n) {T* tmp = p; return constVectorIterator(tmp += n);}
+
+    template <typename _T>
+    friend constVectorIterator operator+(difference_type n, const constVectorIterator<_T>& op) {_T* tmp = op.p; tmp += n; return constVectorIterator(tmp);}
+
+    constVectorIterator operator-(difference_type n) { constVectorIterator it = this->p; return it -= n;}
+    template <typename _T>
+    friend constVectorIterator operator-(difference_type n, const constVectorIterator<_T>& op) {_T* tmp = op.p; tmp -= n; return constVectorIterator(tmp);}
+
+    friend difference_type operator-(const constVectorIterator &lIt, const constVectorIterator &rIt) {return lIt.p - rIt.p;}
+  /*Supports compound assignment operations += and -= */
+    constVectorIterator& operator+=(difference_type n) {
+      difference_type m = n;
+      if (m >= 0) while (m--) ++p;
+      else while (m++) --p;
+      return (*this);
+    }
+    constVectorIterator& operator-=(difference_type n) { return operator+=(-n); }
+
+  /*Can be compared for equivalence using the equality/inequality operators*/
+      template <typename _T>
+      friend bool operator==(const constVectorIterator<_T>& lhs, const constVectorIterator<_T>& rhs) ;
+  /*Can be compared with inequality relational operators (<, >, <= and >=).*/
+      template <typename _T>
+      friend bool operator<(const constVectorIterator<_T>& lhs, const constVectorIterator<_T>& rhs) ;
+
+  /* The underlying pointer to data hold in the container */
+    T* p;
+  };
+
+template <typename T>
+bool operator<(const constVectorIterator<T>& lhs, const constVectorIterator<T>& rhs) { return lhs.p < rhs.p; } ;
+template <typename T>
+bool operator==(const constVectorIterator<T>& lhs, const constVectorIterator<T>& rhs) { return lhs.p == rhs.p; } ;
+template <typename T>
+bool operator>(const constVectorIterator<T>& lhs, const constVectorIterator<T>& rhs) { return operator<(rhs, lhs); } ;
+template <typename T>
+bool operator!=(const constVectorIterator<T>& lhs, const constVectorIterator<T>& rhs) { return !operator==(lhs, rhs); } ;
+template <typename T>
+bool operator<=(const constVectorIterator<T>& lhs, const constVectorIterator<T>& rhs) { return !operator<(lhs, rhs); } ;
+template <typename T>
+bool operator>=(const constVectorIterator<T>& lhs, const constVectorIterator<T>& rhs) { return !operator<(rhs, lhs); } ;
+
 }; // NAMESPACE
 
 #endif

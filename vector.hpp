@@ -54,7 +54,7 @@ template<
         typedef value_type& reference;
         typedef const value_type& const_reference;
         typedef typename ft::vectorIterator<T> iterator;
-        //typedef const_iterator;
+        typedef typename ft::constVectorIterator<T> const_iterator;
         //typedef reverse_iterator;
         //typedef const_reverse_iterator;
 
@@ -169,16 +169,16 @@ template<
 
         //Returns a reference to the element at specified location pos. No bounds checking is performed.
         reference operator[]( size_type pos ){ return *(n + pos); };
-        const_reference operator[]( size_type pos ) const{ return *(n + pos); };
+        const_reference operator[]( size_type pos ) const { return *(n + pos); };
 
         // ! DO CONST ITERATORS
         // Returns a reference to the first element in the container. Calling front on an empty container is undefined.
         reference front() { return *begin(); };
-        //const_reference front() const{ return const *begin(); };
+        const_reference front() const { return *begin(); };
 
         // Returns a reference to the last element in the container.
         reference back() { return *(end() - 1); };
-        //const_reference back() const{ return const *(end() - 1); };
+        const_reference back() const { return *(end() - 1); };
 
         // Returns pointer to the underlying array serving as element storage.
         // The pointer is such that range [data(); data() + size()) is always a valid range, even if the container is empty (data() is not dereferenceable in that case).
@@ -196,13 +196,12 @@ template<
          * Iterators 
         */
 
-        // ! DO CONST ITERATORS AND REVERSE
+        // ! DO REVERSE
         iterator begin() { iterator it = n; return it; };
-// # To Do
-//        const_iterator begin(){ const_iterator it = n; return it; };
+        const_iterator begin() const { const_iterator it = n; return it; };
 //
         iterator end() { iterator it = (n + size()); return it; };
-        //const iterator end(){ const iterator it = (n + size()); return it; };
+        const iterator end() const { const iterator it = (n + size()); return it; };
         //reverse_iterator rbegin() { reverse_iterator it = (n + size); return it };
         //const_reverse_iterator rbegin() { const_reverse_iterator it = (n + size); return it };
         //reverse_iterator rend() { const_reverse_iterator it = n; return it; };

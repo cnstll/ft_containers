@@ -7,3 +7,4 @@
 * [Why should you use explicit keyword ?](https://google.github.io/styleguide/cppguide.html#Implicit_Conversions)
 * [On duck typing](https://en.wikipedia.org/wiki/Duck_typing)
 * [Creating your own containers](https://stdcxx.apache.org/doc/stdlibug/16-3.html)
+* [Clockwise / Spiral Rule](http://c-faq.com/decl/spiral.anderson.html)
