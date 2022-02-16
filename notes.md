@@ -8,3 +8,4 @@
 * [On duck typing](https://en.wikipedia.org/wiki/Duck_typing)
 * [Creating your own containers](https://stdcxx.apache.org/doc/stdlibug/16-3.html)
 * [Clockwise / Spiral Rule](http://c-faq.com/decl/spiral.anderson.html)
+* [Iterator implementation](https://stackoverflow.com/questions/3582608/how-to-correctly-implement-custom-iterators-and-const-iterators)
