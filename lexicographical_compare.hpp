@@ -9,10 +9,10 @@ bool lexicographical_compare( InputIt1 first1, InputIt1 last1, InputIt2 first2, 
   InputIt2 it2 = first2;
 
   while (it1 != last1){
-    if (*it1 < *it2)
-      return (true);
-    else if (*it1 > *it2 || it2 == last2)
+    if (it2 == last2 || *it1 > *it2)
       return (false);
+    else if (*it1 < *it2)
+      return (true);
     ++it1;
     ++it2;
   }
@@ -25,10 +25,10 @@ bool lexicographical_compare( InputIt1 first1, InputIt1 last1, InputIt2 first2, 
   InputIt2 it2 = first2;
 
   while (it1 != last1){
-    if (cmp(*it1, *it2))
-      return (true);
-    else if (cmp(*it2, *it1) || it2 == last2)
+    if (it2 == last2 || cmp(*it2, *it1))
       return (false);
+    else if (cmp(*it1, *it2))
+      return (true);
     ++it1;
     ++it2;
   }

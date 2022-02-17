@@ -52,8 +52,6 @@ template <class T>
     typedef	random_access_iterator_tag iterator_category;
   };
 
-
-
 template <class T> 
 class vectorIterator : public ft::iterator<random_access_iterator_tag, T>
 {
@@ -117,6 +115,7 @@ class vectorIterator : public ft::iterator<random_access_iterator_tag, T>
   /* The underlying pointer to data hold in the container */
     T* p;
   };
+  
 template <class T> 
 class constVectorIterator : public ft::iterator<random_access_iterator_tag, T>
 {
