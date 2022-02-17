@@ -9,3 +9,6 @@
 * [Creating your own containers](https://stdcxx.apache.org/doc/stdlibug/16-3.html)
 * [Clockwise / Spiral Rule](http://c-faq.com/decl/spiral.anderson.html)
 * [Iterator implementation](https://stackoverflow.com/questions/3582608/how-to-correctly-implement-custom-iterators-and-const-iterators)
+* [Strong exception guarantee](https://stackoverflow.com/questions/12137555/strong-exception-guarantee-vs-basic-exception-guarantee)
+* [Compiler flags](https://gcc.gnu.org/onlinedocs/gcc-11.2.0/gcc/Overall-Options.html#Overall-Options)
+* [On iterator traits](https://www.fluentcpp.com/2018/05/08/std-iterator-deprecated/)
