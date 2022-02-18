@@ -326,13 +326,13 @@ int main (void){
     }
     {
         std::cout << "Testing simple iterator ctor for strings" << std::endl;
-        NAMESPACE::vector<int>::iterator it1; 
-        NAMESPACE::vector<int>::iterator it2(it1); 
-        NAMESPACE::vector<int>::iterator it3 = it1; 
-        NAMESPACE::vector<int>::const_iterator it4;
-        NAMESPACE::vector<int>::const_iterator it5(it1);
-        NAMESPACE::vector<int>::const_iterator it6 = it2;
-        NAMESPACE::vector<int>::const_iterator it7 = it5;
+        NAMESPACE::vector<std::string>::iterator it1; 
+        NAMESPACE::vector<std::string>::iterator it2(it1); 
+        NAMESPACE::vector<std::string>::iterator it3 = it1; 
+        NAMESPACE::vector<std::string>::const_iterator it4;
+        NAMESPACE::vector<std::string>::const_iterator it5(it1);
+        NAMESPACE::vector<std::string>::const_iterator it6 = it2;
+        NAMESPACE::vector<std::string>::const_iterator it7 = it5;
         *it3;
         it6 - it7;
     }
@@ -383,12 +383,138 @@ int main (void){
         std::cout << "Value at vector : " << it1[2] << std::endl;
         std::cout << "Value at vector : " << (it1 - v1.begin()) << std::endl;
         NAMESPACE::vector<std::string>::iterator it2; 
-        //std::cout << "Iterator comparison result : " << (it2 > it1) << std::endl;
-        //std::cout << "Iterator comparison result : " << (it2 < it1) << std::endl;
-        //std::cout << "Iterator comparison result : " << (it2 <= it1) << std::endl;
-        //std::cout << "Iterator comparison result : " << (it2 >= it1) << std::endl;
+        std::cout << "Iterator comparison result : " << (it2 > it1) << std::endl;
+        std::cout << "Iterator comparison result : " << (it2 < it1) << std::endl;
+        std::cout << "Iterator comparison result : " << (it2 <= it1) << std::endl;
+        std::cout << "Iterator comparison result : " << (it2 >= it1) << std::endl;
         std::cout << "Iterator comparison result : " << (it2 == it1) << std::endl;
         std::cout << "Iterator comparison result : " << (it2 != it1) << std::endl;
+    }
+    {
+        std::cout << "Testing simple reverse_iterator ctor and operator and comparison" << std::endl;
+        NAMESPACE::vector<int> v1;
+        v1.push_back(42);
+        v1.push_back(21);
+        v1.push_back(10);
+        NAMESPACE::vector<int>::iterator it1 = v1.begin();
+        NAMESPACE::vector<int>::reverse_iterator rit1;
+        NAMESPACE::vector<int>::reverse_iterator rit2(it1);
+        NAMESPACE::vector<int>::reverse_iterator rit3(rit1);
+        rit1 = rit2;
+        rit1.base();
+        std::cout << *rit1.base() << std::endl;
+        std::cout << *(rit1.base() + 1) << std::endl;
+        std::cout << *(rit1.base() + 2) << std::endl;
+        std::cout << *(rit1.base() + 3) << std::endl;
+        //std::cout << rit1[0] << std::endl;
+        std::cout << rit1[-1] << std::endl;
+        std::cout << rit1[-2] << std::endl;
+        std::cout << rit1[-3] << std::endl;
+        --rit1;
+        std::cout << *rit1.base() << std::endl;
+        rit1--;
+        std::cout << *rit1 << std::endl;
+        rit1--;
+        std::cout << *rit1 << std::endl;
+        std::cout << *(rit1 + 2) << std::endl;
+        ++rit1;
+        std::cout << *rit1 << std::endl;
+        rit1++;
+        std::cout << *rit1 << std::endl;
+        std::cout << *(rit1 - 2) << std::endl;
+        rit1-=2;
+        std::cout << *rit1 << std::endl;
+        rit1+=1;
+        std::cout << *rit1 << std::endl;
+        rit1 = v1.rbegin();
+        while (rit1 != v1.rend()){
+            std::cout << "Reversed iteration through vector yield: " << *rit1 << std::endl;
+            rit1++;
+        }
+        std::cout << *v1.rbegin() << std::endl;
+        std::cout << *(v1.rbegin() + 1) << std::endl;
+        std::cout << *(v1.rend() - 1) << std::endl;
+    }
+        {
+        std::cout << "Testing reverse_iterator comparisons and additional non-member operators" << std::endl;
+        NAMESPACE::vector<int> v1; 
+        NAMESPACE::vector<int>::iterator it1; 
+        v1.push_back(42);
+        v1.push_back(21);
+        v1.push_back(10);
+        it1 = v1.begin();
+        NAMESPACE::vector<int>::reverse_iterator rit1(it1);
+        it1+=2;
+        NAMESPACE::vector<int>::reverse_iterator rit2(v1.end()); 
+        std::cout << "Reverse iterator comparison > result : " << (rit2 > rit1) << std::endl;
+        std::cout << "Reverse iterator comparison < result : " << (rit2 < rit1) << std::endl;
+        std::cout << "Reverse iterator comparison <= result : " << (rit2 <= rit1) << std::endl;
+        std::cout << "Reverse iterator comparison >= result : " << (rit2 >= rit1) << std::endl;
+        std::cout << "Reverse iterator comparison == result : " << (rit2 == rit1) << std::endl;
+        std::cout << "Reverse iterator comparison != result : " << (rit2 != rit1) << std::endl;
+        std::cout << "Advancing rit with op+" << std::endl;
+        (rit2 + 2);
+        std::cout << *rit2 << std::endl;
+        std::cout << "Diff between 2 rit :" << (rit2 - rit1) << std::endl;
+    }
+    {
+        std::cout << "Testing simple reverse_iterator ctor and operator and comparison" << std::endl;
+        NAMESPACE::vector<int> v1;
+        v1.push_back(42);
+        v1.push_back(21);
+        v1.push_back(10);
+        NAMESPACE::vector<int>::const_iterator it1 = v1.begin();
+        NAMESPACE::vector<int>::const_reverse_iterator rit1;
+        NAMESPACE::vector<int>::const_reverse_iterator rit2(it1);
+        NAMESPACE::vector<int>::const_reverse_iterator rit3(rit1);
+        rit1 = rit2;
+        rit1.base();
+        std::cout << *rit1.base() << std::endl;
+        std::cout << *(rit1.base() + 1) << std::endl;
+        std::cout << *(rit1.base() + 2) << std::endl;
+        std::cout << *(rit1.base() + 3) << std::endl;
+        //std::cout << rit1[0] << std::endl;
+        std::cout << rit1[-1] << std::endl;
+        std::cout << rit1[-2] << std::endl;
+        std::cout << rit1[-3] << std::endl;
+        --rit1;
+        std::cout << *rit1.base() << std::endl;
+        rit1--;
+        std::cout << *rit1 << std::endl;
+        rit1--;
+        std::cout << *rit1 << std::endl;
+        std::cout << *(rit1 + 2) << std::endl;
+        ++rit1;
+        std::cout << *rit1 << std::endl;
+        rit1++;
+        std::cout << *rit1 << std::endl;
+        std::cout << *(rit1 - 2) << std::endl;
+        rit1-=2;
+        std::cout << *rit1 << std::endl;
+        rit1+=1;
+        std::cout << *rit1 << std::endl;
+    }
+        {
+        std::cout << "Testing const_reverse_iterator comparisons and additional non-member operators" << std::endl;
+        NAMESPACE::vector<int> v1; 
+        NAMESPACE::vector<int>::const_iterator it1; 
+        v1.push_back(42);
+        v1.push_back(21);
+        v1.push_back(10);
+        it1 = v1.begin();
+        NAMESPACE::vector<int>::const_reverse_iterator rit1(it1);
+        it1+=2;
+        NAMESPACE::vector<int>::const_reverse_iterator rit2(v1.end()); 
+        std::cout << "Reverse iterator comparison > result : " << (rit2 > rit1) << std::endl;
+        std::cout << "Reverse iterator comparison < result : " << (rit2 < rit1) << std::endl;
+        std::cout << "Reverse iterator comparison <= result : " << (rit2 <= rit1) << std::endl;
+        std::cout << "Reverse iterator comparison >= result : " << (rit2 >= rit1) << std::endl;
+        std::cout << "Reverse iterator comparison == result : " << (rit2 == rit1) << std::endl;
+        std::cout << "Reverse iterator comparison != result : " << (rit2 != rit1) << std::endl;
+        std::cout << "Advancing rit with op+" << std::endl;
+        (rit2 + 2);
+        std::cout << *rit2 << std::endl;
+        std::cout << "Diff between 2 rit :" << (rit2 - rit1) << std::endl;
     }
     {
         std::cout << "Testing looping on reserve calls" << std::endl;
@@ -848,56 +974,51 @@ int main (void){
         //it2 = v2.begin();
         while (it2 != v1.end()){
             std::cout << "value in vector after swap : " << *it2 << std::endl;
-            it2++;
-        }
+          it2++;
+      }
     }
-    //{
-    //    NAMESPACE::vector<int> s1;
-    //    NAMESPACE::vector<int> s2;
-    //    NAMESPACE::vector<int> s3(5, 42);
-    //    NAMESPACE::vector<int> s4(5, 42);
-    //    NAMESPACE::vector<int> s5(4, 42);
-    //    NAMESPACE::vector<int> s6(5, 21);
-
-    //    std::cout << "TESTING OPERATORS both empty vector" << std::endl;
-    //    std::cout << "s1 < s2: " << (s1 < s2) << std::endl;
-    //    std::cout << "s1 > s2: " << (s1 > s2) << std::endl;
-    //    std::cout << "s1 == s2: " << (s1 == s2) << std::endl;
-    //    std::cout << "s1 != s2: " << (s1 != s2) << std::endl;
-    //    std::cout << "s1 <= s2: " << (s1 != s2) << std::endl;
-    //    std::cout << "s1 >= s2: " << (s1 != s2) << std::endl;
-
-    //    std::cout << "TESTING OPERATORS one empty vector" << std::endl;
-    //    std::cout << "s1 < s3: " << (s1 < s3) << std::endl;
-    //    std::cout << "s1 > s3: " << (s1 > s3) << std::endl;
-    //    std::cout << "s1 == s3: " << (s1 == s3) << std::endl;
-    //    std::cout << "s1 != s3: " << (s1 != s3) << std::endl;
-    //    std::cout << "s1 <= s3: " << (s1 != s3) << std::endl;
-    //    std::cout << "s1 >= s3: " << (s1 != s3) << std::endl;
-
-    //    std::cout << "TESTING OPERATORS non empty" << std::endl;
-    //    std::cout << "s6 < s3: " << (s6 < s3) << std::endl;
-    //    std::cout << "s6 > s3: " << (s6 > s3) << std::endl;
-    //    std::cout << "s6 == s3: " << (s6 == s3) << std::endl;
-    //    std::cout << "s6 != s3: " << (s6 != s3) << std::endl;
-    //    std::cout << "s6 <= s3: " << (s6 != s3) << std::endl;
-    //    std::cout << "s6 >= s3: " << (s6 != s3) << std::endl;
-
-    //    std::cout << "TESTING OPERATORS one vector is a subset of the other" << std::endl;
-    //    std::cout << "s5 < s3: " << (s5 < s3) << std::endl;
-    //    std::cout << "s5 > s3: " << (s5 > s3) << std::endl;
-    //    std::cout << "s5 == s3: " << (s5 == s3) << std::endl;
-    //    std::cout << "s5 != s3: " << (s5 != s3) << std::endl;
-    //    std::cout << "s5 <= s3: " << (s5 != s3) << std::endl;
-    //    std::cout << "s5 >= s3: " << (s5 != s3) << std::endl;
-
-
-    //    std::cout << "TESTING OPERATORS equal vectors" << std::endl;
-    //    std::cout << "s4 < s3: " << (s4 < s3) << std::endl;
-    //    std::cout << "s4 > s3: " << (s4 > s3) << std::endl;
-    //    std::cout << "s4 == s3: " << (s4 == s3) << std::endl;
-    //    std::cout << "s4 != s3: " << (s4 != s3) << std::endl;
-    //    std::cout << "s4 <= s3: " << (s4 != s3) << std::endl;
-    //    std::cout << "s4 >= s3: " << (s4 != s3) << std::endl;
-    //}
-    };
+    {
+        NAMESPACE::vector<int> s1;
+        NAMESPACE::vector<int> s2;
+        NAMESPACE::vector<int> s3(5, 42);
+        NAMESPACE::vector<int> s4(5, 42);
+        NAMESPACE::vector<int> s5(4, 42);
+        NAMESPACE::vector<int> s6(5, 21);
+        std::cout << "TESTING OPERATORS both empty vector" << std::endl;
+        std::cout << "s1 < s2: " << (s1 < s2) << std::endl;
+        std::cout << "s1 > s2: " << (s1 > s2) << std::endl;
+        std::cout << "s1 == s2: " << (s1 == s2) << std::endl;
+        std::cout << "s1 != s2: " << (s1 != s2) << std::endl;
+        std::cout << "s1 <= s2: " << (s1 != s2) << std::endl;
+        std::cout << "s1 >= s2: " << (s1 != s2) << std::endl;
+        std::cout << "TESTING OPERATORS one empty vector" << std::endl;
+        std::cout << "s1 < s3: " << (s1 < s3) << std::endl;
+        std::cout << "s1 > s3: " << (s1 > s3) << std::endl;
+        std::cout << "s1 == s3: " << (s1 == s3) << std::endl;
+        std::cout << "s1 != s3: " << (s1 != s3) << std::endl;
+        std::cout << "s1 <= s3: " << (s1 != s3) << std::endl;
+        std::cout << "s1 >= s3: " << (s1 != s3) << std::endl;
+        std::cout << "TESTING OPERATORS non empty" << std::endl;
+        std::cout << "s6 < s3: " << (s6 < s3) << std::endl;
+        std::cout << "s6 > s3: " << (s6 > s3) << std::endl;
+        std::cout << "s6 == s3: " << (s6 == s3) << std::endl;
+        std::cout << "s6 != s3: " << (s6 != s3) << std::endl;
+        std::cout << "s6 <= s3: " << (s6 != s3) << std::endl;
+        std::cout << "s6 >= s3: " << (s6 != s3) << std::endl;
+        std::cout << "TESTING OPERATORS one vector is a subset of the other" << std::endl;
+        std::cout << "s5 < s3: " << (s5 < s3) << std::endl;
+        std::cout << "s5 > s3: " << (s5 > s3) << std::endl;
+        std::cout << "s5 == s3: " << (s5 == s3) << std::endl;
+        std::cout << "s5 != s3: " << (s5 != s3) << std::endl;
+        std::cout << "s5 <= s3: " << (s5 != s3) << std::endl;
+        std::cout << "s5 >= s3: " << (s5 != s3) << std::endl;
+        std::cout << "TESTING OPERATORS equal vectors" << std::endl;
+        std::cout << "s4 < s3: " << (s4 < s3) << std::endl;
+        std::cout << "s4 > s3: " << (s4 > s3) << std::endl;
+        std::cout << "s4 == s3: " << (s4 == s3) << std::endl;
+        std::cout << "s4 != s3: " << (s4 != s3) << std::endl;
+        std::cout << "s4 <= s3: " << (s4 != s3) << std::endl;
+        std::cout << "s4 >= s3: " << (s4 != s3) << std::endl;
+    }
+}; //Namespace
+    
