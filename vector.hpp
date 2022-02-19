@@ -15,7 +15,6 @@
 
 namespace ft {
 
-// ! TODO: Rewrite specs for vector  - atm its stack specs
 /**
  * @brief The elements are stored contiguously, which means that elements can be accessed not only through iterators, 
  *        but also using offsets to regular pointers to elements. 
@@ -204,16 +203,60 @@ class vector {
         // The pointer is such that range [data(); data() + size()) is always a valid range, even if the container is empty (data() is not dereferenceable in that case).
         T* data() { return this->n; };
         const T* data() const { return this->n; };
-        //! ASSIGN TO DO
         /**
          * @brief Replaces the contents with count copies of value value
          */
-        //void assign( size_type count, const T& value ){};
+        void assign( size_type count, const T& value ){
+            n_allocator.destroy(n);
+            if (count > currentCapacity){
+                T *tmp_n = n_allocator.allocate(count);
+                size_type index = 0;
+                while (index < count){
+                    n_allocator.construct(tmp_n + index, value);
+                    ++index;
+                }
+                n_allocator.deallocate(n, currentCapacity);
+                currentCapacity = count;
+                n = tmp_n;
+            }
+            else {
+                size_type index = 0;
+                while (index < count){
+                    n_allocator.construct(n + index, value);
+                    ++index;
+                }
+            }
+            currentSize = count;
+        };
         /**
          * @brief Replaces the contents with copies of those in the range [first, last).
          * The behavior is undefined if either argument is an iterator into *this.
          */
-        //template< class InputIt > void assign( InputIt first, InputIt last );
+        template< class InputIt >
+        void assign( InputIt first, InputIt last,
+        typename ft::enable_if<!ft::is_integral<InputIt>::value>::type* = 0) {
+            size_type count = _distance(first, last);
+            n_allocator.destroy(n);
+            if (count > currentCapacity){
+                T *tmp_n = n_allocator.allocate(count);
+                size_type index = 0;
+                while (index < count){
+                    n_allocator.construct(tmp_n + index, *(first + index));
+                    ++index;
+                }
+                n_allocator.deallocate(n, currentCapacity);
+                currentCapacity = count;
+                n = tmp_n;
+            }
+            else {
+                size_type index = 0;
+                while (index < count){
+                    n_allocator.construct(n + index, *(first + index));
+                    ++index;
+                }
+            }
+            currentSize = count;
+        };
 
         /**
          * @brief Returns the allocator associated with the container.
@@ -340,7 +383,7 @@ class vector {
             size_type savedCapacity = currentCapacity;
             if (currentCapacity == 0) 
                 currentCapacity+= count;
-            while (currentSize + count > currentCapacity)
+            else while (currentSize + count > currentCapacity)
                 currentCapacity *= 2;
             try {
                 T *tmp_n = n_allocator.allocate(currentCapacity);
@@ -458,18 +501,21 @@ class vector {
                 return (end());
             return (after_removed_el);
         };
-
-        void push_back( const T& value ) {
-            insert(end(), value);
-        };
-
-        void pop_back() {
-
-            n_allocator.destroy(&n[--currentSize]);
-        };
+        /**
+         * @brief Appends the given element value to the end of the container.
+         *        If the new size() is greater than capacity() then all iterators and references (including the past-the-end iterator) are invalidated. 
+         *        Otherwise only the past-the-end iterator is invalidated.
+         */
+        void push_back( const T& value ) { insert(end(), value); };
+        /**
+         * @brief Removes the last element of the container. Calling pop_back on an empty container results in undefined behavior.
+         *        Iterators and references to the last element, as well as the end() iterator, are invalidated.
+         * 
+         */
+        void pop_back() { n_allocator.destroy(&n[--currentSize]); };
 
         /**
-         * Resizes the container to contain count elements.
+         * @brief Resizes the container to contain count elements.
          * If the current size is greater than count, the container is reduced to its first count elements.
          * If the current size is less than count, additional copies of value are appended.
         */
@@ -491,9 +537,10 @@ class vector {
         	a = b;
         	b = temp;
         };
+
     public:
         /**
-         * Exchanges the contents of the container with those of other.
+         * @brief Exchanges the contents of the container with those of other.
          * Does not invoke any move, copy, or swap operations on individual elements.
          * All iterators and references remain valid. The past-the-end iterator is invalidated.
          */
@@ -505,8 +552,6 @@ class vector {
             baseSwap(this->currentSize, other.currentSize);
         };
 
-        template< class _T, class _Alloc >
-        friend void swap( vector<_T, _Alloc>& lhs, vector<_T, _Alloc>& rhs );
 
     private:
         /**
@@ -525,13 +570,13 @@ class vector {
         template <class _T, class _Container>
         friend bool operator<(const ft::vector<_T, _Container> &lhs, const ft::vector<_T, _Container> &rhs);
 
-        //template <class _T, class _Container>
-        //friend bool operator==(const ft::vector<_T, _Container> &lhs, const ft::vector<_T, _Container> &rhs);
 };
 
 /**
- * Vector Non member functions
+* Vector Non member functions
 */
+template< class T, class Alloc >
+void swap( vector<T, Alloc>& lhs, vector<T, Alloc>& rhs ){ lhs.swap(rhs); };
 
 // Operator "<" and "==" are used to build the other operator overloads to limit the use of "friend" functions
 template< class T, class Container >
@@ -553,9 +598,6 @@ bool operator>( const ft::vector<T,Container>& lhs, const ft::vector<T,Container
 
 template< class T, class Container >
     bool operator>=( const ft::vector<T,Container>& lhs, const ft::vector<T,Container>& rhs ) { return !(lhs < rhs); };
-
-template< class _T, class _Alloc >
-void swap( ft::vector<_T, _Alloc>& lhs, ft::vector<_T, _Alloc>& rhs ){ lhs.swap(rhs); };
 
 }; // namespace
 #endif
