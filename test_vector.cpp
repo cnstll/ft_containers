@@ -62,6 +62,8 @@ int main (void){
         std::cout << "Testing copy ctor an empty vector" << std::endl;
         NAMESPACE::vector<int> s1;
         NAMESPACE::vector<int> s2(s1);
+        s2.insert(s2.begin(), 5, 42);
+        NAMESPACE::vector<int> s3(s2.rbegin(), s2.rend() - 2);
         std::cout << "Done" << std::endl;
     }
     {
@@ -169,6 +171,39 @@ int main (void){
         // std::cout << "s1 != s3: " << (s1 != s3) << std::endl;
         // std::cout << "s1 <= s3: " << (s1 != s3) << std::endl;
         // std::cout << "s1 >= s3: " << (s1 != s3) << std::endl;
+    }
+    {
+        std::cout << "Testing assign on int vector" << std::endl;
+        NAMESPACE::vector<int> s1;
+        NAMESPACE::vector<int> s2(23, 4);
+        s1.assign(5, 42);
+        NAMESPACE::vector<int>::iterator it1 = s1.begin();
+        std::cout << "Size : " << s1.size() << " -- Capacity : " << s1.capacity() << std::endl;
+        while (it1 != s1.end()){
+            std::cout << "Value after assign: " << *it1 << std::endl;
+            it1++;
+        }
+        s1.assign(17, 21);
+        std::cout << "Size : " << s1.size() << " -- Capacity : " << s1.capacity() << std::endl;
+        it1 = s1.begin();
+        while (it1 != s1.end()){
+            std::cout << "Value after assign: " << *it1 << std::endl;
+            it1++;
+        }
+        s1.assign(2, 10);
+        it1 = s1.begin();
+        std::cout << "Size : " << s1.size() << " -- Capacity : " << s1.capacity() << std::endl;
+        while (it1 != s1.end()){
+            std::cout << "Value after assign: " << *it1 << std::endl;
+            it1++;
+        }
+        s2.assign(s1.begin(), s1.end());
+        std::cout << "Size : " << s2.size() << " -- Capacity : " << s2.capacity() << std::endl;
+        it1 = s2.begin();
+        while (it1 != s2.end()){
+        std::cout << "Value after assign: " << *it1 << std::endl;
+        it1++;
+        }
     }
     {
         std::cout << "Testing simple iterator ctor" << std::endl;
@@ -912,13 +947,20 @@ int main (void){
         v1.swap(v2);
         std::cout << "Size : " << v1.size() << " -- Capacity : " << v1.capacity() << std::endl;
         std::cout << "Size : " << v2.size() << " -- Capacity : " << v2.capacity() << std::endl;
-        //it1 = v1.begin();
         while (it1 != v2.end()){
             std::cout << "value in vector after swap : " << *it1 << std::endl;
             it1++;
         }
-        //it2 = v2.begin();
         while (it2 != v1.end()){
+            std::cout << "value in vector after swap : " << *it2 << std::endl;
+            it2++;
+        }
+        swap(v1, v2);
+        while (it1 != v1.end()){
+            std::cout << "value in vector after swap : " << *it1 << std::endl;
+            it1++;
+        }
+        while (it2 != v2.end()){
             std::cout << "value in vector after swap : " << *it2 << std::endl;
             it2++;
         }
