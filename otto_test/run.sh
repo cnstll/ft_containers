@@ -37,9 +37,15 @@ then
 fi
 #echo -e "${YELLOW}STDERROR OUTPUT...${RESET}"
 #echo -e "${YELLOW}STL STDERROR: ${RESET}"
+start_stl=`date +%s%N`
 ./stl_vector > stl_${TESTED_CONTAINER}_output.log
+end_stl= `date +%s%N`
 #echo -e "${YELLOW}YOUR STDERROR: ${RESET}"
+start_yours=`date +%s%N`
 ./your_vector > your_${TESTED_CONTAINER}_output.log
+end_yours=`date +%s%N`
+echo -e STL: Execution time was `expr $end_stl - $start_stl` nanoseconds
+echo -e Yours: Execution time was `expr $end_yours - $start_yours` nanoseconds
 
 #echo
 diff  stl_${TESTED_CONTAINER}_output.log your_${TESTED_CONTAINER}_output.log > ${DIFF_FILE}

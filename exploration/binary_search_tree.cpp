@@ -1,12 +1,7 @@
-#include <iterator>
 #include <iostream>
 #include <vector>
-#include <climits>
-#include <algorithm>
 
 class binarySearchTree {
-
-
 
     struct node {
       int data;
@@ -16,7 +11,6 @@ class binarySearchTree {
     };
 
     node *root;
-
 
     node *_createNewNode(int data, node *parent){
       node *createdNode = new node;
@@ -41,7 +35,7 @@ class binarySearchTree {
 
     node *_insert(node *current, node *parent, int dataToInsert){
       if (current == NULL){
-        std::cout << "Parent: "<< parent->data << std::endl;
+        //std::cout << "Parent: "<< parent->data << std::endl;
         current = _createNewNode(dataToInsert, parent);
         return current;
       }
@@ -69,13 +63,13 @@ class binarySearchTree {
       }
       else {
         tmp = _getSuccessor(toRemove);
-        std::cout << tmp->data << " is successor.\n";
+        //std::cout << tmp->data << " is successor.\n";
         if (tmp->parentNode != toRemove){
           _subTreeShift(tmp, tmp->rightChild);
           tmp->rightChild = toRemove->rightChild;
           tmp->rightChild->parentNode = tmp;
         }
-        std::cout << "looking for successor\n";
+        //std::cout << "looking for successor\n";
         _subTreeShift(toRemove, tmp);
         tmp->leftChild = toRemove->leftChild;
         tmp->leftChild->parentNode = tmp;
@@ -87,7 +81,6 @@ class binarySearchTree {
     void _subTreeShift(node *removed, node *replacing){
     
       if (removed->parentNode == NULL){
-        std::cout << "Removing root \n";
         root = replacing; 
       }
       else if (removed == removed->parentNode->leftChild)
@@ -139,6 +132,16 @@ class binarySearchTree {
       return maxNode;
     };
 
+    std::size_t _getNodeLevel(node *current){
+      std::size_t level = 0;
+      node *tmp = current;
+      while (tmp->parentNode){
+        tmp = tmp->parentNode;
+        ++level;
+      }
+      return level;
+    }
+
     node *_search(node *current, int dataToFind){
       if (current == NULL)
         return NULL;
@@ -150,13 +153,37 @@ class binarySearchTree {
         return current;
     };
 
+    // void _printingTreeImage(node *current){
+    //  if (current){
+    //    if (current->parentNode && current->parentNode->rightChild == current){
+    //      img.insert(_getNodeLevel(current) + 1, _size(current) * 4, current->data);
+    //      img.insert(_getNodeLevel(current) + 2, _size(current) * 4, "/ \\");
+    //    }
+    //    else if (current->parentNode && current->parentNode->leftChild == current){
+    //      img.insert(_getNodeLevel(current), _size(current), current->data);
+    //      img.insert(_getNodeLevel(current) + 1, _size(current), "/ \\");
+    //    }
+    //    else {
+    //      img.insert(_getNodeLevel(current), _size(current), current->data);
+    //      img.insert(_getNodeLevel(current) + 1, _size(current), "/ \\");
+    //    }
+    //    _printingTreeImage(current->leftChild);
+    //    _printingTreeImage(current->rightChild);
+    //  }
+    //  if (current && current == _getMax(root)){
+    //    img.displayImg();
+    //  }
+    //};
 
-    void _inOrderTraversal(node *current){
-      if (current){
-
-        _inOrderTraversal(current->leftChild);
-        std::cout << current->data << " ";
-        _inOrderTraversal(current->rightChild);
+    void _printBinaryTree(const std::string& padding, node* current, bool hasRight)
+    { 
+      if( current != NULL )
+      {
+          std::cout << padding << (hasRight ? "|__" : "└──" );
+          // print the value of the node
+          std::cout << current->data << std::endl;
+          _printBinaryTree(padding + (hasRight ? "│   " : "    "), current->leftChild, (current->rightChild != NULL));
+          _printBinaryTree(padding + (hasRight ? "│   " : "    "), current->rightChild, false);
       }
     };
 
@@ -246,11 +273,11 @@ class binarySearchTree {
       }
 
       void search(int dataToSearch){
-        root = _search(root, dataToSearch);
+        _search(root, dataToSearch);
       }
 
       void displayTree(){
-        _inOrderTraversal(root);
+        _printBinaryTree("", root, false);
         std::cout << std::endl;
       }
 };
@@ -271,7 +298,7 @@ int main(){
 
   std::vector<int> v;
   int i = 0;
-  int max_size = 6;
+  int max_size = 42;
   while(i < max_size){
     v.push_back(genRandomNumber());
     i++;
@@ -279,18 +306,19 @@ int main(){
   binarySearchTree tree;
   i = 0;
   while (i < max_size){
-    std::cout << v[i] << " inserted.\n";
+    //std::cout << v[i] << " inserted.\n";
     tree.insert(v[i++]);
   }
   tree.displayTree();
-  std::cout << "Removing " << v[1] << std::endl;
-  tree.remove(v[0]);
-  tree.displayTree();
-  std::cout << "Removing " << v[3] << std::endl;
-  tree.remove(v[3]);
-  tree.displayTree();
-  std::cout << "Removing " << v[2] << std::endl;
-  tree.remove(v[2]);
-  tree.displayTree();
+  //tree.search(1000);
+  //std::cout << "Removing " << v[1] << std::endl;
+  //tree.remove(v[0]);
+  //tree.displayTree();
+  //std::cout << "Removing " << v[3] << std::endl;
+  //tree.remove(v[3]);
+  //tree.displayTree();
+  //std::cout << "Removing " << v[2] << std::endl;
+  //tree.remove(v[2]);
+  //tree.displayTree();
   return (0);
 }
