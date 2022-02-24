@@ -1,5 +1,7 @@
 #include <iostream>
 #include <vector>
+#define black true
+#define red   false
 
 class binarySearchTree {
 
@@ -8,6 +10,7 @@ class binarySearchTree {
       node *parentNode;
       node *leftChild;
       node *rightChild;
+      bool color;
     };
 
     node *root;
@@ -31,21 +34,139 @@ class binarySearchTree {
           _timber(root->rightChild);
           delete root;
       }
-    }
+    };
 
-    node *_insert(node *current, node *parent, int dataToInsert){
-      if (current == NULL){
-        //std::cout << "Parent: "<< parent->data << std::endl;
-        current = _createNewNode(dataToInsert, parent);
-        return current;
+    bool _isLeftChild(node *current, node *parent){
+      return (current == parent->leftChild);
+    };
+
+    bool _isRightChild(node *current, node *parent){
+      return (current == parent->rightChild);
+    };
+
+    bool _isRoot(node *current){
+      return (current->parentNode == NULL);
+    };
+
+    bool _isRed(node *current){
+      return (current->color == red);
+    };
+
+    bool _isBlack(node *current){
+      return (current->color == red);
+    };
+
+    bool _hasLeftChild(node *current){
+      return (current->leftChild != NULL);
+    };
+
+    bool _hasRightChild(node *current){
+      return (current->rightChild != NULL);
+    };
+
+    void _setColor(node *current, bool redOrBlack){
+        current->color = redOrBlack;
+    };
+    
+    void _leftRotate(node *rotatedParent){
+      node *rotatedChild = rotatedParent->rightChild;
+      rotatedParent->rightChild = rotatedChild->leftChild ? rotatedChild->leftChild : NULL;
+      if (_hasLeftChild(rotatedChild)){
+        rotatedChild->leftChild->parentNode = rotatedParent;
       }
-      else if (current->data < dataToInsert){
-          current->rightChild = _insert(current->rightChild, current, dataToInsert);
+      if (_isRoot(rotatedParent)){
+        root = rotatedChild;
+      } else if (_isLeftChild(rotatedParent, rotatedParent->parentNode)){
+        rotatedParent->parentNode->leftChild = rotatedChild;
+      } else {
+        rotatedParent->parentNode->rightChild = rotatedChild;
       }
-      else {
-          current->leftChild = _insert(current->leftChild, current, dataToInsert);
+      rotatedChild->leftChild = rotatedParent;
+      rotatedParent->parentNode = rotatedChild;
+    };
+
+    void _rightRotate(node *rotatedParent){
+      node *rotatedChild = rotatedParent->leftChild;
+      rotatedParent->leftChild = rotatedChild->rightChild ? rotatedChild->rightChild : NULL;
+      if (_hasRightChild(rotatedChild)){
+        rotatedChild->rightChild->parentNode = rotatedParent;
       }
-      return current;
+      rotatedChild->parentNode = rotatedParent->parentNode;
+      if (_isRoot(rotatedParent)){
+        root = rotatedChild;
+      } else if (_isRightChild(rotatedParent, rotatedParent->parentNode)){
+        rotatedParent->parentNode->rightChild = rotatedChild;
+      } else {
+        rotatedParent->parentNode->leftChild = rotatedChild;
+      }
+      rotatedChild->rightChild = rotatedParent;
+      rotatedParent->parentNode = rotatedChild;
+    };
+
+    void _balanceTreeAfterInsertion(node *current){
+      while (!_isRoot(current) && _isRed(current->parentNode)){
+        node *parent = current->parentNode;
+        node *grandpa = current->parentNode->parentNode;
+        node *u;
+        if (_isRightChild(parent, grandpa)){
+          if (_hasLeftChild(grandpa) && _isRed(parent->leftChild)){
+            _setColor(grandpa->leftChild, black);
+            _setColor(parent, black);
+            _setColor(grandpa, red);
+            current = grandpa;
+          } else {
+              if (_isLeftChild(current, parent)){
+              current = parent;
+              _rightRotate(current);
+            }
+            _setColor(parent, black);
+            _setColor(grandpa, red);
+            _leftRotate(grandpa);
+          }
+        } else {
+          if (_hasRightChild(grandpa) && _isRed(grandpa->rightChild)){
+            _setColor(grandpa->rightChild, black);
+            _setColor(parent, black);
+            _setColor(grandpa, red);
+            current = grandpa;
+          } else {
+            if (_isRightChild(current, parent)){
+              current = parent;
+              _leftRotate(current);
+            }
+            _setColor(parent, black);
+            _setColor(grandpa, red);
+            _rightRotate(grandpa);
+          }
+        }                    
+        if (current == root){
+          break;
+        }
+      } 
+      root->color = black;
+    };
+    
+    void _insert(int dataToInsert){
+      node *current = _createNewNode(dataToInsert, NULL);
+      node *rootCopy = root;
+      node *parent = NULL;
+      while(rootCopy){
+        parent = rootCopy;
+        if (current->data < rootCopy->data)
+          rootCopy = rootCopy->leftChild;
+        else
+          rootCopy = rootCopy->rightChild;
+      }
+      current->parentNode = parent;
+      if (parent == NULL){
+        root = current;
+      } else if (parent->data > current->data){
+        parent->leftChild = current;
+      } else {
+        parent->rightChild = current;
+      }
+      parent == NULL ? current->color = black : current->color = red;
+      _balanceTreeAfterInsertion(current);
     };
 
     node *_remove(node *toRemove){
@@ -181,7 +302,10 @@ class binarySearchTree {
       {
           std::cout << padding << (hasRight ? "|__" : "└──" );
           // print the value of the node
-          std::cout << current->data << std::endl;
+          if (current->color == red)
+            std::cout << "\033[31m" << current->data << "\033[0m"<< std::endl;
+          else
+            std::cout << current->data << std::endl;
           _printBinaryTree(padding + (hasRight ? "│   " : "    "), current->leftChild, (current->rightChild != NULL));
           _printBinaryTree(padding + (hasRight ? "│   " : "    "), current->rightChild, false);
       }
@@ -260,12 +384,9 @@ class binarySearchTree {
         root = NULL;
       };
 
-      int getData(node *current){ return current->data; }
+      int getData(node *current){ return current->data; };
       void insert(int dataToInsert){
-        if (root == NULL)
-          root = _createNewNode(dataToInsert, NULL);
-        else
-          root = _insert(root, root->parentNode, dataToInsert);
+        _insert(dataToInsert);
       }
 
       void remove(int dataToRemove){
@@ -298,7 +419,7 @@ int main(){
 
   std::vector<int> v;
   int i = 0;
-  int max_size = 122;
+  int max_size = 15;
   while(i < max_size){
     v.push_back(genRandomNumber());
     i++;
@@ -308,17 +429,17 @@ int main(){
   while (i < max_size){
     //std::cout << v[i] << " inserted.\n";
     tree.insert(v[i++]);
+    tree.displayTree();
   }
-  tree.displayTree();
-  tree.search(1000);
-  std::cout << "Removing " << v[1] << std::endl;
-  tree.remove(v[0]);
-  tree.displayTree();
-  std::cout << "Removing " << v[3] << std::endl;
-  tree.remove(v[3]);
-  tree.displayTree();
-  std::cout << "Removing " << v[2] << std::endl;
-  tree.remove(v[2]);
-  tree.displayTree();
+  //tree.search(1000);
+  //std::cout << "Removing " << v[1] << std::endl;
+  //tree.remove(v[0]);
+  //tree.displayTree();
+  //std::cout << "Removing " << v[3] << std::endl;
+  //tree.remove(v[3]);
+  //tree.displayTree();
+  //std::cout << "Removing " << v[2] << std::endl;
+  //tree.remove(v[2]);
+  //tree.displayTree();
   return (0);
 }
