@@ -1,7 +1,8 @@
 #include <iostream>
 #include <vector>
-#define black true
-#define red   false
+#include <cstdlib>
+#define black false
+#define red   true
 
 class binarySearchTree {
 
@@ -14,20 +15,22 @@ class binarySearchTree {
     };
 
     node *root;
+    node *sentinel;
 
-    node *_createNewNode(int data, node *parent){
+    node *_createNewNode(int data){
       node *createdNode = new node;
       createdNode->data = data;
-      createdNode->parentNode = parent;
-      createdNode->leftChild = NULL;
-      createdNode->rightChild = NULL;
+      createdNode->parentNode = NULL;
+      createdNode->leftChild = sentinel;
+      createdNode->rightChild = sentinel;
+      createdNode->color = red;
       return createdNode;
     };
 
     void _timber(node *root){
 
       //std::cout << "d" << std::endl;
-      if (!root)
+      if (root == sentinel)
         return;
       {
           _timber(root->leftChild);
@@ -57,11 +60,11 @@ class binarySearchTree {
     };
 
     bool _hasLeftChild(node *current){
-      return (current->leftChild != NULL);
+      return (current->leftChild != sentinel);
     };
 
     bool _hasRightChild(node *current){
-      return (current->rightChild != NULL);
+      return (current->rightChild != sentinel);
     };
 
     void _setColor(node *current, bool redOrBlack){
@@ -70,10 +73,11 @@ class binarySearchTree {
     
     void _leftRotate(node *rotatedParent){
       node *rotatedChild = rotatedParent->rightChild;
-      rotatedParent->rightChild = rotatedChild->leftChild ? rotatedChild->leftChild : NULL;
+      rotatedParent->rightChild = rotatedChild->leftChild;
       if (_hasLeftChild(rotatedChild)){
         rotatedChild->leftChild->parentNode = rotatedParent;
       }
+      rotatedChild->parentNode = rotatedParent->parentNode;
       if (_isRoot(rotatedParent)){
         root = rotatedChild;
       } else if (_isLeftChild(rotatedParent, rotatedParent->parentNode)){
@@ -87,7 +91,7 @@ class binarySearchTree {
 
     void _rightRotate(node *rotatedParent){
       node *rotatedChild = rotatedParent->leftChild;
-      rotatedParent->leftChild = rotatedChild->rightChild ? rotatedChild->rightChild : NULL;
+      rotatedParent->leftChild = rotatedChild->rightChild;
       if (_hasRightChild(rotatedChild)){
         rotatedChild->rightChild->parentNode = rotatedParent;
       }
@@ -104,12 +108,11 @@ class binarySearchTree {
     };
 
     void _balanceTreeAfterInsertion(node *current){
-      while (!_isRoot(current) && _isRed(current->parentNode)){
+      while (_isRed(current->parentNode)){
         node *parent = current->parentNode;
         node *grandpa = current->parentNode->parentNode;
-        node *u;
-        if (_isRightChild(parent, grandpa)){
-          if (_hasLeftChild(grandpa) && _isRed(parent->leftChild)){
+        if (parent == grandpa->rightChild){
+          if (_isRed(parent->leftChild)){
             _setColor(grandpa->leftChild, black);
             _setColor(parent, black);
             _setColor(grandpa, red);
@@ -124,7 +127,7 @@ class binarySearchTree {
             _leftRotate(grandpa);
           }
         } else {
-          if (_hasRightChild(grandpa) && _isRed(grandpa->rightChild)){
+          if (_isRed(grandpa->rightChild)){
             _setColor(grandpa->rightChild, black);
             _setColor(parent, black);
             _setColor(grandpa, red);
@@ -147,10 +150,10 @@ class binarySearchTree {
     };
     
     void _insert(int dataToInsert){
-      node *current = _createNewNode(dataToInsert, NULL);
+      node *current = _createNewNode(dataToInsert);
       node *rootCopy = root;
       node *parent = NULL;
-      while(rootCopy){
+      while(rootCopy != sentinel){
         parent = rootCopy;
         if (current->data < rootCopy->data)
           rootCopy = rootCopy->leftChild;
@@ -165,7 +168,14 @@ class binarySearchTree {
       } else {
         parent->rightChild = current;
       }
-      parent == NULL ? current->color = black : current->color = red;
+      std::cout << "Inserted key: " << current->data << std::endl;
+      if (_isRoot(current)){
+        current->color = black;
+        return;
+      }
+      if (_isRoot(current->parentNode)){
+        return;
+      }
       _balanceTreeAfterInsertion(current);
     };
 
@@ -274,31 +284,9 @@ class binarySearchTree {
         return current;
     };
 
-    // void _printingTreeImage(node *current){
-    //  if (current){
-    //    if (current->parentNode && current->parentNode->rightChild == current){
-    //      img.insert(_getNodeLevel(current) + 1, _size(current) * 4, current->data);
-    //      img.insert(_getNodeLevel(current) + 2, _size(current) * 4, "/ \\");
-    //    }
-    //    else if (current->parentNode && current->parentNode->leftChild == current){
-    //      img.insert(_getNodeLevel(current), _size(current), current->data);
-    //      img.insert(_getNodeLevel(current) + 1, _size(current), "/ \\");
-    //    }
-    //    else {
-    //      img.insert(_getNodeLevel(current), _size(current), current->data);
-    //      img.insert(_getNodeLevel(current) + 1, _size(current), "/ \\");
-    //    }
-    //    _printingTreeImage(current->leftChild);
-    //    _printingTreeImage(current->rightChild);
-    //  }
-    //  if (current && current == _getMax(root)){
-    //    img.displayImg();
-    //  }
-    //};
-
     void _printBinaryTree(const std::string& padding, node* current, bool hasRight)
     { 
-      if( current != NULL )
+      if( current != NULL && current != sentinel)
       {
           std::cout << padding << (hasRight ? "|__" : "└──" );
           // print the value of the node
@@ -374,14 +362,38 @@ class binarySearchTree {
       return std::max(lowestHeightLeft, lowestHeightRight) + 1;
     };
 
+    void printHelper(node *root, std::string indent, bool last) {
+    if (root != sentinel) {
+      std::cout << indent;
+      if (last) {
+        std::cout << "R----";
+        indent += "   ";
+      } else {
+        std::cout << "L----";
+        indent += "|  ";
+      }
 
+      std::string sColor = root->color ? "RED" : "BLACK";
+      if (root != sentinel)
+        std::cout << root->data << "(" << sColor << ")" << std::endl;
+      printHelper(root->leftChild, indent, false);
+      printHelper(root->rightChild, indent, true);
+    }
+  }
+    node *_createSentinel(){
+      sentinel = new node;
+      sentinel->color = black;
+      sentinel->leftChild = NULL;
+      sentinel->rightChild = NULL;
+      return sentinel;
+    }
 
     public:
 
-      binarySearchTree() : root(NULL) {};
+      binarySearchTree() : root(_createSentinel()) {};
       ~binarySearchTree(){
         _timber(root);
-        root = NULL;
+        delete sentinel;
       };
 
       int getData(node *current){ return current->data; };
@@ -400,6 +412,12 @@ class binarySearchTree {
       void displayTree(){
         _printBinaryTree("", root, false);
         std::cout << std::endl;
+      }
+
+      void printTree(){
+        if (root) {
+          printHelper(root, "", true);
+        }        
       }
 };
 
@@ -429,8 +447,8 @@ int main(){
   while (i < max_size){
     //std::cout << v[i] << " inserted.\n";
     tree.insert(v[i++]);
-    tree.displayTree();
   }
+  tree.printTree();
   //tree.search(1000);
   //std::cout << "Removing " << v[1] << std::endl;
   //tree.remove(v[0]);
