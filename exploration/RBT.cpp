@@ -56,7 +56,7 @@ class binarySearchTree {
     };
 
     bool _isBlack(node *current){
-      return (current->color == red);
+      return (current->color == black);
     };
 
     bool _hasLeftChild(node *current){
@@ -71,113 +71,232 @@ class binarySearchTree {
         current->color = redOrBlack;
     };
     
-    void _leftRotate(node *rotatedParent){
-      node *rotatedChild = rotatedParent->rightChild;
-      rotatedParent->rightChild = rotatedChild->leftChild;
-      if (_hasLeftChild(rotatedChild)){
-        rotatedChild->leftChild->parentNode = rotatedParent;
-      }
-      rotatedChild->parentNode = rotatedParent->parentNode;
-      if (_isRoot(rotatedParent)){
-        root = rotatedChild;
-      } else if (_isLeftChild(rotatedParent, rotatedParent->parentNode)){
-        rotatedParent->parentNode->leftChild = rotatedChild;
-      } else {
-        rotatedParent->parentNode->rightChild = rotatedChild;
-      }
-      rotatedChild->leftChild = rotatedParent;
-      rotatedParent->parentNode = rotatedChild;
-    };
+//    void _leftRotate(node *rotatedParent){
+//      node *rotatedChild = rotatedParent->rightChild;
+//      rotatedParent->rightChild = rotatedChild->leftChild;
+//      if (_hasLeftChild(rotatedChild)){
+//        rotatedChild->leftChild->parentNode = rotatedParent;
+//      }
+//      rotatedChild->parentNode = rotatedParent->parentNode;
+//      if (_isRoot(rotatedParent)){
+//        root = rotatedChild;
+//      } else if (_isLeftChild(rotatedParent, rotatedParent->parentNode)){
+//        rotatedParent->parentNode->leftChild = rotatedChild;
+//      } else {
+//        rotatedParent->parentNode->rightChild = rotatedChild;
+//      }
+//      rotatedChild->leftChild = rotatedParent;
+//      rotatedParent->parentNode = rotatedChild;
+//    };
+//
+//    void _rightRotate(node *rotatedParent){
+//      node *rotatedChild = rotatedParent->leftChild;
+//      rotatedParent->leftChild = rotatedChild->rightChild;
+//      if (_hasRightChild(rotatedChild)){
+//        rotatedChild->rightChild->parentNode = rotatedParent;
+//      }
+//      rotatedChild->parentNode = rotatedParent->parentNode;
+//      if (_isRoot(rotatedParent)){
+//        root = rotatedChild;
+//      } else if (_isRightChild(rotatedParent, rotatedParent->parentNode)){
+//        rotatedParent->parentNode->rightChild = rotatedChild;
+//      } else {
+//        rotatedParent->parentNode->leftChild = rotatedChild;
+//      }
+//      rotatedChild->rightChild = rotatedParent;
+//      rotatedParent->parentNode = rotatedChild;
+//    };
+//
+//    void _balanceTreeAfterInsertion(node *current){
+//      node *parent = current->parentNode;
+//      node *grandpa = current->parentNode->parentNode;
+//      while (_isRed(current->parentNode)){
+//        if (parent == grandpa->rightChild){
+//          if (_isRed(parent->leftChild)){
+//            _setColor(grandpa->leftChild, black);
+//            _setColor(parent, black);
+//            _setColor(grandpa, red);
+//            current = grandpa;
+//          } else {
+//              if (_isLeftChild(current, parent)){
+//              current = parent;
+//              _rightRotate(current);
+//            }
+//            _setColor(parent, black);
+//            _setColor(grandpa, red);
+//            _leftRotate(grandpa);
+//          }
+//        } else {
+//          if (_isRed(grandpa->rightChild)){
+//            _setColor(grandpa->rightChild, black);
+//            _setColor(parent, black);
+//            _setColor(grandpa, red);
+//            current = grandpa;
+//          } else {
+//            if (_isRightChild(current, parent)){
+//              current = parent;
+//              _leftRotate(current);
+//            }
+//            _setColor(parent, black);
+//            _setColor(grandpa, red);
+//            _rightRotate(grandpa);
+//          }
+//        }                    
+//        if (current == root){
+//          break;
+//        }
+//      } 
+//      root->color = black;
+//    };
+//    
+//    void _insert(int dataToInsert){
+//      node *current = _createNewNode(dataToInsert);
+//      node *rootCopy = root;
+//      node *parent = NULL;
+//      while(rootCopy != sentinel){
+//        parent = rootCopy;
+//        if (current->data < rootCopy->data)
+//          rootCopy = rootCopy->leftChild;
+//        else
+//          rootCopy = rootCopy->rightChild;
+//      }
+//      current->parentNode = parent;
+//      if (parent == NULL){
+//        root = current;
+//      } else if (parent->data > current->data){
+//        parent->leftChild = current;
+//      } else {
+//        parent->rightChild = current;
+//      }
+//      std::cout << "Inserted key: " << current->data << std::endl;
+//      if (_isRoot(current)){
+//        current->color = black;
+//        return;
+//      }
+//      if (_isRoot(current->parentNode)){
+//        return;
+//      }
+//      _balanceTreeAfterInsertion(current);
+//    };
 
-    void _rightRotate(node *rotatedParent){
-      node *rotatedChild = rotatedParent->leftChild;
-      rotatedParent->leftChild = rotatedChild->rightChild;
-      if (_hasRightChild(rotatedChild)){
-        rotatedChild->rightChild->parentNode = rotatedParent;
-      }
-      rotatedChild->parentNode = rotatedParent->parentNode;
-      if (_isRoot(rotatedParent)){
-        root = rotatedChild;
-      } else if (_isRightChild(rotatedParent, rotatedParent->parentNode)){
-        rotatedParent->parentNode->rightChild = rotatedChild;
-      } else {
-        rotatedParent->parentNode->leftChild = rotatedChild;
-      }
-      rotatedChild->rightChild = rotatedParent;
-      rotatedParent->parentNode = rotatedChild;
-    };
+  void leftRotate(node *rotatedParent) {
+  node *rotatedChild = rotatedParent->rightChild;
+    rotatedParent->rightChild = rotatedChild->leftChild;
+    if (rotatedChild->leftChild != sentinel) {
+      rotatedChild->leftChild->parentNode = rotatedParent;
+    }
+    rotatedChild->parentNode = rotatedParent->parentNode;
+    if (rotatedParent->parentNode == NULL) {
+      this->root = rotatedChild;
+    } else if (rotatedParent == rotatedParent->parentNode->leftChild) {
+      rotatedParent->parentNode->leftChild = rotatedChild;
+    } else {
+      rotatedParent->parentNode->rightChild = rotatedChild;
+    }
+    rotatedChild->leftChild = rotatedParent;
+    rotatedParent->parentNode = rotatedChild;
+  }
 
-    void _balanceTreeAfterInsertion(node *current){
-      while (_isRed(current->parentNode)){
-        node *parent = current->parentNode;
-        node *grandpa = current->parentNode->parentNode;
-        if (parent == grandpa->rightChild){
-          if (_isRed(parent->leftChild)){
-            _setColor(grandpa->leftChild, black);
-            _setColor(parent, black);
-            _setColor(grandpa, red);
-            current = grandpa;
-          } else {
-              if (_isLeftChild(current, parent)){
-              current = parent;
-              _rightRotate(current);
-            }
-            _setColor(parent, black);
-            _setColor(grandpa, red);
-            _leftRotate(grandpa);
-          }
+  void rightRotate(node *rotatedParent) {
+  node *rotatedChild = rotatedParent->leftChild;
+    rotatedParent->leftChild = rotatedChild->rightChild;
+    if (rotatedChild->rightChild != sentinel) {
+      rotatedChild->rightChild->parentNode = rotatedParent;
+    }
+    rotatedChild->parentNode = rotatedParent->parentNode;
+    if (rotatedParent->parentNode == NULL) {
+      this->root = rotatedChild;
+    } else if (rotatedParent == rotatedParent->parentNode->rightChild) {
+      rotatedParent->parentNode->rightChild = rotatedChild;
+    } else {
+      rotatedParent->parentNode->leftChild = rotatedChild;
+    }
+    rotatedChild->rightChild = rotatedParent;
+    rotatedParent->parentNode = rotatedChild;
+  }
+  // For balancing the tree after insertion
+  void insertFix(node *k) {
+  node *u;
+    while (k->parentNode->color == 1) {
+      if (k->parentNode == k->parentNode->parentNode->rightChild) {
+        u = k->parentNode->parentNode->leftChild;
+        if (u->color == 1) {
+          u->color = 0;
+          k->parentNode->color = 0;
+          k->parentNode->parentNode->color = 1;
+          k = k->parentNode->parentNode;
         } else {
-          if (_isRed(grandpa->rightChild)){
-            _setColor(grandpa->rightChild, black);
-            _setColor(parent, black);
-            _setColor(grandpa, red);
-            current = grandpa;
-          } else {
-            if (_isRightChild(current, parent)){
-              current = parent;
-              _leftRotate(current);
-            }
-            _setColor(parent, black);
-            _setColor(grandpa, red);
-            _rightRotate(grandpa);
+          if (k == k->parentNode->leftChild) {
+            k = k->parentNode;
+            rightRotate(k);
           }
-        }                    
-        if (current == root){
-          break;
+          k->parentNode->color = 0;
+          k->parentNode->parentNode->color = 1;
+          leftRotate(k->parentNode->parentNode);
         }
-      } 
-      root->color = black;
-    };
-    
-    void _insert(int dataToInsert){
-      node *current = _createNewNode(dataToInsert);
-      node *rootCopy = root;
-      node *parent = NULL;
-      while(rootCopy != sentinel){
-        parent = rootCopy;
-        if (current->data < rootCopy->data)
-          rootCopy = rootCopy->leftChild;
-        else
-          rootCopy = rootCopy->rightChild;
-      }
-      current->parentNode = parent;
-      if (parent == NULL){
-        root = current;
-      } else if (parent->data > current->data){
-        parent->leftChild = current;
       } else {
-        parent->rightChild = current;
+        u = k->parentNode->parentNode->rightChild;
+
+        if (u->color == 1) {
+          u->color = 0;
+          k->parentNode->color = 0;
+          k->parentNode->parentNode->color = 1;
+          k = k->parentNode->parentNode;
+        } else {
+          if (k == k->parentNode->rightChild) {
+            k = k->parentNode;
+            leftRotate(k);
+          }
+          k->parentNode->color = 0;
+          k->parentNode->parentNode->color = 1;
+          rightRotate(k->parentNode->parentNode);
+        }
       }
-      std::cout << "Inserted key: " << current->data << std::endl;
-      if (_isRoot(current)){
-        current->color = black;
-        return;
+      if (k == root) {
+        break;
       }
-      if (_isRoot(current->parentNode)){
-        return;
+    }
+    root->color = 0;
+  }
+
+  void _insert(int key){
+    node *current = new node;
+    current->parentNode = NULL;
+    current->data = key;
+    current->leftChild = sentinel;
+    current->rightChild = sentinel;
+    current->color = 1;
+
+    node *parent = NULL;
+    node *rootCopy = this->root;
+
+    while (rootCopy != sentinel) {
+      parent = rootCopy;
+      if (current->data < rootCopy->data) {
+        rootCopy = rootCopy->leftChild;
+      } else {
+        rootCopy = rootCopy->rightChild;
       }
-      _balanceTreeAfterInsertion(current);
-    };
+    }
+    current->parentNode = current;
+    if (parent == NULL) {
+      root = current;
+    } else if (current->data < parent->data) {
+      parent->leftChild = current;
+    } else {
+      parent->rightChild = current;
+    }
+
+    if (current->parentNode == NULL) {
+      current->color = 0;
+      return;
+    }
+
+    if (current->parentNode->parentNode == NULL) {
+      return;
+    }
+    insertFix(current);
+  }
 
     node *_remove(node *toRemove){
     
@@ -390,7 +509,13 @@ class binarySearchTree {
 
     public:
 
-      binarySearchTree() : root(_createSentinel()) {};
+      binarySearchTree(){
+        sentinel = new node;
+        sentinel->color = black;
+        sentinel->leftChild = NULL;
+        sentinel->rightChild = NULL;
+        root = sentinel;
+      }
       ~binarySearchTree(){
         _timber(root);
         delete sentinel;
