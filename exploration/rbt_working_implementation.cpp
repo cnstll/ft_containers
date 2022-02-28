@@ -1,5 +1,3 @@
-// Implementing Red-Black Tree in C++
-
 #include <iostream>
 #include <cstdlib>
 #include <vector>
@@ -15,30 +13,34 @@ struct Node {
 };
 
 class RedBlackTree {
-   private:
+
+
   Node *root;
   Node *sentinel;
 
-  void preOrderTraversal(Node * node) {
+  /*
+  * HELPER FUNCTIONS
+  */
+  void _preOrderTraversal(Node * node) {
     if (node != sentinel) {
       std::cout << node->data << " ";
-      preOrderTraversal(node->left);
-      preOrderTraversal(node->right);
+      _preOrderTraversal(node->left);
+      _preOrderTraversal(node->right);
     }
   }
 
-  void inOrderTraversal(Node * node) {
+  void _inOrderTraversal(Node * node) {
     if (node != sentinel) {
-      inOrderTraversal(node->left);
+      _inOrderTraversal(node->left);
       std::cout << node->data << " ";
-      inOrderTraversal(node->right);
+      _inOrderTraversal(node->right);
     }
   }
 
-  void postOrderTraversal(Node * node) {
+  void _postOrderTraversal(Node * node) {
     if (node != sentinel) {
-      postOrderTraversal(node->left);
-      postOrderTraversal(node->right);
+      _postOrderTraversal(node->left);
+      _postOrderTraversal(node->right);
       std::cout << node->data << " ";
     }
   }
@@ -70,147 +72,54 @@ class RedBlackTree {
   bool _isRightChild(Node *current, Node *parent){
     return (current == parent->right);
   };
+
+  /**
+   * @brief search tree with in order traversal method
+   * 
+   * @param node active node
+   * @param key data searched in the tree
+   * @return address of the node found 
+   */
   
-  Node * searchTreeHelper(Node * node, int key) {
+  Node *_searchTree(Node * node, int key) {
     if (node == sentinel || key == node->data) {
       return node;
     }
 
     if (key < node->data) {
-      return searchTreeHelper(node->left, key);
+      return _searchTree(node->left, key);
     }
-    return searchTreeHelper(node->right, key);
+    return _searchTree(node->right, key);
   }
-
-void _recolorAndBalanceTreeAfterDelete(Node * current) {
-  Node * s;
-  while (current != root && current->color == black) {
-    if (current == current->parent->left) {
-      s = current->parent->right;
-      //D3 case
-      if (_isRed(s)) {
-        _setColor(s, black);
-        _setColor(current->parent, red);
-        _leftRotate(current->parent);
-        s = current->parent->right;
-      }
-      //D1 Case
-      if (_isBlack(s->left) && _isBlack(s->right)) {
-        _setColor(s, red);
-        current = current->parent;
-      } else {
-        if (_isBlack(s->right)) {
-          _setColor(s->left, black);
-          _setColor(s, black);
-          _rightRotate(s);
-          s = current->parent->right;
-        }
-        _setColor(s, current->parent->color);
-        _setColor(current->parent, black);
-        _setColor(s->right, black);
-        _leftRotate(current->parent);
-        current = root;
-      }
-    } else {
-      s = current->parent->left;
-      //D3
-      if (_isRed(s)) {
-        _setColor(s, black);
-        _setColor(current->parent, red);
-        _rightRotate(current->parent);
-        s = current->parent->left;
-      }
-      //D1
-      if (_isBlack(s->left) && _isBlack(s->right)) {
-        _setColor(s, red);
-        current = current->parent;
-      } else {
-        if (_isBlack(s->left)) {
-          _setColor(s->right, black);
-          _setColor(s,red);
-          _leftRotate(s);
-          s = current->parent->left;
-        }
-        _setColor(s, current->parent->color);
-        _setColor(current->parent, black);
-        _setColor(s->left, black);
-        _rightRotate(current->parent);
-        current = root;
-      }
-    }
-  }
-  _setColor(current, black);
-};
-  /**
-   * @brief reconnect relinkedNode to the deletedNode parent from the parent point of view and the deletedNode point of view
-   * 
-   * @param deletedNode node being replaced by relinkdeNode 
-   * @param relinkedNode node that need to be reconnected to the parent of deletedNode
-   */
-  void relinkNode(Node *deletedNode, Node *relinkedNode) {
-    if (deletedNode->parent == NULL) {
-      root = relinkedNode;
-    } else if (deletedNode == deletedNode->parent->left) {
-      deletedNode->parent->left = relinkedNode;
-    } else {
-      deletedNode->parent->right = relinkedNode;
-    }
-    relinkedNode->parent = deletedNode->parent;
-  }
-
-  void deleteNodeHelper(Node * current, int key) {
-    Node *deletedNode = sentinel;
-    Node *replacingNode; 
-    Node *successorOfDeletedNode;
-    //search algo for the node to be deleted which will be "deletedNode"
-    while (current != sentinel) {
-      if (current->data == key) {
-        deletedNode = current;
-      }
-      if (current->data <= key) {
-        current = current->right;
-      } else {
-        current = current->left;
-      }
-    }
-    if (deletedNode == sentinel) {
-      std::cout << "Key not found in the tree" << std::endl;
+  void _timber(Node *root){
+    //std::cout << "d" << std::endl;
+    if (root == sentinel)
       return;
+    {
+        _timber(root->left);
+        _timber(root->right);
+        delete root;
     }
+  };
 
-    successorOfDeletedNode = deletedNode;
-    bool deletedNodeOriginalColor = deletedNode->color;
-    if (deletedNode->left == sentinel) {
-      replacingNode = deletedNode->right;
-      relinkNode(deletedNode, deletedNode->right);
-    } else if (deletedNode->right == sentinel) {
-      replacingNode = deletedNode->left;
-      relinkNode(deletedNode, deletedNode->left);
-    } else {
-      successorOfDeletedNode = getMin(deletedNode->right);
-      deletedNodeOriginalColor = successorOfDeletedNode->color;
-      replacingNode = successorOfDeletedNode->right;
-      //is successor a child of the deletedNode?
-      if (successorOfDeletedNode->parent == deletedNode) {
-        replacingNode->parent = successorOfDeletedNode;
-      } else {
-        relinkNode(successorOfDeletedNode, successorOfDeletedNode->right);
-        successorOfDeletedNode->right = deletedNode->right;
-        successorOfDeletedNode->right->parent = successorOfDeletedNode;
-      }
-      relinkNode(deletedNode, successorOfDeletedNode);
-      successorOfDeletedNode->left = deletedNode->left;
-      successorOfDeletedNode->left->parent = successorOfDeletedNode;
-      successorOfDeletedNode->color = deletedNode->color;
+  void _printTree(const std::string& padding, Node* current, bool hasRight){ 
+    if(current != sentinel)
+    {
+        std::cout << padding << (hasRight ? "|__" : "└──" );
+        // print the value of the node
+        if (current->color == red)
+          std::cout << "\033[31m" << current->data << "\033[0m"<< std::endl;
+        else
+          std::cout << current->data << std::endl;
+        _printTree(padding + (hasRight ? "│   " : "    "), current->left, (current->right != sentinel));
+        _printTree(padding + (hasRight ? "│   " : "    "), current->right, false);
     }
-    delete deletedNode;
-    if (deletedNodeOriginalColor == black) {
-      _recolorAndBalanceTreeAfterDelete(replacingNode);
-    }
-  }
+  };
 
+  /* 
+   *  INSERTION SECTION
+   */
 
-  // For balancing the tree after insertion
   void _recolorAndBalanceTreeAfterInsert(Node * current) {
     Node *u;
     while (_isRed(current->parent)) {
@@ -290,32 +199,181 @@ void _recolorAndBalanceTreeAfterDelete(Node * current) {
     rotatedParent->parent = rotatedChild;
   }
 
-  void _timber(Node *root){
+  void _insert(int key){
+      Node *insertedNode = new Node;
+      insertedNode->parent = NULL;
+      insertedNode->data = key;
+      insertedNode->left = sentinel;
+      insertedNode->right = sentinel;
+      insertedNode->color = red;
+      Node *savedParent = NULL;
+      Node *savedRoot = this->root;
 
-      //std::cout << "d" << std::endl;
-      if (root == sentinel)
+      while (savedRoot != sentinel) {
+        savedParent = savedRoot;
+        if (insertedNode->data < savedRoot->data) {
+          savedRoot = savedRoot->left;
+        } else {
+          savedRoot = savedRoot->right;
+        }
+      }
+      insertedNode->parent = savedParent;
+      if (savedParent == NULL) {
+        root = insertedNode;
+      } else if (insertedNode->data < savedParent->data) {
+        savedParent->left = insertedNode;
+      } else {
+        savedParent->right = insertedNode;
+      }
+      if (insertedNode->parent == NULL) {
+        insertedNode->color = black;
         return;
-      {
-          _timber(root->left);
-          _timber(root->right);
-          delete root;
       }
+      if (insertedNode->parent->parent == NULL) {
+        return;
+      }
+
+      _recolorAndBalanceTreeAfterInsert(insertedNode);
+  };
+  /* 
+   *  END INSERTION SECTION
+   */
+
+  /* 
+   *  REMOVE SECTION
+   */  
+  void _recolorAndBalanceTreeAfterDelete(Node * current) {
+    Node * s;
+    while (current != root && current->color == black) {
+      if (current == current->parent->left) {
+        s = current->parent->right;
+        //D3 case
+        if (_isRed(s)) {
+          _setColor(s, black);
+          _setColor(current->parent, red);
+          _leftRotate(current->parent);
+          s = current->parent->right;
+        }
+        //D1 Case
+        if (_isBlack(s->left) && _isBlack(s->right)) {
+          _setColor(s, red);
+          current = current->parent;
+        } else {
+          if (_isBlack(s->right)) {
+            _setColor(s->left, black);
+            _setColor(s, black);
+            _rightRotate(s);
+            s = current->parent->right;
+          }
+          _setColor(s, current->parent->color);
+          _setColor(current->parent, black);
+          _setColor(s->right, black);
+          _leftRotate(current->parent);
+          current = root;
+        }
+      } else {
+        s = current->parent->left;
+        //D3
+        if (_isRed(s)) {
+          _setColor(s, black);
+          _setColor(current->parent, red);
+          _rightRotate(current->parent);
+          s = current->parent->left;
+        }
+        //D1
+        if (_isBlack(s->left) && _isBlack(s->right)) {
+          _setColor(s, red);
+          current = current->parent;
+        } else {
+          if (_isBlack(s->left)) {
+            _setColor(s->right, black);
+            _setColor(s,red);
+            _leftRotate(s);
+            s = current->parent->left;
+          }
+          _setColor(s, current->parent->color);
+          _setColor(current->parent, black);
+          _setColor(s->left, black);
+          _rightRotate(current->parent);
+          current = root;
+        }
+      }
+    }
+    _setColor(current, black);
   };
 
-  void _printBinaryTree(const std::string& padding, Node* current, bool hasRight)
-    { 
-      if(current != sentinel)
-      {
-          std::cout << padding << (hasRight ? "|__" : "└──" );
-          // print the value of the node
-          if (current->color == red)
-            std::cout << "\033[31m" << current->data << "\033[0m"<< std::endl;
-          else
-            std::cout << current->data << std::endl;
-          _printBinaryTree(padding + (hasRight ? "│   " : "    "), current->left, (current->right != sentinel));
-          _printBinaryTree(padding + (hasRight ? "│   " : "    "), current->right, false);
+  /**
+   * @brief reconnect relinkedNode to the deletedNode parent from the parent point of view and the deletedNode point of view
+   * 
+   * @param deletedNode node being replaced by relinkdeNode 
+   * @param relinkedNode node that need to be reconnected to the parent of deletedNode
+   */
+  void relinkNode(Node *deletedNode, Node *relinkedNode) {
+    if (deletedNode->parent == NULL) {
+      root = relinkedNode;
+    } else if (deletedNode == deletedNode->parent->left) {
+      deletedNode->parent->left = relinkedNode;
+    } else {
+      deletedNode->parent->right = relinkedNode;
+    }
+    relinkedNode->parent = deletedNode->parent;
+  }
+
+  void _deleteNode(Node * current, int key) {
+    Node *deletedNode = sentinel;
+    Node *replacingNode; 
+    Node *successorOfDeletedNode;
+    //search algo for the node to be deleted which will be "deletedNode"
+    // while (current != sentinel) {
+    //   if (current->data == key) {
+    //     deletedNode = current;
+    //   }
+    //   if (current->data <= key) {
+    //     current = current->right;
+    //   } else {
+    //     current = current->left;
+    //   }
+    // }
+    deletedNode = _searchTree(current, key);
+    if (deletedNode == sentinel) {
+      std::cout << "Key not found in the tree" << std::endl;
+      return;
+    }
+
+    successorOfDeletedNode = deletedNode;
+    bool deletedNodeOriginalColor = deletedNode->color;
+    if (deletedNode->left == sentinel) {
+      replacingNode = deletedNode->right;
+      relinkNode(deletedNode, deletedNode->right);
+    } else if (deletedNode->right == sentinel) {
+      replacingNode = deletedNode->left;
+      relinkNode(deletedNode, deletedNode->left);
+    } else {
+      successorOfDeletedNode = getMin(deletedNode->right);
+      deletedNodeOriginalColor = successorOfDeletedNode->color;
+      replacingNode = successorOfDeletedNode->right;
+      //is successor a child of the deletedNode?
+      if (successorOfDeletedNode->parent == deletedNode) {
+        replacingNode->parent = successorOfDeletedNode;
+      } else {
+        relinkNode(successorOfDeletedNode, successorOfDeletedNode->right);
+        successorOfDeletedNode->right = deletedNode->right;
+        successorOfDeletedNode->right->parent = successorOfDeletedNode;
       }
-  };
+      relinkNode(deletedNode, successorOfDeletedNode);
+      successorOfDeletedNode->left = deletedNode->left;
+      successorOfDeletedNode->left->parent = successorOfDeletedNode;
+      successorOfDeletedNode->color = deletedNode->color;
+    }
+    delete deletedNode;
+    if (deletedNodeOriginalColor == black) {
+      _recolorAndBalanceTreeAfterDelete(replacingNode);
+    }
+  }
+  /* 
+   *  END REMOVE SECTION
+   */
+
 
   public:
 
@@ -334,7 +392,7 @@ void _recolorAndBalanceTreeAfterDelete(Node * current) {
 
 
     Node * searchTree(int k) {
-      return searchTreeHelper(this->root, k);
+      return _searchTree(this->root, k);
     }
 
     Node *getMin(Node * node) {
@@ -374,59 +432,27 @@ void _recolorAndBalanceTreeAfterDelete(Node * current) {
         return y;
     };
 
-    void insert(int key) {
-      Node *insertedNode = new Node;
-      insertedNode->parent = NULL;
-      insertedNode->data = key;
-      insertedNode->left = sentinel;
-      insertedNode->right = sentinel;
-      insertedNode->color = red;
-      Node *savedParent = NULL;
-      Node *savedRoot = this->root;
-
-      while (savedRoot != sentinel) {
-        savedParent = savedRoot;
-        if (insertedNode->data < savedRoot->data) {
-          savedRoot = savedRoot->left;
-        } else {
-          savedRoot = savedRoot->right;
-        }
-      }
-      insertedNode->parent = savedParent;
-      if (savedParent == NULL) {
-        root = insertedNode;
-      } else if (insertedNode->data < savedParent->data) {
-        savedParent->left = insertedNode;
-      } else {
-        savedParent->right = insertedNode;
-      }
-      if (insertedNode->parent == NULL) {
-        insertedNode->color = black;
-        return;
-      }
-      if (insertedNode->parent->parent == NULL) {
-        return;
-      }
-
-      _recolorAndBalanceTreeAfterInsert(insertedNode);
-    }
-
-    Node * getRoot() {
+    Node * getRoot(){
       return this->root;
-    }
+    };
 
-    int getRootData() {
-      return this->root->data;
-    }
+    int getRootData(){
+      return getRoot()->data;
+    };
 
-    void remove(int data) {
-      deleteNodeHelper(this->root, data);
-    }
-    void printTree() {
+    void insert(int key) {
+      _insert(key);
+    };
+
+    void remove(int data){
+      _deleteNode(this->root, data);
+    };
+
+    void printTree(){
       if (root) {
-        _printBinaryTree("", this->root, true);
+        _printTree("", this->root, true);
       }
-    }
+    };
 };
 
 int genRandomNumber(){
