@@ -70,31 +70,31 @@ done
 for test in ./${TESTED_FILES_FOLDER}${TESTED_CONTAINER}_testing/*.cpp; do
 
     COUNT_TOTAL_TESTS=$((COUNT_TOTAL_TESTS + 1))
-    c++ ${COMPILATION_FLAGS} ${test} -o ${STL_BIN} -D NAMESPACE="std" 
+    c++ ${COMPILATION_FLAGS} ${test} -o ${STL_BIN} -D NAMESPACE="std"
     c++ ${COMPILATION_FLAGS} ${test} -o ${YOUR_BIN} -D NAMESPACE="ft"
     if [ $? -eq 0 ]
     then
         ./${STL_BIN} > "${STL_OUTPUT_FOLDER}${STL_OUTPUT}.log"
         ./${YOUR_BIN} > "${YOUR_OUTPUT_FOLDER}${YOUR_OUTPUT}.log"
 
+		test_name=$(basename ${test} | sed "s'\.cpp''")
+        diff  ${STL_OUTPUT_FOLDER}${STL_OUTPUT}.log ${YOUR_OUTPUT_FOLDER}${YOUR_OUTPUT}.log > ${DIFF_FOLDER}${DIFF_FILE}_${test_name}
 
-        diff  ${STL_OUTPUT} ${YOUR_OUTPUT} > ${DIFF_FOLDER}${DIFF_FILE}_${test}
-
-        if [ -s "${DIFF_FOLDER}${DIFF_FILE}_${test}" ]
+        if [ -s "${DIFF_FOLDER}${DIFF_FILE}_${test_name}" ]
         then
             echo -e "EXECUTION: ${RED}FAILED${RESET}"
         else
             echo -e "EXECUTION: ${GREEN}SUCCESS${RESET}"
             COUNT_PASSED_TESTS=$((COUNT_PASSED_TESTS + 1))
-            rm -f ${DIFF_FOLDER}${DIFF_FILE}_${test}
+            rm -f ${DIFF_FOLDER}${DIFF_FILE}_${test_name}
         fi
     fi
     rm -f ${STL_BIN} ${YOUR_BIN}
 done
 
 # if [ $? != 0 ]
-# then
-#     echo -e "${RED} >> COMPILATION ERROR FROM ORIGINAL LIB${RESET}"
+# thel
+#l    echo -e "${RED} >> COMPILATION ERROR FROM ORIGINAL LIB${RESET}"
 #     exit 1
 # fi
 # if [ $? != 0 ]
