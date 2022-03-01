@@ -7,7 +7,7 @@ namespace ft {
 template<
     class Key,
     class T,
-    class Compare = ft::less<Key>, 
+    class Compare = std::less<Key>, 
     class Allocator = std::allocator<std::pair<const Key, T> > 
 > class map {
 public:
@@ -15,25 +15,25 @@ public:
   typedef Key                                key_type;                
   typedef T                                  mapped_type;             
   typedef std::pair<const Key, T>            value_type;// ! Recoder std::pair           
-  typedef tree_t::size_type                  size_type;               
-  typedef tree_t::difference_type            difference_type;         
+  //typedef RedBlackTree::size_type                  size_type;               
+  //typedef RedBlackTree::difference_type            difference_type;         
   typedef Compare                            key_compare;             
   typedef Allocator                          allocator_type;          
-  typedef tree_t::reference                  reference;               
-  typedef tree_t::const_reference            const_reference;         
-  typedef tree_t::pointer                    pointer;                 
-  typedef tree_t::const_pointer              const_pointer;           
-  typedef tree_t::iterator                   iterator;                
-  typedef tree_t::const_iterator             const_iterator;          
-  typedef tree_t::reverse_iterator           reverse_iterator;        
-  typedef tree_t::const_reverse_iterator     const_reverse_iterator;  
-  typedef tree_t::stored_allocator_type      stored_allocator_type;   
+  //typedef RedBlackTree::reference                  reference;               
+  //typedef RedBlackTree::const_reference            const_reference;         
+  //typedef RedBlackTree::pointer                    pointer;                 
+  //typedef RedBlackTree::const_pointer              const_pointer;           
+  //typedef RedBlackTree::iterator                   iterator;                
+  //typedef RedBlackTree::const_iterator             const_iterator;          
+  //typedef RedBlackTree::reverse_iterator           reverse_iterator;        
+  //typedef RedBlackTree::const_reverse_iterator     const_reverse_iterator;  
+  //typedef RedBlackTree::stored_allocator_type      stored_allocator_type;   
   //typedef unspecified                        nonconst_impl_value_type;
   //typedef value_compare_impl                 value_compare;           
 
   // construct/copy/destruct
   map(){};
-  explicit map(const Compare &, const allocator_type & = allocator_type()){};
+  //explicit map(const Compare& comp, const allocator_type& alloc = Allocator()){};
   //template<typename InputIterator> 
   //  map(InputIterator, InputIterator, const Compare & = Compare(), 
   //      const allocator_type & = allocator_type()){};
@@ -101,5 +101,7 @@ public:
   //std::pair< iterator, iterator > equal_range(const key_type &){};
   //std::pair< const_iterator, const_iterator > 
   //equal_range(const key_type &) const{};
+  private:
+    RedBlackTree rbt_tree;
 };//
 };//NAMESPACE
