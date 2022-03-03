@@ -465,8 +465,8 @@ public:
     return this->root;
   };
 
-  T getRootData(){
-    return getRoot()->data;
+  T getData(Node *current){
+    return current->data;
   };
 
   void insert(key_value_pair data) {
@@ -482,7 +482,40 @@ public:
       _printTree("", this->root, true);
     }
   };
+
+  Node *_duplicateNode(Node *srcNode){
+    Node *dup = nodeAllocator->allocate(1);
+    dup->color = srcNode->color;
+    dup->data = srcNode->data;
+    dup->left = srcNode->left;
+    dup->right = srcNode->right;
+    dup->parent = srcNode->parent;
+    return dup;
+  }
+  template <class _T, class _Compare, class _Allocator>
+  friend void copyTree(RedBlackTree<_T, _Compare, _Allocator> *destination, RedBlackTree<_T, _Compare, _Allocator> *source);
+  
+  void *_copyTreeHelper(Node *destNode, Node *srcNode){
+    Node *tmp;
+    if (destNode != sentinel)
+      destNode = _duplicateNode(srcNode);
+      tmp = srcNode;
+    else
+      return;
+    if (srcNode->left != sentinel){
+      destNode->left = _duplicateNode(srcNode->left);
+    }
+    if (srcNode->right != sentinel){
+      destNode->right = _duplicateNode(srcNode->right);
+    }
+  }
 };
+template <class T, class Compare, class Allocator>
+void copyTree(RedBlackTree<T, Compare, Allocator> *destination, RedBlackTree<T, Compare, Allocator> *source){
+  Node<T> *rootSource = source->getRoot();
+  Node<T> *rootDestination = destination->getRoot();
+  _
+}
 }; //NAMESPACE
 
 #endif

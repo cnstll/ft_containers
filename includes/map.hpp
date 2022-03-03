@@ -54,23 +54,17 @@ public:
   explicit map(const Compare& comp = Compare(), const allocator_type& alloc = Allocator()): tree(comp){
     (void)(alloc);
   };
-  //template<typename InputIterator> 
-  //  map(InputIterator, InputIterator, const Compare & = Compare(), 
-  //      const allocator_type & = allocator_type()){};
-  //template<typename InputIterator> 
-  //  map(ordered_unique_range_t, InputIterator, InputIterator, 
-  //      const Compare & = Compare(), const allocator_type & = allocator_type()){};
-  //map(const map &){};
-  //map(BOOST_RV_REF(map)){};
-  //map(const map &, const allocator_type &){};
-  //map(BOOST_RV_REF(map), const allocator_type &){};
-  //map& operator=(BOOST_COPY_ASSIGN_REF(map)){};
-  //map& operator=(BOOST_RV_REF(map)){};
+  map( const map& other );
   ~map(){
     if (tree.getNodeCount() == 0)
       tree.clearTreeSentinel();
     else
       tree.clearTree();
+  };
+  map& operator=( const map& other ){
+    if (this != &other){
+      tree.insert(other->tree.getRoot();
+    }
   };
   //// public member functions
   key_compare key_comp() const { return tree.getComp(); };
