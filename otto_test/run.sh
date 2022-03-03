@@ -114,4 +114,4 @@ done
 # echo -e STL: Execution time was `expr $end_stl - $start_stl` nanoseconds
 # echo -e Yours: Execution time was `expr $end_yours - $start_yours` nanoseconds
 print_score ${COUNT_PASSED_TESTS} ${COUNT_TOTAL_TESTS}
-#rm -rf ${TESTED_FILES_FOLDER}
+rm -rf ${TESTED_FILES_FOLDER}

@@ -2,32 +2,49 @@
 #define RBTREE_HPP
 #define red 1
 #define black 0
-#include <string>
+#include "pair.hpp"
 #include <iostream>
+#include <memory>
+#include <string>
 
 namespace ft {
   /**
  * @brief Node structure used in RedBlackTree class that contains the parent of the node, right and left childs and the color stored in a boolean
  * 
  */
-  struct Node {
-    int data;
-    Node *parent;
-    Node *left;
-    Node *right;
-    int color;
-  };
+template <class T>
+struct mapNode {
+  T data;
+  mapNode<T> *parent;
+  mapNode<T> *left;
+  mapNode<T> *right;
+  bool color; // change from int to bool
+};
   /*
   * HELPER FUNCTIONS
   */
-class RedBlackTree {
+template <
+    class T,
+    class Compare,
+    class Allocator
+> class RedBlackTree {
   
+  typedef T key_value_pair;
+  typedef mapNode<key_value_pair> Node;
+  typedef Compare key_compare;
+  typedef std::size_t size_type;
+  typedef Allocator tree_allocator_type;
+  typedef typename tree_allocator_type::template rebind<Node>::other node_allocator_type;
+
   Node *root;
   Node *sentinel;
+  node_allocator_type nodeAllocator;
+  key_compare comp;
+  std::size_t countNode;
 
   void _preOrderTraversal(Node * node) {
     if (node != sentinel) {
-      std::cout << node->data << " ";
+      std::cout << node->data.first << " ";
       _preOrderTraversal(node->left);
       _preOrderTraversal(node->right);
     }
@@ -81,28 +98,28 @@ class RedBlackTree {
    * @brief search tree with in order traversal method
    * 
    * @param node active node
-   * @param key data searched in the tree
+   * @param data pair of key and value. The key is searched in the tree
    * @return address of the node found 
    */
   
-  Node *_searchTree(Node * node, int key) {
-    if (node == sentinel || key == node->data) {
+  Node *_searchTree(Node * node,  key_value_pair data) {
+    if (node == sentinel || data.first == node->data.first) {
       return node;
     }
-
-    if (key < node->data) {
-      return _searchTree(node->left, key);
+    if (Compare(data.first, node->data.first)) {
+      return _searchTree(node->left, data);
     }
-    return _searchTree(node->right, key);
+    return _searchTree(node->right, data);
   }
-  void _timber(Node *root){
+  // ! should deallocate 1 by 1 or can it be done in bulk with getNodeCount() ? 
+    void _timber(Node *root){
     //std::cout << "d" << std::endl;
     if (root == sentinel)
       return;
     {
         _timber(root->left);
         _timber(root->right);
-        delete root;
+        _nodeDeletionHelper(root, 1);
     }
   };
 
@@ -201,19 +218,14 @@ class RedBlackTree {
     rotatedParent->parent = rotatedChild;
   }
 
-  void _insert(int key){
-      Node *insertedNode = new Node;
-      insertedNode->parent = NULL;
-      insertedNode->data = key;
-      insertedNode->left = sentinel;
-      insertedNode->right = sentinel;
-      insertedNode->color = red;
+  void _insert(key_value_pair data){
+      Node *insertedNode = _nodeCreationHelper(data);
       Node *savedParent = NULL;
       Node *savedRoot = this->root;
 
       while (savedRoot != sentinel) {
         savedParent = savedRoot;
-        if (insertedNode->data < savedRoot->data) {
+        if (Compare(insertedNode->data.first, savedRoot->data.first)) {
           savedRoot = savedRoot->left;
         } else {
           savedRoot = savedRoot->right;
@@ -222,7 +234,7 @@ class RedBlackTree {
       insertedNode->parent = savedParent;
       if (savedParent == NULL) {
         root = insertedNode;
-      } else if (insertedNode->data < savedParent->data) {
+      } else if (Compare(insertedNode->data.first, savedParent->data.first)) {
         savedParent->left = insertedNode;
       } else {
         savedParent->right = insertedNode;
@@ -321,11 +333,11 @@ class RedBlackTree {
     relinkedNode->parent = deletedNode->parent;
   }
 
-  void _deleteNode(Node * current, int key) {
+  void _deleteNode(Node * current, key_value_pair data) {
     Node *deletedNode = sentinel;
     Node *replacingNode; 
     Node *successorOfDeletedNode;
-    deletedNode = _searchTree(current, key);
+    deletedNode = _searchTree(current, data);
     if (deletedNode == sentinel) {
       std::cout << "Key not found in the tree" << std::endl;
       return;
@@ -356,32 +368,60 @@ class RedBlackTree {
       successorOfDeletedNode->left->parent = successorOfDeletedNode;
       successorOfDeletedNode->color = deletedNode->color;
     }
-    delete deletedNode;
+    _nodeDeletionHelper(deletedNode);
     if (deletedNodeOriginalColor == black) {
       _recolorAndBalanceTreeAfterDelete(replacingNode);
     }
+  }
+
+  Node *_nodeCreationHelper(key_value_pair data){
+    Node *newNode = nodeAllocator->allocate(1);
+    newNode->color = red;
+    newNode->data = data;
+    newNode->left = sentinel;
+    newNode->right = sentinel;
+    newNode->parent = NULL;
+    return newNode;
+  }
+
+  void _nodeDeletionHelper(Node *deletedNode, size_type numberOfNodeToDel){
+      nodeAllocator.deallocate(deletedNode, numberOfNodeToDel);
   }
   /* 
    *  END REMOVE SECTION
    */
 public:
 
-  RedBlackTree() {
-    sentinel = new Node;
+  RedBlackTree(const key_compare& comp = key_compare()) : comp(comp), countNode(0){
+    sentinel = nodeAllocator.allocate(1);
     sentinel->color = black;
     sentinel->left = NULL;
     sentinel->right = NULL;
+    sentinel->parent = NULL;
     root = sentinel;
   }
-  
-  ~RedBlackTree(){
-    _timber(root);
-    delete sentinel;
-  }
 
-  Node * searchTree(int k) {
-    return _searchTree(this->root, k);
+  ~RedBlackTree(){};
+
+  size_type getNodeCount(){
+    return countNode;
+  };
+
+  key_compare getComp(){
+    return comp;
   }
+  
+  void clearTree(){
+    _timber(root);
+  };
+
+  void clearTreeSentinel(){
+    _nodeDeletionHelper(sentinel, 1);
+  };
+
+  Node *searchTree(key_value_pair data) {
+    return _searchTree(this->root, data);
+  };
 
   Node *getMin(Node * node) {
     while (node->left != sentinel) {
@@ -425,15 +465,15 @@ public:
     return this->root;
   };
 
-  int getRootData(){
+  T getRootData(){
     return getRoot()->data;
   };
 
-  void insert(int key) {
-    _insert(key);
+  void insert(key_value_pair data) {
+    _insert(data);
   };
 
-  void remove(int data){
+  void remove(key_value_pair data){
     _deleteNode(this->root, data);
   };
 

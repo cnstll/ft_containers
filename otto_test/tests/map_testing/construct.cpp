@@ -15,6 +15,8 @@ int main (){
 
   {
     NAMESPACE::map<char,int> first;
+    //NAMESPACE::map<char,int> second(first);
+
   }
   {
     //std::map<char,int> first;
