@@ -16,15 +16,9 @@ int main (){
   {
     NAMESPACE::map<char,int> first;
     //NAMESPACE::map<char,int> second(first);
-
   }
   {
-    //std::map<char,int> first;
-//
-    //first['a']=10;
-    //first['b']=30;
-    //first['c']=50;
-    //first['d']=70;
+
 //
     //std::map<char,int> second (first.begin(),first.end());
     //std::map<char,int> third (second);

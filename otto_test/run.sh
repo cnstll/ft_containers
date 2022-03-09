@@ -16,6 +16,8 @@ function is_test_folder(){
 # Global variables
 ROOT_DIR="../"
 TESTED_CONTAINER="map"
+COMPILATION_ERROR_FILE="compilation.log"
+EXECUTION_ERROR_FILE="execution.log"
 STL_BIN="stl_${TESTED_CONTAINER}"
 YOUR_BIN="your_${TESTED_CONTAINER}"
 STL_OUTPUT="stl_${TESTED_CONTAINER}_output"
@@ -34,6 +36,7 @@ COUNT_TOTAL_TESTS=0;
 # Cleaning files
 rm -rf ${DIFF_FOLDER} ${TESTED_FILES_FOLDER}
 rm -f ${YOUR_BIN} ${YOUR_OUTPUT} ${STL_BIN} ${STL_OUTPUT}
+rm -f ${COMPILATION_ERROR_FILE} ${EXECUTION_ERROR_FILE}
 
 # Creating tests folder
 mkdir -p "$TESTED_FILES_FOLDER"
@@ -70,24 +73,32 @@ done
 for test in ./${TESTED_FILES_FOLDER}${TESTED_CONTAINER}_testing/*.cpp; do
 
     COUNT_TOTAL_TESTS=$((COUNT_TOTAL_TESTS + 1))
+	test_name=$(basename ${test} | sed "s'\.cpp''")
+    echo -en "TEST: #${COUNT_TOTAL_TESTS} - "
     c++ ${COMPILATION_FLAGS} ${test} -o ${STL_BIN} -D NAMESPACE="std"
-    c++ ${COMPILATION_FLAGS} ${test} -o ${YOUR_BIN} -D NAMESPACE="ft"
+    ./${STL_BIN} > "${STL_OUTPUT_FOLDER}${STL_OUTPUT}_${test_name}.log"
+    c++ ${COMPILATION_FLAGS} ${test} -o ${YOUR_BIN} -D NAMESPACE="ft" 2>> ${COMPILATION_ERROR_FILE}
     if [ $? -eq 0 ]
     then
-        ./${STL_BIN} > "${STL_OUTPUT_FOLDER}${STL_OUTPUT}.log"
-        ./${YOUR_BIN} > "${YOUR_OUTPUT_FOLDER}${YOUR_OUTPUT}.log"
-
-		test_name=$(basename ${test} | sed "s'\.cpp''")
-        diff  ${STL_OUTPUT_FOLDER}${STL_OUTPUT}.log ${YOUR_OUTPUT_FOLDER}${YOUR_OUTPUT}.log > ${DIFF_FOLDER}${DIFF_FILE}_${test_name}
-
-        if [ -s "${DIFF_FOLDER}${DIFF_FILE}_${test_name}" ]
+        echo -en "COMPILATION: ${GREEN}SUCCESS${RESET} - "
+        ./${YOUR_BIN} > "${YOUR_OUTPUT_FOLDER}${YOUR_OUTPUT}_${test_name}.log" 2>> ${EXECUTION_ERROR_FILE}
+        if [ $? -ne 0 ]
         then
-            echo -e "EXECUTION: ${RED}FAILED${RESET}"
+            echo -e "EXECUTION: ${RED}ERROR${RESET}"
         else
-            echo -e "EXECUTION: ${GREEN}SUCCESS${RESET}"
-            COUNT_PASSED_TESTS=$((COUNT_PASSED_TESTS + 1))
-            rm -f ${DIFF_FOLDER}${DIFF_FILE}_${test_name}
+            diff  ${STL_OUTPUT_FOLDER}${STL_OUTPUT}_${test_name}.log ${YOUR_OUTPUT_FOLDER}${YOUR_OUTPUT}_${test_name}.log > ${DIFF_FOLDER}${DIFF_FILE}_${test_name}
+            if [ -s "${DIFF_FOLDER}${DIFF_FILE}_${test_name}" ]
+            then
+                echo -e "EXECUTION: ${RED}FAILED${RESET}"
+            else
+                echo -e "EXECUTION: ${GREEN}SUCCESS${RESET}"
+                COUNT_PASSED_TESTS=$((COUNT_PASSED_TESTS + 1))
+                rm -f ${DIFF_FOLDER}${DIFF_FILE}_${test_name}
+            fi
         fi
+    else
+        echo -en "COMPILATION: ${RED}ERROR${RESET}  - "
+        echo -e "EXECUTION: ${RED}ERROR${RESET}"
     fi
     rm -f ${STL_BIN} ${YOUR_BIN}
 done
