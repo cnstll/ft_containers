@@ -53,7 +53,10 @@ for folder in ../*/; do
     fi
 done
 chmod +r ./${TESTED_FILES_FOLDER}
-
+if [[ $1 == "-debug" ]]
+then
+    exit
+fi
 # Creating diff and output folder
 mkdir -p "$DIFF_FOLDER"
 mkdir -p "$YOUR_OUTPUT_FOLDER"
@@ -70,11 +73,13 @@ for file in $TESTED_FILES_FOLDER${TESTED_CONTAINER}_testing/*.cpp; do
     sed -i "s'#include.*\.hpp\"'#include \"${include_path}\"'" "$file"
 done
 
+echo -en "TESTED CONTAINER >>>>>> $TESTED_CONTAINER\n"
+
 for test in ./${TESTED_FILES_FOLDER}${TESTED_CONTAINER}_testing/*.cpp; do
 
     COUNT_TOTAL_TESTS=$((COUNT_TOTAL_TESTS + 1))
 	test_name=$(basename ${test} | sed "s'\.cpp''")
-    echo -en "TEST: #${COUNT_TOTAL_TESTS} - "
+    echo -en "TEST #${COUNT_TOTAL_TESTS}: ${test_name} - "
     c++ ${COMPILATION_FLAGS} ${test} -o ${STL_BIN} -D NAMESPACE="std"
     ./${STL_BIN} > "${STL_OUTPUT_FOLDER}${STL_OUTPUT}_${test_name}.log"
     c++ ${COMPILATION_FLAGS} ${test} -o ${YOUR_BIN} -D NAMESPACE="ft" 2>> ${COMPILATION_ERROR_FILE}
