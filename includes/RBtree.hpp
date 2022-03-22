@@ -23,7 +23,7 @@ struct mapNode {
 
   mapNode() : data(), parent(NULL), left(NULL), right(NULL), color(black), isSentinel(true){}
   mapNode(const T& d, mapNode<T> *p, mapNode<T> *l, mapNode<T>* r, bool c, bool s) : data(d), parent(p), left(l), right(r), color(c), isSentinel(s){}
-  mapNode(const mapNode& other) : data(other.data), parent(other.parent), left(other.left), right(other.right), color(other.color){}
+  mapNode(const mapNode& other) : data(other.data), parent(other.parent), left(other.left), right(other.right), color(other.color), isSentinel(other.isSentinel){}
   ~mapNode(){}
   mapNode &operator=(const mapNode& other){
     if (this != &other){
@@ -32,30 +32,31 @@ struct mapNode {
       left = other.left;
       right = other.right;
       color = other.color;
+      isSentinel = other.isSentinel;
     }
     return *this;
   }
 
-  //mapNode<T> *getSuccessor() {
-  //  if (!this->right->isSentinel) {
-  //    return getMin(this->right);
-  //  }
-  //  mapNode<T> *searchedParent = this->parent;
-  //  while (!searchedParent->isSentinel && this == searchedParent->right) {
-  //    this = searchedParent;
-  //    searchedParent = searchedParent->parent;
-  //  }
-  //  return searchedParent;
-  //};
-  //mapNode<T> *getMin() {
-  //  mapNode<T> tmp = this;
-  //  while (tmp->left != NULL && !tmp->left->isSentinel) {
-  //    tmp = tmp->left;
-  //  }
-  //  return tmp;
-  //};
-};
+  mapNode<T> *getSuccessor() {
+    if (!right->isSentinel)
+      return right->getMin();
+    mapNode<T> *searchedParent = parent;
+    mapNode<T> *tmp = this;
+    while (!searchedParent->isSentinel && tmp == searchedParent->right)
+    {
+      tmp = searchedParent;
+      searchedParent = searchedParent->parent;
+    }
+    return searchedParent;
+  };
 
+  mapNode<T> *getMin() {
+    mapNode<T> *tmp = this;
+    while (tmp->left != NULL && !tmp->left->isSentinel)
+      tmp = tmp->left;
+    return tmp;
+  };
+};
 
 template <
     class T,
@@ -255,7 +256,7 @@ template <
 
   bool _insert(const key_value_pair& data){
       Node *insertedNode = _nodeCreationHelper(data);
-      Node *savedParent = NULL;
+      Node *savedParent = sentinel;
       Node *savedRoot = this->root;
 
       while (savedRoot != sentinel) {
@@ -272,7 +273,7 @@ template <
         }
       }
       insertedNode->parent = savedParent;
-      if (savedParent == NULL) {
+      if (savedParent == sentinel) {
         root = insertedNode;
       } else if (comp(insertedNode->data.first, savedParent->data.first)) {
         savedParent->left = insertedNode;
@@ -280,11 +281,11 @@ template <
         savedParent->right = insertedNode;
       }
       lastInsertedNode = insertedNode;
-      if (insertedNode->parent == NULL) {
+      if (insertedNode->parent == sentinel) {
         insertedNode->color = black;
         return true;
       }
-      if (insertedNode->parent->parent == NULL) {
+      if (insertedNode->parent->parent == sentinel) {
         return true;
       }
       _recolorAndBalanceTreeAfterInsert(insertedNode);
@@ -500,6 +501,10 @@ public:
 
   Node *getRoot(){
     return this->root;
+  };
+
+  Node *getSentinel(){
+    return this->sentinel;
   };
 
   Node *getLastInsertedNode(){

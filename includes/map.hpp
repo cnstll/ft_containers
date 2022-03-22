@@ -90,7 +90,7 @@ public:
   ft::pair<iterator, bool> insert( const value_type& value ){
     
     bool insertionResult = tree.insert(value);
-    if (insertionResult) tree.printTree();
+    //if (insertionResult) tree.printTree();
     return make_pair(iterator(tree.getLastInsertedNode()), insertionResult);
   };
   template< class InputIt >

@@ -276,41 +276,43 @@ class mapIterator : public ft::iterator<bidirectional_iterator_tag, T>
     typedef T* pointer;
     typedef T& reference;
   /* Is default-constructible, copy-constructible, copy-assignable and destructible */
-    mapIterator() : node(), root(), sentinel(){}
-    mapIterator(nodePointer someMapNode) : node(someMapNode){}
+    mapIterator() : currentNode(), root(), sentinel(){}
+    mapIterator(nodePointer someMapNode) : currentNode(someMapNode), root(), sentinel(){}
     mapIterator(const mapIterator& other){ *this = other; }
     mapIterator &operator=(const mapIterator& rhs){ 
       if (this != &rhs)
-        this->node = rhs.node;
+        this->currentNode = rhs.currentNode;
       return *this;
     }
     ~mapIterator(void) {}
 
   /*Can be dereferenced as an lvalue (if in a dereferenceable state).*/
-    T& operator*() const { return node->data; }
-    T *operator->() { return &node->data; }
+    //map<T,U>::iterator it
+    // *it
+    T& operator*() const { return currentNode->data; }
+    T *operator->() { return &currentNode->data; }
 
   /*Supports the offset dereference operator ([])	*/
     reference operator[](difference_type n) {
-      nodePointer nodeSuccessor = node;
+      nodePointer nodeSuccessor = currentNode;
       while (n-- > 0){
         nodeSuccessor = nodeSuccessor->getSuccessor();
       }
       return (nodeSuccessor->data);
     }
   /*Can be incremented (if in a dereferenceable state).*/
-    mapIterator& operator++() {node = node->getSuccessor(); return *this;}
+    mapIterator& operator++() {currentNode = currentNode->getSuccessor(); return *this;}
     mapIterator operator++(int) {mapIterator tmp(*this); operator++(); return tmp;}
 
   /*Can be incremented (if in a dereferenceable state).*/
-    mapIterator& operator--() {node = node->getPredecessor(node); return *this;}
-    mapIterator operator--(int) {mapIterator tmp(*this); operator--(); return tmp;}
+   // mapIterator& operator--() {currentNode = tree->getPredecessor(currentNode); return *this;}
+   // mapIterator operator--(int) {mapIterator tmp(*this); operator--(); return tmp;}
   
   /*Can be compared for equivalence using the equality/inequality operators*/
-    friend bool operator==(const mapIterator& lhs, const mapIterator& rhs) { return lhs.node->data == rhs.node->data; };
+    friend bool operator==(const mapIterator& lhs, const mapIterator& rhs) { return lhs.currentNode->data == rhs.currentNode->data; };
     friend bool operator!=(const mapIterator& lhs, const mapIterator& rhs) { return !operator==(lhs, rhs); };
     
-    nodePointer node;
+    nodePointer currentNode;
     nodePointer root;
     nodePointer sentinel;
 };

@@ -2,7 +2,7 @@
 #include <iterator>
 #include <iostream>
 #include <utility>
-#include "map.hpp"
+#include "../../under_test/includes/map.hpp"
 
 int main (){
 
@@ -28,5 +28,6 @@ int main (){
   asciiTab.insert(asciiUpper.begin(), asciiUpper.end());
   std::cout << "Data inserted : " << asciiTab['d'] << std::endl;
   std::cout << "Data inserted : " << asciiTab['B'] << std::endl;  
+  std::cout << "Data inserted : " << asciiTab['C'] << std::endl;  
   std::cout << "Data inserted : " << asciiTab['D'] << std::endl;
 }
