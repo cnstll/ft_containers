@@ -56,6 +56,8 @@ struct mapNode {
       tmp = tmp->left;
     return tmp;
   };
+  // friend bool operator==(const mapNode<T>& lhs, const mapNode<T>& rhs) { return lhs.data == rhs.data; };
+
 };
 
 template <
@@ -138,11 +140,11 @@ template <
    * @return address of the node found 
    */
   
-  Node *_searchTree(Node * node,  key_value_pair data) {
+  Node *_searchTree(Node * node,  key_value_pair data) const {
     if (node == sentinel || data.first == node->data.first) {
       return node;
     }
-    if (Compare(data.first, node->data.first)) {
+    if (comp(data.first, node->data.first)) {
       return _searchTree(node->left, data);
     }
     return _searchTree(node->right, data);
@@ -225,7 +227,7 @@ template <
       rotatedChild->left->parent = rotatedParent;
     }
     rotatedChild->parent = rotatedParent->parent;
-    if (rotatedParent->parent == NULL) {
+    if (rotatedParent->parent == sentinel) {
       this->root = rotatedChild;
     } else if (rotatedParent == rotatedParent->parent->left) {
       rotatedParent->parent->left = rotatedChild;
@@ -243,7 +245,7 @@ template <
       rotatedChild->right->parent = rotatedParent;
     }
     rotatedChild->parent = rotatedParent->parent;
-    if (rotatedParent->parent == NULL) {
+    if (rotatedParent->parent == sentinel) {
       root = rotatedChild;
     } else if (rotatedParent == rotatedParent->parent->right) {
       rotatedParent->parent->right = rotatedChild;
@@ -376,16 +378,14 @@ template <
     relinkedNode->parent = deletedNode->parent;
   }
 
-  void _deleteNode(Node * current, key_value_pair data) {
+  bool _deleteNode(Node * current, key_value_pair data) {
     Node *deletedNode = sentinel;
     Node *replacingNode; 
     Node *successorOfDeletedNode;
     deletedNode = _searchTree(current, data);
     if (deletedNode == sentinel) {
-      std::cout << "Key not found in the tree" << std::endl;
-      return;
+      return 0;
     }
-
     successorOfDeletedNode = deletedNode;
     bool deletedNodeOriginalColor = deletedNode->color;
     if (deletedNode->left == sentinel) {
@@ -415,6 +415,7 @@ template <
     if (deletedNodeOriginalColor == black) {
       _recolorAndBalanceTreeAfterDelete(replacingNode);
     }
+    return 1;
   }
 
   Node *_nodeCreationHelper(const key_value_pair& data){
@@ -426,6 +427,7 @@ template <
   void _nodeDeletionHelper(Node *deletedNode){
       nodeAllocator.destroy(deletedNode);
       nodeAllocator.deallocate(deletedNode, 1);
+      --countNode;
   }
   /* 
    *  END REMOVE SECTION
@@ -439,13 +441,16 @@ public:
   }
 
   ~RedBlackTree(){
+    if (getNodeCount() > 0)
+      clearTree();
+    clearTreeSentinel();
   };
 
-  size_type getNodeCount(){
+  size_type getNodeCount() const {
     return countNode;
   };
 
-  key_compare getComp(){
+  key_compare getComp() const {
     return comp;
   }
   
@@ -457,8 +462,12 @@ public:
     _nodeDeletionHelper(sentinel);
   };
 
-  Node *searchTree(key_value_pair data) {
-    return _searchTree(this->root, data);
+  Node *searchTree(key_value_pair data) const {
+    Node *tmp = _searchTree(this->root, data);
+    if (tmp == sentinel)
+      return sentinel;
+    else
+      return tmp;
   };
 
   Node *getMin(Node * current) {
@@ -475,35 +484,53 @@ public:
     return current;
   };
 
-  Node *getSuccessor(Node * current) {
-    if (current->right != sentinel) {
-      return getMin(current->right);
+  Node *getSuccessor(const key_value_pair &data) {
+    Node *nodeProcessed;
+    if ((nodeProcessed = _searchTree(root, data)) == sentinel)
+      return sentinel;
+    if (nodeProcessed->right != sentinel) {
+      return getMin(nodeProcessed->right);
     }
-    Node * searchedParent = current->parent;
-    while (searchedParent != sentinel && current == searchedParent->right) {
-      current = searchedParent;
+    Node * searchedParent = nodeProcessed->parent;
+    while (searchedParent != sentinel && nodeProcessed == searchedParent->right) {
+      nodeProcessed = searchedParent;
       searchedParent = searchedParent->parent;
     }
     return searchedParent;
   };
 
-  Node *getPredecessor(Node * current) {
-    if (current->left != sentinel) {
-      return getMax(current->left);
+  Node *getPredecessor(const key_value_pair &data){
+    Node *nodeProcessed;
+    if ((nodeProcessed = _searchTree(root, data)) == sentinel)
+      return sentinel;
+    if (nodeProcessed->left != sentinel) {
+      return getMax(nodeProcessed->left);
     }
-    Node * searchedParent = current->parent;
-    while (searchedParent != sentinel && current == searchedParent->left) {
-      current = searchedParent;
+    Node * searchedParent = nodeProcessed->parent;
+    while (searchedParent != sentinel && nodeProcessed == searchedParent->left) {
+      nodeProcessed = searchedParent;
       searchedParent = searchedParent->parent;
     }
     return searchedParent;
   };
+
+  Node *getLowerBound(const key_value_pair &data){
+    Node *nodeProcessed;
+    if ((nodeProcessed = _searchTree(root, data)) == sentinel)
+      return sentinel;
+    if (!comp(nodeProcessed->data.first, nodeProcessed->data.first)){
+      return nodeProcessed;
+    } else {
+      std::cout << "ELSE IN getLowerBound\n";
+      return nodeProcessed;
+    }
+  }
 
   Node *getRoot(){
     return this->root;
   };
 
-  Node *getSentinel(){
+  Node *getSentinel() const {
     return this->sentinel;
   };
 
@@ -523,8 +550,8 @@ public:
     return insertionSucceded;
   };
 
-  void remove(const key_value_pair &data){
-    _deleteNode(this->root, data);
+  size_type remove(const key_value_pair &data){
+    return _deleteNode(this->root, data);
   };
 
   void printTree(){
