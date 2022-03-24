@@ -3,9 +3,10 @@
 #include "enable_if.hpp" 
 #include "is_integral.hpp" 
 #include "integral_constant.hpp" 
+#include "iterator.hpp"
 #include "lexicographical_compare.hpp" 
 #include "remove_cv.hpp" 
-#include "iterator.hpp"
+#include "utilities.hpp"
 #include <cstddef>
 #include <iostream>
 #include <memory>
@@ -528,14 +529,6 @@ class vector {
             else {
                 insert(end(), count - currentSize, value);
             }
-        };
-    private:
-        template <typename _T>
-        void baseSwap(_T &a, _T &b) {
-        
-        	_T temp = a;
-        	a = b;
-        	b = temp;
         };
 
     public:
