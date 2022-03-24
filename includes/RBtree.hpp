@@ -157,6 +157,7 @@ template <
         _timber(root->left);
         _timber(root->right);
         //std::cout << "deleted key: " << root->data.first << std::endl;
+        --countNode;
         _nodeDeletionHelper(root);
     }
   };
@@ -164,13 +165,13 @@ template <
   void _printTree(const std::string& padding, Node* current, bool hasRight){ 
     if(current != sentinel)
     {
-        std::cout << padding << (hasRight ? "|__" : "└──" );
-        if (current->color == red)
-          std::cout << current->data.first << "," << current->data.second << std::endl;
-        else
-          std::cout << current->data.first << "." << current->data.second << std::endl;
-        _printTree(padding + (hasRight ? "│   " : "    "), current->left, (current->right != sentinel));
-        _printTree(padding + (hasRight ? "│   " : "    "), current->right, false);
+      std::cout << padding << (hasRight ? "|__" : "└──" );
+      if (current->color == red)
+        std::cout << current->data.first << "," << current->data.second << std::endl;
+      else
+        std::cout << current->data.first << "." << current->data.second << std::endl;
+      _printTree(padding + (hasRight ? "│   " : "    "), current->left, (current->right != sentinel));
+      _printTree(padding + (hasRight ? "│   " : "    "), current->right, false);
     }
   };
 
@@ -283,6 +284,7 @@ template <
         savedParent->right = insertedNode;
       }
       lastInsertedNode = insertedNode;
+      ++countNode;
       if (insertedNode->parent == sentinel) {
         insertedNode->color = black;
         return true;
@@ -411,6 +413,7 @@ template <
       successorOfDeletedNode->left->parent = successorOfDeletedNode;
       successorOfDeletedNode->color = deletedNode->color;
     }
+    --countNode;
     _nodeDeletionHelper(deletedNode);
     if (deletedNodeOriginalColor == black) {
       _recolorAndBalanceTreeAfterDelete(replacingNode);
@@ -427,7 +430,16 @@ template <
   void _nodeDeletionHelper(Node *deletedNode){
       nodeAllocator.destroy(deletedNode);
       nodeAllocator.deallocate(deletedNode, 1);
-      --countNode;
+  }
+
+  void _deepCopyNodes(Node * node) {
+    if (node->isSentinel)
+      return;
+    {
+      this->_insert(node->data);
+      _deepCopyNodes(node->left);
+      _deepCopyNodes(node->right);
+    }
   }
   /* 
    *  END REMOVE SECTION
@@ -438,8 +450,46 @@ public:
     sentinel = nodeAllocator.allocate(1);
     nodeAllocator.construct(sentinel, Node());
     root = sentinel;
+    lastInsertedNode = root;
   }
-
+  RedBlackTree(const RedBlackTree &other){
+    countNode = other.countNode;
+    comp = Compare(other.comp);
+    nodeAllocator = Allocator(other.nodeAllocator);
+    sentinel = nodeAllocator.allocate(1);
+    nodeAllocator.construct(sentinel, Node());
+    root = sentinel;
+    lastInsertedNode = root;
+    // If other tree is not empty then insert its content in instanciated tree
+    if (other.getNodeCount()){
+      _deepCopyNodes(other.root);
+      lastInsertedNode = _searchTree(root, other.lastInsertedNode->data);
+    }
+  }
+  RedBlackTree& operator=( const RedBlackTree& other ){
+    if (this != &other){
+      // 1. this is empty, other is empty >  clear tree and sentinel and swap other element
+      // 2. this is empty, other is not empty >  clear tree and sentinel and swap other element and insert elements
+      // 3. this is not empty, other is not empty >  clear tree and sentinel and swap other element and insert elements
+      // 4. this is not empty, other is empty >  clear tree and sentinel and swap other element
+      if (countNode != 0 || !other.getNodeCount()){
+        clearTree();
+        clearTreeSentinel();
+      }
+      comp = Compare(other.comp);
+      nodeAllocator = Allocator(other.nodeAllocator);
+      sentinel = nodeAllocator.allocate(1);
+      nodeAllocator.construct(sentinel, Node());
+      root = sentinel;
+      lastInsertedNode = root;
+      // If other tree is not empty then insert its content in instanciated tree
+      if (other.getNodeCount()){
+        _deepCopyNodes(other.root);
+        lastInsertedNode = _searchTree(root, other.lastInsertedNode->data);
+      }
+    }
+    return *this;
+  };
   ~RedBlackTree(){
     if (getNodeCount() > 0)
       clearTree();
@@ -469,6 +519,13 @@ public:
     else
       return tmp;
   };
+
+  key_value_pair searchTreeWithBoundChecking(key_value_pair data) const {
+      Node *searchResult = _searchTree(this->root, data);
+      if (searchResult == getSentinel())
+        throw std::out_of_range("OUT OF RANGE");
+      return searchResult->data;
+  }
 
   Node *getMin(Node * current) {
     while (current->left != sentinel) {
@@ -543,11 +600,7 @@ public:
   };
 
   bool insert(const key_value_pair &data) {
-    bool insertionSucceded = _insert(data);
-    if (insertionSucceded){
-      ++countNode;
-    }
-    return insertionSucceded;
+    return _insert(data);
   };
 
   size_type remove(const key_value_pair &data){

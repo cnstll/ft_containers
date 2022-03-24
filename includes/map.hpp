@@ -4,8 +4,11 @@
 #include "pair.hpp"
 #include "RBtree.hpp"
 #include "iterator.hpp"
+#include "utilities.hpp"
+#include <exception>
 #include <functional>
 #include <memory>
+#include <stdexcept>
 
 // ! Remove std::less std::pair
 namespace ft {
@@ -35,8 +38,6 @@ public:
   //typedef value_compare_impl                 value_compare;
   //typedef typename ft::mapNode<value_type>  node_type;
   //typedef typename ft::mapNode<value_type>*  node_pointer;
-  //template <class Key, class T, class Compare, class Alloc>
-  //class map<Key, T, Compare, Alloc>::value_compare {
   class value_compare : public std::binary_function<value_type, value_type, bool> {
     friend class map;
   protected:
@@ -55,14 +56,19 @@ public:
   explicit map(const Compare& comp = Compare(), const allocator_type& alloc = Allocator()): tree(comp){
     (void)(alloc);
   };
-  map( const map& other ){ this = other; };
+  map( const map& other ){ *this = other; };
   ~map(){};
   map& operator=( const map& other ){
     if (this != &other){
-      ;//tree.insert(other->tree.getRoot();
+      tree = other.tree;
+      tree_allocator = Allocator(other.tree_allocator);
     }
+    return *this;
   };
-  //// public member functions
+  mapped_type& operator[]( const key_type& key ){
+    return insert(ft::make_pair(key, mapped_type())).first->second;
+  };
+
   key_compare key_comp() const { return tree.getComp(); };
   value_compare value_comp() const{ return value_compare(key_comp());};
 
@@ -81,10 +87,11 @@ public:
   bool empty() const { return tree.getNodeCount() == 0; };
   size_type size() const { return tree.getNodeCount(); };
   size_type max_size() const { return tree_allocator.max_size(); };
-  mapped_type& operator[]( const key_type& key ){
-    return insert(ft::make_pair(key, mapped_type())).first->second;
+
+  void swap(map &other){
+    baseSwap(tree_allocator, other.tree_allocator);
+    baseSwap(tree, other.tree);
   };
-  // void swap(map &){};
   ft::pair<iterator, bool> insert( const value_type& value ){
     
     bool insertionResult = tree.insert(value);
@@ -103,11 +110,11 @@ public:
     }
   };
   //void erase( iterator pos ){
-  //  remove ()
+  //  erase((*pos).first);
   //};
   //iterator erase( const_iterator pos );
   size_type erase( const Key& key ){
-    return (tree.remove(make_pair(key,0)));
+    return (tree.remove(make_pair(key, mapped_type())));
   };
   void clear(){
     tree.clearTree();
@@ -123,7 +130,7 @@ public:
    * @return iterator to the node where key was found or end() if no node with key was found
    */
   iterator find(const key_type &key){
-    iterator it(tree.searchTree(make_pair(key, 0)));
+    iterator it(tree.searchTree(make_pair(key, mapped_type())));
     if (it == tree.getSentinel())
       return end();
     else
@@ -137,7 +144,7 @@ public:
    * @return size_type of 1 or 0 
    */
   size_type count(const key_type &key) const {
-    if (tree.searchTree(make_pair(key, 0)) != tree.getSentinel())
+    if (tree.searchTree(make_pair(key, mapped_type())) != tree.getSentinel())
       return 1;
     else
       return 0;
@@ -150,7 +157,7 @@ public:
    * @return iterator to the node which validates !key_compare or end() if no such node is found
    */
   iterator lower_bound(const key_type &key){
-    iterator it(tree.getLowerBound(make_pair(key, 0)));
+    iterator it(tree.getLowerBound(make_pair(key, mapped_type())));
     if (it != tree.getSentinel())
       return it;
     else
@@ -164,7 +171,7 @@ public:
    * @return iterator to the successor node or end() if no successor is found 
    */
   iterator upper_bound(const key_type &key){
-    iterator it(tree.getSuccessor(make_pair(key, 0)));
+    iterator it(tree.getSuccessor(make_pair(key, mapped_type())));
     if (it != tree.getSentinel())
       return it;
     else
