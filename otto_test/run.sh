@@ -74,7 +74,7 @@ for file in $TESTED_FILES_FOLDER${TESTED_CONTAINER}_testing/*.cpp; do
 done
 
 echo -en "TESTED CONTAINER >>>>>> $TESTED_CONTAINER\n"
-
+#Loop through test files with compilation and execution for each test
 for test in ./${TESTED_FILES_FOLDER}${TESTED_CONTAINER}_testing/*.cpp; do
 
     COUNT_TOTAL_TESTS=$((COUNT_TOTAL_TESTS + 1))
