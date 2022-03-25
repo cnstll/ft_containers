@@ -56,6 +56,26 @@ struct mapNode {
       tmp = tmp->left;
     return tmp;
   };
+
+  mapNode<T> *getPredecessor() {
+    if (!left->isSentinel)
+      return left->getMax();
+    mapNode<T> *searchedParent = parent;
+    mapNode<T> *tmp = this;
+    while (!searchedParent->isSentinel && tmp == searchedParent->left)
+    {
+      tmp = searchedParent;
+      searchedParent = searchedParent->parent;
+    }
+    return searchedParent;
+  };
+
+  mapNode<T> *getMax() {
+    mapNode<T> *tmp = this;
+    while (tmp->right != NULL && !tmp->right->isSentinel)
+      tmp = tmp->right;
+    return tmp;
+  };
   // friend bool operator==(const mapNode<T>& lhs, const mapNode<T>& rhs) { return lhs.data == rhs.data; };
 
 };
@@ -474,8 +494,8 @@ public:
       // 4. this is not empty, other is empty >  clear tree and sentinel and swap other element
       if (countNode != 0 || !other.getNodeCount()){
         clearTree();
-        clearTreeSentinel();
       }
+      clearTreeSentinel();
       comp = Compare(other.comp);
       nodeAllocator = Allocator(other.nodeAllocator);
       sentinel = nodeAllocator.allocate(1);
@@ -527,15 +547,15 @@ public:
       return searchResult->data;
   }
 
-  Node *getMin(Node * current) {
-    while (current->left != sentinel) {
+  Node *getMin(Node * current) const {
+    while (!current->isSentinel && current->left != sentinel) {
       current = current->left;
     }
     return current;
   };
 
-  Node *getMax(Node * current) {
-    while (current->right != sentinel) {
+  Node *getMax(Node * current) const {
+    while (!current->isSentinel && current->right != sentinel) {
       current = current->right;
     }
     return current;
@@ -583,7 +603,7 @@ public:
     }
   }
 
-  Node *getRoot(){
+  Node *getRoot() const{
     return this->root;
   };
 
@@ -591,11 +611,11 @@ public:
     return this->sentinel;
   };
 
-  Node *getLastInsertedNode(){
+  Node *getLastInsertedNode() const {
     return this->lastInsertedNode;
   }
 
-  T getData(Node *current){
+  T getData(Node *current) const {
     return current->data;
   };
 

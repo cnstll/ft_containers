@@ -47,5 +47,20 @@ int main (){
     std::cout << "Empty ? : " << first.empty() << std::endl;
     std::cout << "Size ? : " << first.size() << std::endl;
   }
+  {
+    NAMESPACE::map<char,int> first;
+    first['a'] = 97;
+    first['b'] = 98;
+    first['c'] = 99;
+    first['d'] = 100;
+    NAMESPACE::map<char, int>::iterator it = first.begin();
+    std::cout << "Before erase: \n";
+    std::cout << "Empty ? : " << first.empty() << std::endl;
+    std::cout << "Size ? : " << first.size() << std::endl;
+    first.erase(it);
+    std::cout << "After erase: \n";
+    std::cout << "Empty ? : " << first.empty() << std::endl;
+    std::cout << "Size ? : " << first.size() << std::endl;
+  }
   return 0;
 }

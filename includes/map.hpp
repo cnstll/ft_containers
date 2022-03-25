@@ -1,6 +1,7 @@
 #ifndef MAP_HPP
 #define MAP_HPP
 // ! Remove
+#include "lexicographical_compare.hpp"
 #include "pair.hpp"
 #include "RBtree.hpp"
 #include "iterator.hpp"
@@ -32,7 +33,7 @@ public:
   //typedef RedBlackTree::pointer                    pointer;                 
   //typedef RedBlackTree::const_pointer              const_pointer;           
   typedef typename ft::mapIterator<value_type>                   iterator;                
-  //typedef ft::constMapIterator<value_type>             const_iterator;          
+  typedef typename ft::constMapIterator<value_type>              const_iterator;          
   //typedef RedBlackTree::reverse_iterator           reverse_iterator;        
   //typedef RedBlackTree::const_reverse_iterator     const_reverse_iterator;  
   //typedef value_compare_impl                 value_compare;
@@ -56,27 +57,33 @@ public:
   explicit map(const Compare& comp = Compare(), const allocator_type& alloc = Allocator()): tree(comp){
     (void)(alloc);
   };
+  template< class InputIt >
+  //map( InputIt first, InputIt last, const Compare& comp = Compare(), const Allocator& alloc = Allocator() ){
+  //  
+  //};
   map( const map& other ){ *this = other; };
   ~map(){};
   map& operator=( const map& other ){
     if (this != &other){
-      tree = other.tree;
       tree_allocator = Allocator(other.tree_allocator);
+      tree = other.tree;
     }
     return *this;
   };
+  allocator_type get_allocator() const { return tree_allocator; };
+  /**
+   * ELEMENT ACCESS FUNCTIONS
+   */
   mapped_type& operator[]( const key_type& key ){
     return insert(ft::make_pair(key, mapped_type())).first->second;
   };
-
-  key_compare key_comp() const { return tree.getComp(); };
-  value_compare value_comp() const{ return value_compare(key_comp());};
-
-  //allocator_type get_allocator() const { return tree_allocator; };
-  iterator begin(){ return iterator(tree.getMin(tree.getRoot())) ;};
-  // const_iterator begin() const{};
-  iterator end(){ return iterator(tree.getMax(tree.getRoot())->right); };
-  // const_iterator end() const{};
+  /**
+   * ITERATORS FUNCTIONS
+   */
+  iterator begin(){ return iterator(tree.getMin(tree.getRoot()));};
+  const_iterator begin() const { return const_iterator(tree.getMin(tree.getRoot())); };
+  iterator end(){ return iterator(tree.getSentinel()); };
+  const_iterator end() const { return const_iterator(tree.getSentinel()); };
   // reverse_iterator rbegin(){};
   // const_reverse_iterator rbegin() const{};
   // reverse_iterator rend(){};
@@ -87,18 +94,16 @@ public:
   bool empty() const { return tree.getNodeCount() == 0; };
   size_type size() const { return tree.getNodeCount(); };
   size_type max_size() const { return tree_allocator.max_size(); };
-
-  void swap(map &other){
-    baseSwap(tree_allocator, other.tree_allocator);
-    baseSwap(tree, other.tree);
+  /**
+   * MODIFIERS FUNCTIONS
+   */
+  void clear(){
+    tree.clearTree();
   };
   ft::pair<iterator, bool> insert( const value_type& value ){
     
     bool insertionResult = tree.insert(value);
-    //if (insertionResult) tree.printTree();
-    //std::cout << "Tree state: \n";
-    //tree.printTree();
-    return make_pair(iterator(tree.getLastInsertedNode()), insertionResult);
+    return ft::make_pair(iterator(tree.getLastInsertedNode()), insertionResult);
   };
 
   template< class InputIt >
@@ -109,34 +114,26 @@ public:
       ++it;
     }
   };
-  //void erase( iterator pos ){
-  //  erase((*pos).first);
-  //};
-  //iterator erase( const_iterator pos );
-  size_type erase( const Key& key ){
-    return (tree.remove(make_pair(key, mapped_type())));
+  void erase( iterator pos ){
+    erase((*pos).first);
   };
-  void clear(){
-    tree.clearTree();
+  void erase( iterator first, iterator last ){
+    while (first != last){
+      erase(first);
+      ++first;
+    }
+  };
+  size_type erase( const Key& key ){
+    return (tree.remove(ft::make_pair(key, mapped_type())));
+  };
+  void swap(map &other){
+    baseSwap(tree_allocator, other.tree_allocator);
+    baseSwap(tree, other.tree);
   };
   /**
    * LOOKUP FUNCTIONS 
    */
 
-  /**
-   * @brief search the RBtree for nodes with the corresponding key
-   * 
-   * @param key used to search the tree for the corresponding node
-   * @return iterator to the node where key was found or end() if no node with key was found
-   */
-  iterator find(const key_type &key){
-    iterator it(tree.searchTree(make_pair(key, mapped_type())));
-    if (it == tree.getSentinel())
-      return end();
-    else
-      return it;
-  };
-  // const_iterator find(const key_type &) const{};
   /**
    * @brief count the number of node with the key passed, as map is made of unique keys count can only return 1 or 0
    * 
@@ -144,40 +141,31 @@ public:
    * @return size_type of 1 or 0 
    */
   size_type count(const key_type &key) const {
-    if (tree.searchTree(make_pair(key, mapped_type())) != tree.getSentinel())
+    if (tree.searchTree(ft::make_pair(key, mapped_type())) != tree.getSentinel())
       return 1;
     else
       return 0;
   };
-  //! Not sure about implementation, to be further tested
   /**
-   * @brief find the first node with a key that validate key !key_compare
+   * @brief search the RBtree for nodes with the corresponding key
    * 
-   * @param key checked against
-   * @return iterator to the node which validates !key_compare or end() if no such node is found
+   * @param key used to search the tree for the corresponding node
+   * @return iterator to the node where key was found or end() if no node with key was found
    */
-  iterator lower_bound(const key_type &key){
-    iterator it(tree.getLowerBound(make_pair(key, mapped_type())));
-    if (it != tree.getSentinel())
-      return it;
-    else
+  iterator find(const key_type &key){
+    iterator it(tree.searchTree(ft::make_pair(key, mapped_type())));
+    if (it == tree.getSentinel())
       return end();
+    else
+      return it;
   };
-  // const_iterator lower_bound(const key_type &) const{};
-  /**
-   * @brief find the successor of the node with key passed as parameter
-   * 
-   * @param key checked against 
-   * @return iterator to the successor node or end() if no successor is found 
-   */
-  iterator upper_bound(const key_type &key){
-    iterator it(tree.getSuccessor(make_pair(key, mapped_type())));
-    if (it != tree.getSentinel())
-      return it;
-    else
+  const_iterator find(const key_type &key) const {
+    const_iterator it(tree.searchTree(ft::make_pair(key, mapped_type())));
+    if (it == tree.getSentinel())
       return end();
-  }
-  // const_iterator upper_bound(const key_type &) const{};
+    else
+      return it;
+  };
   /**
    * @brief find a pair of iterator that points to the lower and upper bound of the key passed
    * 
@@ -187,11 +175,107 @@ public:
   ft::pair< iterator, iterator > equal_range(const key_type &key){
     return ft::make_pair(lower_bound(key), upper_bound(key));
   };
-  // std::pair< const_iterator, const_iterator >
-  // equal_range(const key_type &) const{};
+  ft::pair< const_iterator, const_iterator > equal_range(const key_type &key) const {
+    return ft::make_pair(lower_bound(key), upper_bound(key));
+  };
+  //! Not sure about implementation, to be further tested
+  /**
+   * @brief lower_bound, find the first node with a key that validate key !key_compare
+   * 
+   * @param key checked against
+   * @return iterator to the node which validates !key_compare or end() if no such node is found
+   */
+  iterator lower_bound(const key_type &key){
+    iterator it(tree.getLowerBound(ft::make_pair(key, mapped_type())));
+    if (it != tree.getSentinel())
+      return it;
+    else
+      return end();
+  };
+  const_iterator lower_bound(const key_type &key) const {
+    const_iterator it(tree.getLowerBound(ft::make_pair(key, mapped_type())));
+    if (it != tree.getSentinel())
+      return it;
+    else
+      return end();
+  };
+  /**
+   * @brief find the successor of the node with key passed as parameter
+   * 
+   * @param key checked against 
+   * @return iterator to the successor node or end() if no successor is found 
+   */
+  iterator upper_bound(const key_type &key){
+    iterator it(tree.getSuccessor(ft::make_pair(key, mapped_type())));
+    if (it != tree.getSentinel())
+      return it;
+    else
+      return end();
+  }
+  const_iterator upper_bound(const key_type &key) const{
+    const_iterator it(tree.getSuccessor(ft::make_pair(key, mapped_type())));
+    if (it != tree.getSentinel())
+      return it;
+    else
+      return end();
+  };
+  /**
+   * OBSERVERS FUNCTIONS
+   */
+  key_compare key_comp() const { return tree.getComp(); };
+  value_compare value_comp() const{ return value_compare(key_comp());};
+  /**
+   * @brief overload of operator== marked as friend to be able to access "tree" in map
+   */
+  template< class _Key, class _T, class _Compare, class _Alloc >
+  friend bool operator==( const ft::map<_Key,_T,_Compare,_Alloc>& lhs, const ft::map<_Key,_T,_Compare,_Alloc>& rhs );
+  
   private : 
     RedBlackTree<value_type, key_compare, allocator_type>        tree;
     allocator_type tree_allocator;
+};
+/**
+* map Non member functions
+*/
+template< class Key, class T, class Compare, class Alloc >
+void swap( ft::map<Key,T,Compare,Alloc>& lhs, ft::map<Key,T,Compare,Alloc>& rhs ){ lhs.swap(rhs); };
+template< class Key, class T, class Compare, class Alloc >
+bool operator==( const ft::map<Key,T,Compare,Alloc>& lhs, const ft::map<Key,T,Compare,Alloc>& rhs ){
+  if (lhs.tree.getNodeCount() != rhs.tree.getNodeCount())
+    return false;
+  typename ft::map<Key,T,Compare,Alloc>::const_iterator it_lhs = lhs.begin();
+  typename ft::map<Key,T,Compare,Alloc>::const_iterator it_rhs = rhs.begin();
+  while (it_lhs != lhs.end() && it_rhs != rhs.end()){
+    if ((*it_lhs).first != (*it_lhs).first)
+      return false;
+    if ((*it_lhs).second != (*it_lhs).second)
+      return false;
+    ++it_lhs;
+    ++it_rhs;
+  }
+  if (it_lhs != lhs.end() || it_rhs != rhs.end())
+    return false;
+  return true;
+};
+template< class Key, class T, class Compare, class Alloc >
+bool operator!=( const ft::map<Key,T,Compare,Alloc>& lhs, const ft::map<Key,T,Compare,Alloc>& rhs ){
+  return !(lhs == rhs);
+};
+template< class Key, class T, class Compare, class Alloc >
+bool operator<( const ft::map<Key,T,Compare,Alloc>& lhs, const ft::map<Key,T,Compare,Alloc>& rhs ){
+  return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+};
+template< class Key, class T, class Compare, class Alloc >
+bool operator<=( const ft::map<Key,T,Compare,Alloc>& lhs, const ft::map<Key,T,Compare,Alloc>& rhs ){
+  return !(rhs < lhs);
+};
+template< class Key, class T, class Compare, class Alloc >
+bool operator>( const ft::map<Key,T,Compare,Alloc>& lhs, const ft::map<Key,T,Compare,Alloc>& rhs ){
+  return (rhs <  lhs);
+};
+template< class Key, class T, class Compare, class Alloc >
+bool operator>=( const ft::map<Key,T,Compare,Alloc>& lhs, const ft::map<Key,T,Compare,Alloc>& rhs ){
+  return !(lhs < rhs);
 };
 };//NAMESPACE
 #endif
