@@ -276,8 +276,8 @@ class mapIterator : public ft::iterator<bidirectional_iterator_tag, T>
     typedef T* pointer;
     typedef T& reference;
   /* Is default-constructible, copy-constructible, copy-assignable and destructible */
-    mapIterator() : currentNode(), root(), sentinel(){}
-    mapIterator(nodePointer someMapNode) : currentNode(someMapNode), root(), sentinel(){}
+    mapIterator() : currentNode(){}
+    mapIterator(nodePointer someMapNode) : currentNode(someMapNode){}
     mapIterator(const mapIterator& other){ *this = other; }
     mapIterator &operator=(const mapIterator& rhs){ 
       if (this != &rhs)
@@ -287,34 +287,83 @@ class mapIterator : public ft::iterator<bidirectional_iterator_tag, T>
     ~mapIterator(void) {}
 
   /*Can be dereferenced as an lvalue (if in a dereferenceable state).*/
-    //map<T,U>::iterator it
-    // *it
     T& operator*() const { return currentNode->data; }
     T *operator->() { return &currentNode->data; }
 
   /*Supports the offset dereference operator ([])	*/
-    reference operator[](difference_type n) {
-      nodePointer nodeSuccessor = currentNode;
-      while (n-- > 0){
-        nodeSuccessor = nodeSuccessor->getSuccessor();
-      }
-      return (nodeSuccessor->data);
-    }
+  /* There is apparently not subscript operator for map iterator*/
+  //  reference operator[](difference_type n) {
+  //    nodePointer nodeSuccessor = currentNode;
+  //    while (n-- > 0){
+  //      nodeSuccessor = nodeSuccessor->getSuccessor();
+  //    }
+  //    return (nodeSuccessor->data);
+  //  }
   /*Can be incremented (if in a dereferenceable state).*/
     mapIterator& operator++() {currentNode = currentNode->getSuccessor(); return *this;}
     mapIterator operator++(int) {mapIterator tmp(*this); operator++(); return tmp;}
 
   /*Can be incremented (if in a dereferenceable state).*/
-   // mapIterator& operator--() {currentNode = tree->getPredecessor(currentNode); return *this;}
-   // mapIterator operator--(int) {mapIterator tmp(*this); operator--(); return tmp;}
+    mapIterator& operator--() {
+      if (currentNode->isSentinel)
+        currentNode = currentNode->getMax();
+      else
+        currentNode = currentNode->getPredecessor();
+      return *this;
+    }
+    mapIterator operator--(int) {mapIterator tmp(*this); operator--(); return tmp;}
   
   /*Can be compared for equivalence using the equality/inequality operators*/
     friend bool operator==(const mapIterator& lhs, const mapIterator& rhs) { return lhs.currentNode->data == rhs.currentNode->data; };
     friend bool operator!=(const mapIterator& lhs, const mapIterator& rhs) { return !operator==(lhs, rhs); };
     
     nodePointer currentNode;
-    nodePointer root;
-    nodePointer sentinel;
+};
+template <class T> 
+class constMapIterator : public ft::iterator<bidirectional_iterator_tag, T>
+{
+  public:
+    typedef bidirectional_iterator_tag iterator_category;
+    typedef std::ptrdiff_t difference_type;
+    typedef typename ft::mapNode<T>* nodePointer;
+    typedef const T value_type;
+    typedef const T* pointer;
+    typedef const T& reference;
+  /* Is default-constructible, copy-constructible, copy-assignable and destructible */
+    constMapIterator() : currentNode(){}
+    constMapIterator(nodePointer someMapNode) : currentNode(someMapNode){}
+    constMapIterator(const constMapIterator& other){ *this = other; }
+    constMapIterator(const mapIterator<T>& other){ *this = other; }
+    constMapIterator &operator=(const constMapIterator& rhs){ 
+      if (this != &rhs)
+        this->currentNode = rhs.currentNode;
+      return *this;
+    }
+    ~constMapIterator(void) {}
+
+  /*Can be dereferenced as an lvalue (if in a dereferenceable state).*/
+    T& operator*() const { return currentNode->data; }
+    T *operator->() { return &currentNode->data; }
+
+  /*Can be incremented (if in a dereferenceable state).*/
+    constMapIterator& operator++() {currentNode = currentNode->getSuccessor(); return *this;}
+    constMapIterator operator++(int) {constMapIterator tmp(*this); operator++(); return tmp;}
+
+  /*Can be incremented (if in a dereferenceable state).*/
+    constMapIterator& operator--() {
+      if (currentNode->isSentinel)
+        currentNode = currentNode->getMax();
+      else
+        currentNode = currentNode->getPredecessor();
+      return *this;
+    }
+    constMapIterator operator--(int) {constMapIterator tmp(*this); operator--(); return tmp;}
+  
+  /*Can be compared for equivalence using the equality/inequality operators*/
+    friend bool operator==(const constMapIterator& lhs, const constMapIterator& rhs) { return lhs.currentNode->data == rhs.currentNode->data; };
+    friend bool operator!=(const constMapIterator& lhs, const constMapIterator& rhs) { return !operator==(lhs, rhs); };
+    
+    nodePointer currentNode;
 };
 }; // NAMESPACE
 
