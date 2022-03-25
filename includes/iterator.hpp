@@ -299,7 +299,13 @@ class mapIterator : public ft::iterator<bidirectional_iterator_tag, T>
   //    return (nodeSuccessor->data);
   //  }
   /*Can be incremented (if in a dereferenceable state).*/
-    mapIterator& operator++() {currentNode = currentNode->getSuccessor(); return *this;}
+    mapIterator& operator++() {
+      if (currentNode->isSentinel)
+        currentNode = currentNode->getMin();
+      else
+        currentNode = currentNode->getSuccessor();
+      return *this;
+    }
     mapIterator operator++(int) {mapIterator tmp(*this); operator++(); return tmp;}
 
   /*Can be incremented (if in a dereferenceable state).*/

@@ -278,43 +278,47 @@ template <
   }
 
   bool _insert(const key_value_pair& data){
-      Node *insertedNode = _nodeCreationHelper(data);
-      Node *savedParent = sentinel;
-      Node *savedRoot = this->root;
+      try {
+        Node *insertedNode = _nodeCreationHelper(data);
+        Node *savedParent = sentinel;
+        Node *savedRoot = this->root;
 
-      while (savedRoot != sentinel) {
-        savedParent = savedRoot;
-        if (insertedNode->data.first == savedRoot->data.first){
-          lastInsertedNode = savedRoot;
-          _nodeDeletionHelper(insertedNode);
-          return false;
+        while (savedRoot != sentinel) {
+          savedParent = savedRoot;
+          if (insertedNode->data.first == savedRoot->data.first){
+            lastInsertedNode = savedRoot;
+            _nodeDeletionHelper(insertedNode);
+            return false;
+          }
+          else if (comp(insertedNode->data.first, savedRoot->data.first)) {
+            savedRoot = savedRoot->left;
+          } else {
+            savedRoot = savedRoot->right;
+          }
         }
-        else if (comp(insertedNode->data.first, savedRoot->data.first)) {
-          savedRoot = savedRoot->left;
+        insertedNode->parent = savedParent;
+        if (savedParent == sentinel) {
+          root = insertedNode;
+        } else if (comp(insertedNode->data.first, savedParent->data.first)) {
+          savedParent->left = insertedNode;
         } else {
-          savedRoot = savedRoot->right;
+          savedParent->right = insertedNode;
         }
-      }
-      insertedNode->parent = savedParent;
-      if (savedParent == sentinel) {
-        root = insertedNode;
-      } else if (comp(insertedNode->data.first, savedParent->data.first)) {
-        savedParent->left = insertedNode;
-      } else {
-        savedParent->right = insertedNode;
-      }
-      lastInsertedNode = insertedNode;
-      ++countNode;
-      if (insertedNode->parent == sentinel) {
-        insertedNode->color = black;
+        lastInsertedNode = insertedNode;
+        ++countNode;
+        if (insertedNode->parent == sentinel) {
+          insertedNode->color = black;
+          return true;
+        }
+        if (insertedNode->parent->parent == sentinel) {
+          return true;
+        }
+        _recolorAndBalanceTreeAfterInsert(insertedNode);
+        lastInsertedNode = insertedNode;
         return true;
+      } catch (...){
+        return false;
       }
-      if (insertedNode->parent->parent == sentinel) {
-        return true;
-      }
-      _recolorAndBalanceTreeAfterInsert(insertedNode);
-      lastInsertedNode = insertedNode;
-      return true;
   };
   /* 
    *  END INSERTION SECTION
@@ -442,8 +446,13 @@ template <
   }
 
   Node *_nodeCreationHelper(const key_value_pair& data){
-    Node *newNode = nodeAllocator.allocate(1);
-    nodeAllocator.construct(newNode, Node(data, NULL, sentinel, sentinel, red, false));
+    Node *newNode;
+    try {
+          newNode = nodeAllocator.allocate(1);
+          nodeAllocator.construct(newNode, Node(data, NULL, sentinel, sentinel, red, false));
+    } catch (...){
+      throw std::bad_alloc();
+    }
     return newNode;
   }
 
@@ -467,35 +476,18 @@ template <
 public:
 
   RedBlackTree(const key_compare& comp = key_compare()) : comp(comp), countNode(0){
-    sentinel = nodeAllocator.allocate(1);
-    nodeAllocator.construct(sentinel, Node());
-    root = sentinel;
-    lastInsertedNode = root;
-  }
-  RedBlackTree(const RedBlackTree &other){
-    countNode = other.countNode;
-    comp = Compare(other.comp);
-    nodeAllocator = Allocator(other.nodeAllocator);
-    sentinel = nodeAllocator.allocate(1);
-    nodeAllocator.construct(sentinel, Node());
-    root = sentinel;
-    lastInsertedNode = root;
-    // If other tree is not empty then insert its content in instanciated tree
-    if (other.getNodeCount()){
-      _deepCopyNodes(other.root);
-      lastInsertedNode = _searchTree(root, other.lastInsertedNode->data);
+    try {
+      sentinel = nodeAllocator.allocate(1);
+      nodeAllocator.construct(sentinel, Node());
+      root = sentinel;
+      lastInsertedNode = root;
+    } catch (...){
+      throw std::bad_alloc();
     }
   }
-  RedBlackTree& operator=( const RedBlackTree& other ){
-    if (this != &other){
-      // 1. this is empty, other is empty >  clear tree and sentinel and swap other element
-      // 2. this is empty, other is not empty >  clear tree and sentinel and swap other element and insert elements
-      // 3. this is not empty, other is not empty >  clear tree and sentinel and swap other element and insert elements
-      // 4. this is not empty, other is empty >  clear tree and sentinel and swap other element
-      if (countNode != 0 || !other.getNodeCount()){
-        clearTree();
-      }
-      clearTreeSentinel();
+  RedBlackTree(const RedBlackTree &other){
+    try {
+      countNode = other.countNode;
       comp = Compare(other.comp);
       nodeAllocator = Allocator(other.nodeAllocator);
       sentinel = nodeAllocator.allocate(1);
@@ -506,6 +498,32 @@ public:
       if (other.getNodeCount()){
         _deepCopyNodes(other.root);
         lastInsertedNode = _searchTree(root, other.lastInsertedNode->data);
+      }
+    } catch (...){
+      throw std::bad_alloc();
+    }
+
+  }
+  RedBlackTree& operator=( const RedBlackTree& other ){
+    if (this != &other){
+      try {
+        if (countNode != 0 || !other.getNodeCount()){
+          clearTree();
+        }
+        clearTreeSentinel();
+        comp = Compare(other.comp);
+        nodeAllocator = Allocator(other.nodeAllocator);
+        sentinel = nodeAllocator.allocate(1);
+        nodeAllocator.construct(sentinel, Node());
+        root = sentinel;
+        lastInsertedNode = root;
+        // If other tree is not empty then insert its content in instanciated tree
+        if (other.getNodeCount()){
+          _deepCopyNodes(other.root);
+          lastInsertedNode = _searchTree(root, other.lastInsertedNode->data);
+        }
+      } catch (...){
+        throw std::bad_alloc();
       }
     }
     return *this;

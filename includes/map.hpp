@@ -21,46 +21,50 @@ template<
 > class map {
 public:
   // types
-  typedef Key                                key_type;                
-  typedef T                                  mapped_type;             
-  typedef typename ft::pair<const Key, T>            value_type;           
-  typedef std::size_t                  size_type;               
-  //typedef std::ptrdiff            difference_type;         
-  typedef Compare                            key_compare;             
-  typedef Allocator                          allocator_type;
-  //typedef RedBlackTree::reference                  reference;               
-  //typedef RedBlackTree::const_reference            const_reference;         
-  //typedef RedBlackTree::pointer                    pointer;                 
-  //typedef RedBlackTree::const_pointer              const_pointer;           
-  typedef typename ft::mapIterator<value_type>                   iterator;                
-  typedef typename ft::constMapIterator<value_type>              const_iterator;          
-  typedef typename ft::reverse_iterator<mapIterator<value_type> >           reverse_iterator;        
-  typedef typename ft::reverse_iterator<constMapIterator<value_type> >           const_reverse_iterator;        
-  //typedef value_compare_impl                 value_compare;
-  //typedef typename ft::mapNode<value_type>  node_type;
-  //typedef typename ft::mapNode<value_type>*  node_pointer;
+  typedef Key                                                           key_type;
+  typedef T                                                             mapped_type;
+  typedef typename ft::pair<const Key, T>                               value_type;
+  typedef std::size_t                                                   size_type;
+  typedef std::ptrdiff_t                                                difference_type;
+  typedef Compare                                                       key_compare;
+  typedef Allocator                                                     allocator_type;
+  typedef value_type&                                                   reference;
+  typedef const value_type&                                             const_reference;
+  typedef typename Allocator::pointer                                   pointer;
+  typedef typename Allocator::const_pointer                             const_pointer;
+  typedef typename ft::mapIterator<value_type>                          iterator;
+  typedef typename ft::constMapIterator<value_type>                     const_iterator;
+  typedef typename ft::reverse_iterator<mapIterator<value_type> >       reverse_iterator;
+  typedef typename ft::reverse_iterator<constMapIterator<value_type> >  const_reverse_iterator;
+  /**
+   * @brief ft::map::value_compare is a function object that compares objects of type
+   * ft::map::value_type (key-value pairs) by comparing of the first components of the pairs.
+   * 
+   */
   class value_compare : public std::binary_function<value_type, value_type, bool> {
     friend class map;
-  protected:
-    Compare comp;
-    value_compare(Compare c) : comp(c) {} // constructed with map's comparison object
-  public:
-    typedef bool result_type;
-    typedef value_type first_argument_type;
-    typedef value_type second_argument_type;
-    bool operator()(const value_type &x, const value_type &y) const
-    {
-      return comp(x.first, y.first);
-    }
+    protected:
+      key_compare comp;
+      value_compare(Compare c) : comp(c) {} // constructed with map's comparison object
+    public:
+      typedef bool result_type;
+      typedef value_type first_argument_type;
+      typedef value_type second_argument_type;
+      /**
+       * @brief Compares x.first and y.first by calling the stored comparator
+       */
+      bool operator()(const value_type &x, const value_type &y) const {
+        return comp(x.first, y.first);
+      }
   };
-  // construct/copy/destruct
-  explicit map(const Compare& comp = Compare(), const allocator_type& alloc = Allocator()): tree(comp){
-    (void)(alloc);
-  };
+  /**
+   * CONSTRUCTORS, COPY CONSTRUCTORS, DESTRUCTOR
+   */
+  explicit map(const Compare& comp = Compare(), const allocator_type& alloc = Allocator()): tree(comp), tree_allocator(alloc){};
   template< class InputIt >
-  //map( InputIt first, InputIt last, const Compare& comp = Compare(), const Allocator& alloc = Allocator() ){
-  //  
-  //};
+  map( InputIt first, InputIt last, const Compare& comp = Compare(), const Allocator& alloc = Allocator()) : tree(comp), tree_allocator(alloc){
+    insert(first, last);
+  };
   map( const map& other ){ *this = other; };
   ~map(){};
   map& operator=( const map& other ){
@@ -84,6 +88,7 @@ public:
   const_iterator begin() const { return const_iterator(tree.getMin(tree.getRoot())); };
   iterator end(){ return iterator(tree.getSentinel()); };
   const_iterator end() const { return const_iterator(tree.getSentinel()); };
+  //! REVERSE ITERATORS NEED FIXING
   reverse_iterator rbegin(){ return reverse_iterator(end()); };
   const_reverse_iterator rbegin() const{ return const_reverse_iterator(end()); };
   reverse_iterator rend(){ return reverse_iterator(begin()); };
@@ -98,7 +103,8 @@ public:
    * MODIFIERS FUNCTIONS
    */
   void clear(){
-    tree.clearTree();
+    if (tree.getNodeCount() > 0)
+      tree.clearTree();
   };
   ft::pair<iterator, bool> insert( const value_type& value ){
     
@@ -223,7 +229,7 @@ public:
    * OBSERVERS FUNCTIONS
    */
   key_compare key_comp() const { return tree.getComp(); };
-  value_compare value_comp() const{ return value_compare(key_comp());};
+  value_compare value_comp() const { return value_compare(key_comp());};
   /**
    * @brief overload of operator== marked as friend to be able to access "tree" in map
    */
@@ -237,8 +243,15 @@ public:
 /**
 * map Non member functions
 */
+
 template< class Key, class T, class Compare, class Alloc >
 void swap( ft::map<Key,T,Compare,Alloc>& lhs, ft::map<Key,T,Compare,Alloc>& rhs ){ lhs.swap(rhs); };
+
+/**
+ * @brief Checks if the contents of lhs and rhs are equal,
+ * that is, they have the same number of elements
+ * and each element in lhs compares equal with the element in rhs at the same position.
+ */
 template< class Key, class T, class Compare, class Alloc >
 bool operator==( const ft::map<Key,T,Compare,Alloc>& lhs, const ft::map<Key,T,Compare,Alloc>& rhs ){
   if (lhs.tree.getNodeCount() != rhs.tree.getNodeCount())
@@ -261,6 +274,12 @@ template< class Key, class T, class Compare, class Alloc >
 bool operator!=( const ft::map<Key,T,Compare,Alloc>& lhs, const ft::map<Key,T,Compare,Alloc>& rhs ){
   return !(lhs == rhs);
 };
+
+/**
+ * @brief Compares the contents of lhs and rhs lexicographically.
+ * The comparison is performed by a function equivalent to std::lexicographical_compare.
+ * This comparison ignores the map's ordering Compare.
+ */
 template< class Key, class T, class Compare, class Alloc >
 bool operator<( const ft::map<Key,T,Compare,Alloc>& lhs, const ft::map<Key,T,Compare,Alloc>& rhs ){
   return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
