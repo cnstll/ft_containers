@@ -263,8 +263,7 @@ template< class Iterator >
 typename reverse_iterator<Iterator>::difference_type operator-( const reverse_iterator<Iterator>& lhs, const reverse_iterator<Iterator>& rhs ){
   return (rhs.base() - lhs.base());
 }
-// Node-> pair(key, value)
-//
+
 template <class T> 
 class mapIterator : public ft::iterator<bidirectional_iterator_tag, T>
 {

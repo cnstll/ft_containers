@@ -34,8 +34,8 @@ public:
   //typedef RedBlackTree::const_pointer              const_pointer;           
   typedef typename ft::mapIterator<value_type>                   iterator;                
   typedef typename ft::constMapIterator<value_type>              const_iterator;          
-  //typedef RedBlackTree::reverse_iterator           reverse_iterator;        
-  //typedef RedBlackTree::const_reverse_iterator     const_reverse_iterator;  
+  typedef typename ft::reverse_iterator<mapIterator<value_type> >           reverse_iterator;        
+  typedef typename ft::reverse_iterator<constMapIterator<value_type> >           const_reverse_iterator;        
   //typedef value_compare_impl                 value_compare;
   //typedef typename ft::mapNode<value_type>  node_type;
   //typedef typename ft::mapNode<value_type>*  node_pointer;
@@ -84,10 +84,10 @@ public:
   const_iterator begin() const { return const_iterator(tree.getMin(tree.getRoot())); };
   iterator end(){ return iterator(tree.getSentinel()); };
   const_iterator end() const { return const_iterator(tree.getSentinel()); };
-  // reverse_iterator rbegin(){};
-  // const_reverse_iterator rbegin() const{};
-  // reverse_iterator rend(){};
-  // const_reverse_iterator rend() const{};
+  reverse_iterator rbegin(){ return reverse_iterator(end()); };
+  const_reverse_iterator rbegin() const{ return const_reverse_iterator(end()); };
+  reverse_iterator rend(){ return reverse_iterator(begin()); };
+  const_reverse_iterator rend() const{ return const_reverse_iterator(begin()); };
   /**
    * CAPACITY FUNCTIONS 
    */
