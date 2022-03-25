@@ -32,6 +32,17 @@ int main (){
     second['$'] = 42;
     first['d'] = 33;
   }
-
+  {
+    NAMESPACE::map<char,int> first;
+    first['b'] = 23;
+    first['c'] = 32;
+    first['d'] = 33;
+    NAMESPACE::map<char,int> second(first.begin(), first.end());
+    NAMESPACE::map<char,int>::iterator it = second.begin();
+    while(it != second.end()){
+      std::cout << "Key: " << (*it).first << "Value: " << (*it).second << std::endl;
+      ++it;
+    }
+  }
   return 0;
 }

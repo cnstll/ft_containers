@@ -81,12 +81,16 @@ for test in ./${TESTED_FILES_FOLDER}${TESTED_CONTAINER}_testing/*.cpp; do
 	test_name=$(basename ${test} | sed "s'\.cpp''")
     echo -en "TEST #${COUNT_TOTAL_TESTS}: ${test_name} - "
     c++ ${COMPILATION_FLAGS} ${test} -o ${STL_BIN} -D NAMESPACE="std"
+    STL_START=$(date +%N)
     ./${STL_BIN} > "${STL_OUTPUT_FOLDER}${STL_OUTPUT}_${test_name}.log"
+    STL_END=$(date +%N)
     c++ ${COMPILATION_FLAGS} ${test} -o ${YOUR_BIN} -D NAMESPACE="ft" 2>> ${COMPILATION_ERROR_FILE}
     if [ $? -eq 0 ]
     then
         echo -en "COMPILATION: ${GREEN}SUCCESS${RESET} - "
+        YOURS_START=$(date +%N)
         ./${YOUR_BIN} > "${YOUR_OUTPUT_FOLDER}${YOUR_OUTPUT}_${test_name}.log" 2>> ${EXECUTION_ERROR_FILE}
+        YOURS_END=$(date +%N)
         if [ $? -ne 0 ]
         then
             echo -e "EXECUTION: ${RED}ERROR${RESET}"
@@ -96,7 +100,11 @@ for test in ./${TESTED_FILES_FOLDER}${TESTED_CONTAINER}_testing/*.cpp; do
             then
                 echo -e "EXECUTION: ${RED}FAILED${RESET}"
             else
-                echo -e "EXECUTION: ${GREEN}SUCCESS${RESET}"
+                echo -ne "EXECUTION: ${GREEN}SUCCESS${RESET} - "
+                STL_DIFF=$(echo "$STL_END - $STL_START" | bc)
+                YOURS_DIFF=$(echo "$YOURS_END - $YOURS_START" | bc)
+                EXEC_TIME_MULTIPLE=$(echo "$YOURS_DIFF/$STL_DIFF" | bc)
+                echo -e "EXECUTION TIME MULTIPLE: ${EXEC_TIME_MULTIPLE}"
                 COUNT_PASSED_TESTS=$((COUNT_PASSED_TESTS + 1))
                 rm -f ${DIFF_FOLDER}${DIFF_FILE}_${test_name}
             fi

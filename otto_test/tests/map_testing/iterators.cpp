@@ -74,4 +74,16 @@ int main()
     std::cout << "it == ?" << (it == it2) << std::endl;
     std::cout << "it != ?" << (it != it2) << std::endl;
   }
+  {
+    NAMESPACE::map<char, int> asciiTab;
+    asciiTab.insert(NAMESPACE::make_pair('a', 97));
+    asciiTab.insert(NAMESPACE::make_pair('b', 98));
+    asciiTab.insert(NAMESPACE::make_pair('c', 99));
+    asciiTab.insert(NAMESPACE::make_pair('d', 100));
+    NAMESPACE::map<char, int>::reverse_iterator rit(asciiTab.rbegin());
+    //while (rit != asciiTab.rend()){
+    //  std::cout << "Key: " << (*rit).first << " - Value: " << (*rit).second << std::endl;
+    //  rit++;
+    //}
+  }
 };
