@@ -278,7 +278,7 @@ class mapIterator : public ft::iterator<bidirectional_iterator_tag, T>
   /* Is default-constructible, copy-constructible, copy-assignable and destructible */
     mapIterator() : currentNode(){}
     mapIterator(nodePointer someMapNode) : currentNode(someMapNode){}
-    mapIterator(const mapIterator& other){ *this = other; }
+    mapIterator(const mapIterator& other) : currentNode(other.currentNode){}
     mapIterator &operator=(const mapIterator& rhs){ 
       if (this != &rhs)
         this->currentNode = rhs.currentNode;
@@ -332,8 +332,8 @@ class constMapIterator : public ft::iterator<bidirectional_iterator_tag, T>
   /* Is default-constructible, copy-constructible, copy-assignable and destructible */
     constMapIterator() : currentNode(){}
     constMapIterator(nodePointer someMapNode) : currentNode(someMapNode){}
-    constMapIterator(const constMapIterator& other){ *this = other; }
-    constMapIterator(const mapIterator<T>& other){ *this = other; }
+    constMapIterator(const constMapIterator& other) : currentNode(other.currentNode){}
+    constMapIterator(const mapIterator<T>& other) : currentNode(other.currentNode){}
     constMapIterator &operator=(const constMapIterator& rhs){ 
       if (this != &rhs)
         this->currentNode = rhs.currentNode;
