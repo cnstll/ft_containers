@@ -571,7 +571,7 @@ class vector {
 template< class T, class Alloc >
 void swap( vector<T, Alloc>& lhs, vector<T, Alloc>& rhs ){ lhs.swap(rhs); };
 
-// Operator "<" and "==" are used to build the other operator overloads to limit the use of "friend" functions
+// Operator "<" is used to build the other operator overloads to limit the use of "friend" functions
 template< class T, class Container >
     bool operator<( const ft::vector<T,Container>& lhs, const ft::vector<T,Container>& rhs ) {
         return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()); 
