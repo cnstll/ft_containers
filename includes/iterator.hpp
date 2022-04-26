@@ -208,7 +208,7 @@ class reverse_iterator {
      * @return iterator_type 
      */
     iterator_type base() const { return current; };
-    reference operator*() const { iterator_type tmp = current; return *--tmp;};
+    reference operator*() const { iterator_type tmp = current; return *(--tmp);};
     pointer operator->() const { return &(operator*()); };
     reference operator[]( difference_type n ) const { return base()[-n-1]; };
     /**
@@ -216,8 +216,8 @@ class reverse_iterator {
               Inverse operations are applied to the underlying operator because of the reverse order.
      * @return reverse_iterator&, or reverse_iterator 
      */
-    reverse_iterator& operator++() { current--; return *this; };
-    reverse_iterator& operator--() { current++; return *this; };
+    reverse_iterator& operator++() { --current; return *this; };
+    reverse_iterator& operator--() { ++current; return *this; };
     reverse_iterator operator++( int ) { reverse_iterator tmp(base()); current--; return tmp; };
     reverse_iterator operator--( int ) { reverse_iterator tmp(base()); current++; return tmp; };
     reverse_iterator operator+( difference_type n ) const { return reverse_iterator(base() - n); };
@@ -299,7 +299,7 @@ class mapIterator : public ft::iterator<bidirectional_iterator_tag, T>
   //    return (nodeSuccessor->data);
   //  }
   /*Can be incremented (if in a dereferenceable state).*/
-    mapIterator& operator++() {
+    mapIterator& operator++()  {
       if (currentNode->isSentinel)
         currentNode = currentNode->getMin();
       else
@@ -310,8 +310,10 @@ class mapIterator : public ft::iterator<bidirectional_iterator_tag, T>
 
   /*Can be incremented (if in a dereferenceable state).*/
     mapIterator& operator--() {
-      if (currentNode->isSentinel)
+      //std::cout << "IS SENTINEL: " << currentNode->isSentinel << "\n";
+      if (currentNode->isSentinel){
         currentNode = currentNode->getMax();
+      }
       else
         currentNode = currentNode->getPredecessor();
       return *this;
@@ -324,6 +326,7 @@ class mapIterator : public ft::iterator<bidirectional_iterator_tag, T>
     
     nodePointer currentNode;
 };
+
 template <class T> 
 class constMapIterator : public ft::iterator<bidirectional_iterator_tag, T>
 {
@@ -351,7 +354,13 @@ class constMapIterator : public ft::iterator<bidirectional_iterator_tag, T>
     T *operator->() { return &currentNode->data; }
 
   /*Can be incremented (if in a dereferenceable state).*/
-    constMapIterator& operator++() {currentNode = currentNode->getSuccessor(); return *this;}
+    constMapIterator& operator++() {
+      if (currentNode->isSentinel)
+        currentNode = currentNode->getMin();
+      else
+        currentNode = currentNode->getSuccessor();
+      return *this;
+    }
     constMapIterator operator++(int) {constMapIterator tmp(*this); operator++(); return tmp;}
 
   /*Can be incremented (if in a dereferenceable state).*/

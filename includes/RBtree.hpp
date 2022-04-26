@@ -20,10 +20,11 @@ struct mapNode {
   mapNode<T> *right;
   bool color; // change from int to bool
   bool isSentinel;
+  mapNode<T> *lastUpdatedRoot; // Only valid for the sentinel node
 
-  mapNode() : data(), parent(NULL), left(NULL), right(NULL), color(black), isSentinel(true){}
-  mapNode(const T& d, mapNode<T> *p, mapNode<T> *l, mapNode<T>* r, bool c, bool s) : data(d), parent(p), left(l), right(r), color(c), isSentinel(s){}
-  mapNode(const mapNode& other) : data(other.data), parent(other.parent), left(other.left), right(other.right), color(other.color), isSentinel(other.isSentinel){}
+  mapNode() : data(), parent(NULL), left(NULL), right(NULL), color(black), isSentinel(true), lastUpdatedRoot(NULL){}
+  mapNode(const T& d, mapNode<T> *p, mapNode<T> *l, mapNode<T>* r, bool c, bool s, mapNode<T>* lastRoot) : data(d), parent(p), left(l), right(r), color(c), isSentinel(s), lastUpdatedRoot(lastRoot){}
+  mapNode(const mapNode& other) : data(other.data), parent(other.parent), left(other.left), right(other.right), color(other.color), isSentinel(other.isSentinel), lastUpdatedRoot(other.lastUpdatedRoot){}
   ~mapNode(){}
   mapNode &operator=(const mapNode& other){
     if (this != &other){
@@ -52,7 +53,10 @@ struct mapNode {
 
   mapNode<T> *getMin() {
     mapNode<T> *tmp = this;
-    while (tmp->left != NULL && !tmp->left->isSentinel)
+    if (tmp->isSentinel){
+      tmp = tmp->lastUpdatedRoot;
+    }
+    while (!tmp->left->isSentinel)
       tmp = tmp->left;
     return tmp;
   };
@@ -72,7 +76,10 @@ struct mapNode {
 
   mapNode<T> *getMax() {
     mapNode<T> *tmp = this;
-    while (tmp->right != NULL && !tmp->right->isSentinel)
+    if (tmp->isSentinel){
+      tmp = tmp->lastUpdatedRoot;
+    }
+    while (!tmp->right->isSentinel)
       tmp = tmp->right;
     return tmp;
   };
@@ -449,7 +456,7 @@ template <
     Node *newNode;
     try {
           newNode = nodeAllocator.allocate(1);
-          nodeAllocator.construct(newNode, Node(data, NULL, sentinel, sentinel, red, false));
+          nodeAllocator.construct(newNode, Node(data, NULL, sentinel, sentinel, red, false, NULL));
     } catch (...){
       throw std::bad_alloc();
     }
@@ -616,7 +623,6 @@ public:
     if (!comp(nodeProcessed->data.first, nodeProcessed->data.first)){
       return nodeProcessed;
     } else {
-      std::cout << "ELSE IN getLowerBound\n";
       return nodeProcessed;
     }
   }
@@ -638,11 +644,17 @@ public:
   };
 
   bool insert(const key_value_pair &data) {
-    return _insert(data);
+    bool hasBeenInserted = _insert(data);
+    if (hasBeenInserted)
+      sentinel->lastUpdatedRoot = getRoot(); 
+    return hasBeenInserted;
   };
 
-  size_type remove(const key_value_pair &data){
-    return _deleteNode(this->root, data);
+  bool remove(const key_value_pair &data){
+    int hasBeenDeleted =_deleteNode(this->root, data);
+    if (hasBeenDeleted)
+      sentinel->lastUpdatedRoot = getRoot(); 
+    return hasBeenDeleted;
   };
 
   void printTree(){
