@@ -116,5 +116,20 @@ int main()
       std::cout << "Key: " << (*rit).first << " - Value: " << (*rit).second << std::endl;
       ++rit;
     }
+    rit = asciiTab.rbegin();
+    while (rit != asciiTab.rend()){
+      std::cout << "Key: " << (*rit).first << " - Value: " << (*rit).second << std::endl;
+      rit++;
+    }
+    rit = asciiTab.rend();
+    while (rit != asciiTab.rbegin()){
+      --rit;
+      std::cout << "Key: " << (*rit).first << " - Value: " << (*rit).second << std::endl;
+    }
+    rit = asciiTab.rend();
+    while (rit != asciiTab.rbegin()){
+      rit--;
+      std::cout << "Key: " << (*rit).first << " - Value: " << (*rit).second << std::endl;
+    }
   }
 };

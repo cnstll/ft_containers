@@ -38,6 +38,13 @@ rm -rf ${DIFF_FOLDER} ${TESTED_FILES_FOLDER}
 rm -f ${YOUR_BIN} ${YOUR_OUTPUT} ${STL_BIN} ${STL_OUTPUT}
 rm -f ${COMPILATION_ERROR_FILE} ${EXECUTION_ERROR_FILE}
 
+#Verify Argument passed
+if [[ ${TESTED_CONTAINER} != "vector" ]] && [[ ${TESTED_CONTAINER} != "map" ]]
+then    
+    echo -e "ERROR: unkown argument"
+    echo -e "USAGE: ./run.sh [vector|map]"
+    exit 1
+fi
 # Creating tests folder
 mkdir -p "$TESTED_FILES_FOLDER"
 
