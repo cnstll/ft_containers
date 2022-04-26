@@ -15,7 +15,7 @@ function is_test_folder(){
 
 # Global variables
 ROOT_DIR="../"
-TESTED_CONTAINER="map"
+TESTED_CONTAINER=$1
 COMPILATION_ERROR_FILE="compilation.log"
 EXECUTION_ERROR_FILE="execution.log"
 STL_BIN="stl_${TESTED_CONTAINER}"
@@ -65,13 +65,14 @@ mkdir -p "$STL_OUTPUT_FOLDER"
 # Copy tests in active folder
 cp -r "$SRC_TESTS_FOLDER" "$TESTED_FILES_FOLDER"
 
-include_path=$(find . -name map.hpp | sed "s'\.\/${TESTED_FILES_FOLDER}'\.\.\/'")
-for file in $TESTED_FILES_FOLDER${TESTED_CONTAINER}_testing/*.cpp; do
-    #echo "file : "$file" and include path: "$include_path""
-    line_to_change=$(grep -n "map.hpp" "./$file" | sed 's/[^0-9]*//g')
-    #echo "Line to change $line_to_change -- ${line_to_change}"
-    sed -i "s'#include.*\.hpp\"'#include \"${include_path}\"'" "$file"
-done
+#replace include path
+# include_path=$(find . -name ${TESTED_CONTAINER}.hpp | sed "s'\.\/${TESTED_FILES_FOLDER}'\.\.\/'")
+# for file in $TESTED_FILES_FOLDER${TESTED_CONTAINER}_testing/*.cpp; do
+#     #echo "file : "$file" and include path: "$include_path""
+#     line_to_change=$(grep -n "${TESTED_CONTAINER}.hpp" "./$file" | sed 's/[^0-9]*//g')
+#     #echo "Line to change $line_to_change -- ${line_to_change}"
+#     sed -i "s'#include.*\.hpp\"'#include \"${include_path}\"'" "$file"
+# done
 
 echo -en "TESTED CONTAINER >>>>>> $TESTED_CONTAINER\n"
 #Loop through test files with compilation and execution for each test
@@ -103,8 +104,8 @@ for test in ./${TESTED_FILES_FOLDER}${TESTED_CONTAINER}_testing/*.cpp; do
                 echo -ne "EXECUTION: ${GREEN}SUCCESS${RESET} - "
                 STL_DIFF=$(echo "$STL_END - $STL_START" | bc)
                 YOURS_DIFF=$(echo "$YOURS_END - $YOURS_START" | bc)
-                EXEC_TIME_MULTIPLE=$(echo "$YOURS_DIFF/$STL_DIFF" | bc)
-                echo -e "EXECUTION TIME MULTIPLE: ${EXEC_TIME_MULTIPLE}"
+                EXEC_TIME_MULTIPLE=$(echo "$STL_DIFF/$YOURS_DIFF" | bc)
+                echo -e ""STL EXEC TIME / YOUR EXEC TIME": ${EXEC_TIME_MULTIPLE}"
                 COUNT_PASSED_TESTS=$((COUNT_PASSED_TESTS + 1))
                 rm -f ${DIFF_FOLDER}${DIFF_FILE}_${test_name}
             fi
@@ -138,4 +139,4 @@ done
 # echo -e STL: Execution time was `expr $end_stl - $start_stl` nanoseconds
 # echo -e Yours: Execution time was `expr $end_yours - $start_yours` nanoseconds
 print_score ${COUNT_PASSED_TESTS} ${COUNT_TOTAL_TESTS}
-rm -rf ${TESTED_FILES_FOLDER}
+# rm -rf ${TESTED_FILES_FOLDER}
