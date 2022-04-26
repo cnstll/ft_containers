@@ -34,8 +34,8 @@ public:
   typedef typename Allocator::const_pointer                             const_pointer;
   typedef typename ft::mapIterator<value_type>                          iterator;
   typedef typename ft::constMapIterator<value_type>                     const_iterator;
-  typedef typename ft::reverse_iterator<mapIterator<value_type> >       reverse_iterator;
-  typedef typename ft::reverse_iterator<constMapIterator<value_type> >  const_reverse_iterator;
+  typedef typename ft::reverse_iterator<iterator>                       reverse_iterator;
+  typedef typename ft::reverse_iterator<const_iterator>                 const_reverse_iterator;
   /**
    * @brief ft::map::value_compare is a function object that compares objects of type
    * ft::map::value_type (key-value pairs) by comparing of the first components of the pairs.

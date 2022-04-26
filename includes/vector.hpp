@@ -31,7 +31,7 @@ namespace ft {
  * @param Allocator An allocator that is used to acquire/release memory and to construct/destroy the elements in that memory.
  */
 
-template< class T, class Allocator = std::allocator<T>>
+template< class T, class Allocator = std::allocator<T> >
 class vector {
 
     public:
@@ -48,8 +48,8 @@ class vector {
         typedef const value_type& const_reference;
         typedef typename ft::vectorIterator<T> iterator;
         typedef typename ft::constVectorIterator<T> const_iterator;
-        typedef typename ft::reverse_iterator<vectorIterator<T>> reverse_iterator;
-        typedef typename ft::reverse_iterator<constVectorIterator<T>> const_reverse_iterator;
+        typedef typename ft::reverse_iterator<vectorIterator<T> > reverse_iterator;
+        typedef typename ft::reverse_iterator<constVectorIterator<T> > const_reverse_iterator;
 
         /**
          * Member functions
