@@ -88,7 +88,6 @@ public:
   const_iterator begin() const { return const_iterator(tree.getMin(tree.getRoot())); };
   iterator end(){ return iterator(tree.getSentinel()); };
   const_iterator end() const { return const_iterator(tree.getSentinel()); };
-  //! REVERSE ITERATORS NEED FIXING
   reverse_iterator rbegin(){ return reverse_iterator(end()); };
   const_reverse_iterator rbegin() const{ return const_reverse_iterator(end()); };
   reverse_iterator rend(){ return reverse_iterator(begin()); };
@@ -123,15 +122,22 @@ public:
   void erase( iterator pos ){
     erase((*pos).first);
   };
+
   void erase( iterator first, iterator last ){
+    key_type nextKey;
+    iterator tmp;
+    tmp = first;
     while (first != last){
+      ++tmp;
       erase(first);
-      ++first;
+      first = tmp;
     }
   };
+
   size_type erase( const Key& key ){
     return (tree.remove(ft::make_pair(key, mapped_type())));
   };
+  
   void swap(map &other){
     baseSwap(tree_allocator, other.tree_allocator);
     baseSwap(tree, other.tree);

@@ -72,15 +72,6 @@ mkdir -p "$STL_OUTPUT_FOLDER"
 # Copy tests in active folder
 cp -r "$SRC_TESTS_FOLDER" "$TESTED_FILES_FOLDER"
 
-#replace include path
-# include_path=$(find . -name ${TESTED_CONTAINER}.hpp | sed "s'\.\/${TESTED_FILES_FOLDER}'\.\.\/'")
-# for file in $TESTED_FILES_FOLDER${TESTED_CONTAINER}_testing/*.cpp; do
-#     #echo "file : "$file" and include path: "$include_path""
-#     line_to_change=$(grep -n "${TESTED_CONTAINER}.hpp" "./$file" | sed 's/[^0-9]*//g')
-#     #echo "Line to change $line_to_change -- ${line_to_change}"
-#     sed -i "s'#include.*\.hpp\"'#include \"${include_path}\"'" "$file"
-# done
-
 echo -en "TESTED CONTAINER >>>>>> $TESTED_CONTAINER\n"
 #Loop through test files with compilation and execution for each test
 for test in ./${TESTED_FILES_FOLDER}${TESTED_CONTAINER}_testing/*.cpp; do
@@ -89,37 +80,39 @@ for test in ./${TESTED_FILES_FOLDER}${TESTED_CONTAINER}_testing/*.cpp; do
 	test_name=$(basename ${test} | sed "s'\.cpp''")
     echo -en "TEST #${COUNT_TOTAL_TESTS}: ${test_name} - "
     c++ ${COMPILATION_FLAGS} ${test} -o ${STL_BIN} -D NAMESPACE="std"
-    STL_START=$(date +%N)
-    ./${STL_BIN} > "${STL_OUTPUT_FOLDER}${STL_OUTPUT}_${test_name}.log"
-    STL_END=$(date +%N)
     c++ ${COMPILATION_FLAGS} ${test} -o ${YOUR_BIN} -D NAMESPACE="ft" 2>> ${COMPILATION_ERROR_FILE}
     if [ $? -eq 0 ]
     then
         echo -en "COMPILATION: ${GREEN}SUCCESS${RESET} - "
-        YOURS_START=$(date +%N)
-        ./${YOUR_BIN} > "${YOUR_OUTPUT_FOLDER}${YOUR_OUTPUT}_${test_name}.log" 2>> ${EXECUTION_ERROR_FILE}
-        YOURS_END=$(date +%N)
-        if [ $? -ne 0 ]
-        then
-            echo -e "EXECUTION: ${RED}ERROR${RESET}"
-        else
-            diff  ${STL_OUTPUT_FOLDER}${STL_OUTPUT}_${test_name}.log ${YOUR_OUTPUT_FOLDER}${YOUR_OUTPUT}_${test_name}.log > ${DIFF_FOLDER}${DIFF_FILE}_${test_name}
-            if [ -s "${DIFF_FOLDER}${DIFF_FILE}_${test_name}" ]
-            then
-                echo -e "EXECUTION: ${RED}FAILED${RESET}"
-            else
-                echo -ne "EXECUTION: ${GREEN}SUCCESS${RESET} - "
-                STL_DIFF=$(echo "$STL_END - $STL_START" | bc)
-                YOURS_DIFF=$(echo "$YOURS_END - $YOURS_START" | bc)
-                EXEC_TIME_MULTIPLE=$(echo "$STL_DIFF/$YOURS_DIFF" | bc)
-                echo -e ""STL EXEC TIME / YOUR EXEC TIME": ${EXEC_TIME_MULTIPLE}"
-                COUNT_PASSED_TESTS=$((COUNT_PASSED_TESTS + 1))
-                rm -f ${DIFF_FOLDER}${DIFF_FILE}_${test_name}
-            fi
-        fi
     else
         echo -en "COMPILATION: ${RED}ERROR${RESET}  - "
         echo -e "EXECUTION: ${RED}ERROR${RESET}"
+        continue
+    fi
+    STL_START=$(date +.%N)
+    ./${STL_BIN} > "${STL_OUTPUT_FOLDER}${STL_OUTPUT}_${test_name}.log"
+    STL_END=$(date +.%N)
+    YOURS_START=$(date +.%N)
+    ./${YOUR_BIN} > "${YOUR_OUTPUT_FOLDER}${YOUR_OUTPUT}_${test_name}.log" 2>> ${EXECUTION_ERROR_FILE}
+    EXEC_RET=$?
+    YOURS_END=$(date +.%N)
+    if [ ${EXEC_RET} -ne 0 ]
+    then
+        echo -e "EXECUTION: ${RED}ERROR${RESET}"
+    else
+        diff  ${STL_OUTPUT_FOLDER}${STL_OUTPUT}_${test_name}.log ${YOUR_OUTPUT_FOLDER}${YOUR_OUTPUT}_${test_name}.log > ${DIFF_FOLDER}${DIFF_FILE}_${test_name}
+        if [ -s "${DIFF_FOLDER}${DIFF_FILE}_${test_name}" ]
+        then
+            echo -e "EXECUTION: ${RED}FAILED${RESET}"
+        else
+            echo -ne "EXECUTION: ${GREEN}SUCCESS${RESET} - "
+            STL_DIFF=$(echo "$STL_END - $STL_START" | bc -l)
+            YOURS_DIFF=$(echo "$YOURS_END - $YOURS_START" | bc -l)
+            EXEC_TIME_MULTIPLE=$(echo "$STL_DIFF/$YOURS_DIFF" | bc -l)
+            echo -e ""STL EXEC TIME / YOUR EXEC TIME": ${EXEC_TIME_MULTIPLE}"
+            COUNT_PASSED_TESTS=$((COUNT_PASSED_TESTS + 1))
+            rm -f ${DIFF_FOLDER}${DIFF_FILE}_${test_name}
+        fi
     fi
     rm -f ${STL_BIN} ${YOUR_BIN}
 done
