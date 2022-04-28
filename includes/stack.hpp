@@ -45,7 +45,7 @@ template <
         /**
          * Member functions
         */
-        explicit stack( const Container& cont = Container() ) : c(cont) { std::cout << "Constructor" <<std::endl; }; 
+        explicit stack( const Container& cont = Container() ) : c(cont) {}; 
         stack( const stack& other ){ this->c = other.c; };
         stack& operator=( const stack& other ){ this->c = other.c; return *this;};
         ~stack(){};

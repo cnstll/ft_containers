@@ -18,8 +18,8 @@ ROOT_DIR="../"
 TESTED_CONTAINER=$1
 COMPILATION_ERROR_FILE="compilation.log"
 EXECUTION_ERROR_FILE="execution.log"
-STL_BIN="stl_${TESTED_CONTAINER}"
-YOUR_BIN="your_${TESTED_CONTAINER}"
+STL_BIN="stl_bin"
+YOUR_BIN="your_bin"
 STL_OUTPUT="stl_${TESTED_CONTAINER}_output"
 YOUR_OUTPUT="your_${TESTED_CONTAINER}_output"
 STL_OUTPUT_FOLDER="stl_output/"
@@ -39,7 +39,7 @@ rm -f ${YOUR_BIN} ${YOUR_OUTPUT} ${STL_BIN} ${STL_OUTPUT}
 rm -f ${COMPILATION_ERROR_FILE} ${EXECUTION_ERROR_FILE}
 
 #Verify Argument passed
-if [[ ${TESTED_CONTAINER} != "vector" ]] && [[ ${TESTED_CONTAINER} != "map" ]]
+if [[ ${TESTED_CONTAINER} != "vector" ]] && [[ ${TESTED_CONTAINER} != "map" ]] && [[ ${TESTED_CONTAINER} != "stack" ]]
 then    
     echo -e "ERROR: unkown argument"
     echo -e "USAGE: ./run.sh [vector|map]"
@@ -90,7 +90,7 @@ for test in ./${TESTED_FILES_FOLDER}${TESTED_CONTAINER}_testing/*.cpp; do
         continue
     fi
     STL_START=$(date +.%N)
-    ./${STL_BIN} > "${STL_OUTPUT_FOLDER}${STL_OUTPUT}_${test_name}.log"
+    ./${STL_BIN} > "${STL_OUTPUT_FOLDER}${STL_OUTPUT}_${test_name}.log" 2> /dev/null
     STL_END=$(date +.%N)
     YOURS_START=$(date +.%N)
     ./${YOUR_BIN} > "${YOUR_OUTPUT_FOLDER}${YOUR_OUTPUT}_${test_name}.log" 2>> ${EXECUTION_ERROR_FILE}
@@ -99,6 +99,9 @@ for test in ./${TESTED_FILES_FOLDER}${TESTED_CONTAINER}_testing/*.cpp; do
     if [ ${EXEC_RET} -ne 0 ]
     then
         echo -e "EXECUTION: ${RED}ERROR${RESET}"
+        if [ $2 ] && [ $2 -eq 0 ]
+        then    break
+        fi
     else
         diff  ${STL_OUTPUT_FOLDER}${STL_OUTPUT}_${test_name}.log ${YOUR_OUTPUT_FOLDER}${YOUR_OUTPUT}_${test_name}.log > ${DIFF_FOLDER}${DIFF_FILE}_${test_name}
         if [ -s "${DIFF_FOLDER}${DIFF_FILE}_${test_name}" ]
