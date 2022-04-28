@@ -190,14 +190,14 @@ template <
   };
 
   void _printTree(const std::string& padding, Node* current, bool hasRight){ 
-    if(current != sentinel)
+    if(!current->isSentinel)
     {
-      std::cout << padding << (hasRight ? "|__" : "└──" );
+      std::cerr << padding << (hasRight ? "|__" : "└──" );
       if (current->color == red)
-        std::cout << current->data.first << "," << current->data.second << std::endl;
+        std::cerr << current->data.first << "," << current->data.second << std::endl;
       else
-        std::cout << current->data.first << "." << current->data.second << std::endl;
-      _printTree(padding + (hasRight ? "│   " : "    "), current->left, (current->right != sentinel));
+        std::cerr << current->data.first << "." << current->data.second << std::endl;
+      _printTree(padding + (hasRight ? "│   " : "    "), current->left, (!current->right->isSentinel));
       _printTree(padding + (hasRight ? "│   " : "    "), current->right, false);
     }
   };
@@ -416,15 +416,15 @@ template <
     Node *replacingNode; 
     Node *successorOfDeletedNode;
     deletedNode = _searchTree(current, data);
-    if (deletedNode == sentinel) {
+    if (deletedNode->isSentinel) {
       return 0;
     }
     successorOfDeletedNode = deletedNode;
     bool deletedNodeOriginalColor = deletedNode->color;
-    if (deletedNode->left == sentinel) {
+    if (deletedNode->left->isSentinel) {
       replacingNode = deletedNode->right;
       relinkNode(deletedNode, deletedNode->right);
-    } else if (deletedNode->right == sentinel) {
+    } else if (deletedNode->right->isSentinel) {
       replacingNode = deletedNode->left;
       relinkNode(deletedNode, deletedNode->left);
     } else {

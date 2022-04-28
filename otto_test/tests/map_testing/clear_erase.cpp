@@ -62,5 +62,14 @@ int main (){
     std::cout << "Empty ? : " << first.empty() << std::endl;
     std::cout << "Size ? : " << first.size() << std::endl;
   }
+  {
+    NAMESPACE::map<int, int> asciiTab;
+    int numberOfElementInserted = 10;
+    while (numberOfElementInserted > 0){
+      asciiTab[numberOfElementInserted] = 42;
+      numberOfElementInserted--;
+    }
+    asciiTab.erase(asciiTab.find(1), asciiTab.find(10));
+  }
   return 0;
 }

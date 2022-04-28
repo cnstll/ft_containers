@@ -15,9 +15,9 @@ int genRandomNum(){
 int main (){
 
   NAMESPACE::map<int, int> asciiTab;
-  int numberOfElementInserted = 10000000;
+  int numberOfElementInserted = 10;
   while (numberOfElementInserted > 0){
-    asciiTab.insert(NAMESPACE::make_pair(genRandomNum(), 42));
+    asciiTab.insert(NAMESPACE::make_pair(numberOfElementInserted, numberOfElementInserted));//genRandomNum(), 42));
     numberOfElementInserted--;
   }
   asciiTab.erase(asciiTab.begin(), asciiTab.end());

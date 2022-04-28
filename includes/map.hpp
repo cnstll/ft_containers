@@ -124,12 +124,20 @@ public:
   };
 
   void erase( iterator first, iterator last ){
-    key_type nextKey;
-    iterator tmp;
-    tmp = first;
+    key_type nextKey = (*first).first;
+    // key_type lastKey = (*last).first;
+      // std::cerr << "LK: "<< lastKey << std::endl;
+    iterator tmp = first;
+    std::cerr << "NK: "<< nextKey << std::endl;
     while (first != last){
-      ++tmp;
+      tmp = upper_bound((*tmp).first);
+      nextKey = (*tmp).first;
       erase(first);
+      if (tmp == end())
+        break;
+      tree.printTree();
+      std::cerr << "NK: "<< nextKey << std::endl;
+      tmp = find(nextKey);
       first = tmp;
     }
   };
