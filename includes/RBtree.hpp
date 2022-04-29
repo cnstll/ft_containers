@@ -34,6 +34,7 @@ struct mapNode {
       right = other.right;
       color = other.color;
       isSentinel = other.isSentinel;
+      lastUpdatedRoot = other.lastUpdatedRoot;
     }
     return *this;
   }
@@ -290,7 +291,7 @@ template <
         Node *savedParent = sentinel;
         Node *savedRoot = this->root;
 
-        while (savedRoot != sentinel) {
+        while (!savedRoot->isSentinel) {
           savedParent = savedRoot;
           if (insertedNode->data.first == savedRoot->data.first){
             lastInsertedNode = savedRoot;
@@ -304,7 +305,7 @@ template <
           }
         }
         insertedNode->parent = savedParent;
-        if (savedParent == sentinel) {
+        if (savedParent->isSentinel) {
           root = insertedNode;
         } else if (comp(insertedNode->data.first, savedParent->data.first)) {
           savedParent->left = insertedNode;
@@ -313,11 +314,11 @@ template <
         }
         lastInsertedNode = insertedNode;
         ++countNode;
-        if (insertedNode->parent == sentinel) {
+        if (insertedNode->parent->isSentinel) {
           insertedNode->color = black;
           return true;
         }
-        if (insertedNode->parent->parent == sentinel) {
+        if (insertedNode->parent->parent->isSentinel) {
           return true;
         }
         _recolorAndBalanceTreeAfterInsert(insertedNode);
@@ -401,7 +402,7 @@ template <
    * @param relinkedNode node that need to be reconnected to the parent of deletedNode
    */
   void relinkNode(Node *deletedNode, Node *relinkedNode) {
-    if (deletedNode->parent == NULL) {
+    if (deletedNode->parent->isSentinel) {
       root = relinkedNode;
     } else if (deletedNode == deletedNode->parent->left) {
       deletedNode->parent->left = relinkedNode;
@@ -559,7 +560,7 @@ public:
 
   Node *searchTree(key_value_pair data) const {
     Node *tmp = _searchTree(this->root, data);
-    if (tmp == sentinel)
+    if (tmp->isSentinel)
       return sentinel;
     else
       return tmp;
@@ -573,14 +574,14 @@ public:
   }
 
   Node *getMin(Node * current) const {
-    while (!current->isSentinel && current->left != sentinel) {
+    while (!current->isSentinel && !current->left->isSentinel) {
       current = current->left;
     }
     return current;
   };
 
   Node *getMax(Node * current) const {
-    while (!current->isSentinel && current->right != sentinel) {
+    while (!current->isSentinel && !current->right->isSentinel) {
       current = current->right;
     }
     return current;
@@ -590,11 +591,11 @@ public:
     Node *nodeProcessed;
     if ((nodeProcessed = _searchTree(root, data)) == sentinel)
       return sentinel;
-    if (nodeProcessed->right != sentinel) {
+    if (!nodeProcessed->right->isSentinel) {
       return getMin(nodeProcessed->right);
     }
     Node * searchedParent = nodeProcessed->parent;
-    while (searchedParent != sentinel && nodeProcessed == searchedParent->right) {
+    while (!searchedParent->isSentinel && nodeProcessed == searchedParent->right) {
       nodeProcessed = searchedParent;
       searchedParent = searchedParent->parent;
     }
@@ -605,11 +606,11 @@ public:
     Node *nodeProcessed;
     if ((nodeProcessed = _searchTree(root, data)) == sentinel)
       return sentinel;
-    if (nodeProcessed->left != sentinel) {
+    if (!nodeProcessed->left->isSentinel) {
       return getMax(nodeProcessed->left);
     }
     Node * searchedParent = nodeProcessed->parent;
-    while (searchedParent != sentinel && nodeProcessed == searchedParent->left) {
+    while (!searchedParent->isSentinel && nodeProcessed == searchedParent->left) {
       nodeProcessed = searchedParent;
       searchedParent = searchedParent->parent;
     }
@@ -652,8 +653,11 @@ public:
 
   bool remove(const key_value_pair &data){
     int hasBeenDeleted =_deleteNode(this->root, data);
-    if (hasBeenDeleted)
-      sentinel->lastUpdatedRoot = getRoot(); 
+    if (hasBeenDeleted){
+      if(countNode == 0)
+        root = sentinel;
+      sentinel->lastUpdatedRoot = getRoot();
+    }
     return hasBeenDeleted;
   };
 
@@ -672,30 +676,7 @@ public:
     dup->parent = srcNode->parent;
     return dup;
   }
-  //template <class _T, class _Compare, class _Allocator>
-  //friend void copyTree(RedBlackTree<_T, _Compare, _Allocator> *destination, RedBlackTree<_T, _Compare, _Allocator> *source);
-  
-  //void *_copyTreeHelper(Node *destNode, Node *srcNode){
-  //  Node *tmp;
-  //  if (destNode != sentinel)
-  //    destNode = _duplicateNode(srcNode);
-  //    tmp = srcNode;
-  //  else
-  //    return;
-  //  if (srcNode->left != sentinel){
-  //    destNode->left = _duplicateNode(srcNode->left);
-  //  }
-  //  if (srcNode->right != sentinel){
-  //    destNode->right = _duplicateNode(srcNode->right);
-  //  }
-  //}
 };
-//template <class T, class Compare, class Allocator>
-//void copyTree(RedBlackTree<T, Compare, Allocator> *destination, RedBlackTree<T, Compare, Allocator> *source){
-//  Node<T> *rootSource = source->getRoot();
-//  Node<T> *rootDestination = destination->getRoot();
-//  _
-//}
 }; //NAMESPACE
 
 #endif

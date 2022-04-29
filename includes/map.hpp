@@ -1,6 +1,5 @@
 #ifndef MAP_HPP
 #define MAP_HPP
-// ! Remove
 #include "lexicographical_compare.hpp"
 #include "pair.hpp"
 #include "RBtree.hpp"
@@ -125,18 +124,13 @@ public:
 
   void erase( iterator first, iterator last ){
     key_type nextKey = (*first).first;
-    // key_type lastKey = (*last).first;
-      // std::cerr << "LK: "<< lastKey << std::endl;
     iterator tmp = first;
-    std::cerr << "NK: "<< nextKey << std::endl;
     while (first != last){
-      tmp = upper_bound((*tmp).first);
+      ++tmp;
       nextKey = (*tmp).first;
       erase(first);
       if (tmp == end())
         break;
-      tree.printTree();
-      std::cerr << "NK: "<< nextKey << std::endl;
       tmp = find(nextKey);
       first = tmp;
     }
@@ -198,7 +192,6 @@ public:
   ft::pair< const_iterator, const_iterator > equal_range(const key_type &key) const {
     return ft::make_pair(lower_bound(key), upper_bound(key));
   };
-  //! Not sure about implementation, to be further tested
   /**
    * @brief lower_bound, find the first node with a key that validate key !key_compare
    * 
@@ -310,5 +303,6 @@ template< class Key, class T, class Compare, class Alloc >
 bool operator>=( const ft::map<Key,T,Compare,Alloc>& lhs, const ft::map<Key,T,Compare,Alloc>& rhs ){
   return !(lhs < rhs);
 };
+
 };//NAMESPACE
 #endif
