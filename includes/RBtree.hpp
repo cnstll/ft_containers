@@ -6,6 +6,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <sstream>
 
 namespace ft {
   /**
@@ -484,17 +485,12 @@ template <
 public:
 
   RedBlackTree(const key_compare& comp = key_compare()) : comp(comp), countNode(0){
-    try {
       sentinel = nodeAllocator.allocate(1);
       nodeAllocator.construct(sentinel, Node());
       root = sentinel;
       lastInsertedNode = root;
-    } catch (...){
-      throw std::bad_alloc();
-    }
   }
   RedBlackTree(const RedBlackTree &other){
-    try {
       countNode = other.countNode;
       comp = Compare(other.comp);
       nodeAllocator = Allocator(other.nodeAllocator);
@@ -507,14 +503,9 @@ public:
         _deepCopyNodes(other.root);
         lastInsertedNode = _searchTree(root, other.lastInsertedNode->data);
       }
-    } catch (...){
-      throw std::bad_alloc();
-    }
-
   }
   RedBlackTree& operator=( const RedBlackTree& other ){
     if (this != &other){
-      try {
         if (countNode != 0 || !other.getNodeCount()){
           clearTree();
         }
@@ -530,12 +521,10 @@ public:
           _deepCopyNodes(other.root);
           lastInsertedNode = _searchTree(root, other.lastInsertedNode->data);
         }
-      } catch (...){
-        throw std::bad_alloc();
-      }
     }
     return *this;
   };
+
   ~RedBlackTree(){
     if (getNodeCount() > 0)
       clearTree();
@@ -566,10 +555,14 @@ public:
       return tmp;
   };
 
-  key_value_pair searchTreeWithBoundChecking(key_value_pair data) const {
+  key_value_pair searchTreeWithBoundChecking(key_value_pair &data) const {
       Node *searchResult = _searchTree(this->root, data);
-      if (searchResult == getSentinel())
-        throw std::out_of_range("OUT OF RANGE");
+      if (searchResult == getSentinel()){
+        std::stringstream sstm_err;
+        sstm_err << "map::_M_range_check: __n (which is " << data.first << ") >= ";
+        sstm_err << "this->size() (which is " << countNode << ")";
+        throw std::out_of_range(sstm_err.str());
+      }
       return searchResult->data;
   }
 

@@ -73,7 +73,6 @@ class vector {
             n = n_allocator.allocate(count);
             for (size_type i = 0; i < count; i++) {
                 n_allocator.construct(&n[i], value);
-                //n[i] = value;
             }
         };
         /**
