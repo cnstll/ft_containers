@@ -43,6 +43,10 @@ int main (){
       std::cout << "Key: " << (*it).first << "Value: " << (*it).second << std::endl;
       ++it;
     }
+    NAMESPACE::map<char,int> third = second;
+    second.erase('c');
+    std::cout << "Size second: " << second.size() << std::endl;
+    std::cout << "Size third: " << third.size() << std::endl;
   }
   return 0;
 }
