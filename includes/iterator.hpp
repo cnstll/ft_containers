@@ -288,15 +288,6 @@ class mapIterator : public ft::iterator<bidirectional_iterator_tag, T>
     T& operator*() const { return currentNode->data; }
     T *operator->() { return &currentNode->data; }
 
-  /*Supports the offset dereference operator ([])	*/
-  /* There is apparently not subscript operator for map iterator*/
-  //  reference operator[](difference_type n) {
-  //    nodePointer nodeSuccessor = currentNode;
-  //    while (n-- > 0){
-  //      nodeSuccessor = nodeSuccessor->getSuccessor();
-  //    }
-  //    return (nodeSuccessor->data);
-  //  }
   /*Can be incremented (if in a dereferenceable state).*/
     mapIterator& operator++()  {
       if (currentNode->isSentinel)
@@ -309,7 +300,6 @@ class mapIterator : public ft::iterator<bidirectional_iterator_tag, T>
 
   /*Can be incremented (if in a dereferenceable state).*/
     mapIterator& operator--() {
-      //std::cout << "IS SENTINEL: " << currentNode->isSentinel << "\n";
       if (currentNode->isSentinel){
         currentNode = currentNode->getMax();
       }

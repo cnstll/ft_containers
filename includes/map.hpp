@@ -10,7 +10,6 @@
 #include <memory>
 #include <stdexcept>
 
-// ! Remove std::less std::pair
 namespace ft {
 template<
     class Key,
