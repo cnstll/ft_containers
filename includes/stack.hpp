@@ -86,7 +86,6 @@ template <
     template< class _T, class _Container >
         friend bool operator==( const ft::stack<_T,_Container>& lhs, const ft::stack<_T,_Container>& rhs );
 };
-// TODO: look into EqualityComparable requirement https://en.cppreference.com/w/cpp/named_req/EqualityComparable
 /**
  * Non member functions
 */
