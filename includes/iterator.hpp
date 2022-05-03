@@ -1,6 +1,7 @@
 #ifndef ITERATOR_HPP
 #define ITERATOR_HPP
 #include "rb_tree.hpp"
+#include "remove_cv.hpp"
 #include <cstddef> //std::ptrdiff_t | std::size_t
 
 namespace ft {
@@ -196,12 +197,12 @@ class reverse_iterator {
     typedef typename iterator_traits<Iter>::pointer pointer;
     typedef typename iterator_traits<Iter>::reference reference;
 
-    reverse_iterator(){};
+    reverse_iterator(): current(){};
     explicit reverse_iterator( iterator_type x ) : current(x) {};
     template< class U >
     reverse_iterator( const reverse_iterator<U>& other ) { *this = other; };
     template< class U >
-    reverse_iterator& operator=( const reverse_iterator<U>& other ) { this->current = other.p; return *this; };
+    reverse_iterator& operator=( const reverse_iterator<U>& other ) { this->current = other.base(); return *this; };
     /**
      * @brief Returns the underlying base iterator. That is ft::reverse_iterator(it).base() == it
      * @return iterator_type 
@@ -223,7 +224,10 @@ class reverse_iterator {
     reverse_iterator operator-( difference_type n ) const { return reverse_iterator(base() + n); };
     reverse_iterator& operator+=( difference_type n ){ current = base() - n; return *this; };
     reverse_iterator& operator-=( difference_type n ){ current = base() + n; return *this; };
-
+  	
+    // operator reverse_iterator<const iterator_type>() const {
+		// 	return (reverse_iterator<const iterator_type>(base()));
+		// }
   protected:
     iterator_type current;
 };
@@ -254,10 +258,10 @@ template< class Iterator1, class Iterator2 >
 bool operator>=( const reverse_iterator<Iterator1>& lhs, const reverse_iterator<Iterator2>& rhs ){
     return (!operator<(lhs, rhs));
 };
-template< class Iter >
-reverse_iterator<Iter> operator+( typename reverse_iterator<Iter>::difference_type n, const reverse_iterator<Iter>& it ){
-      return (reverse_iterator<Iter>(it.base() - n));
-    };
+template< class Iterator >
+reverse_iterator<Iterator> operator+(  typename reverse_iterator<Iterator>::difference_type n, const reverse_iterator<Iterator>& it ){
+      return (reverse_iterator<Iterator>(it.base() - n));
+};
 template< class Iterator >
 typename reverse_iterator<Iterator>::difference_type operator-( const reverse_iterator<Iterator>& lhs, const reverse_iterator<Iterator>& rhs ){
   return (rhs.base() - lhs.base());
@@ -286,7 +290,7 @@ class mapIterator : public ft::iterator<bidirectional_iterator_tag, T>
 
   /*Can be dereferenced as an lvalue (if in a dereferenceable state).*/
     T& operator*() const { return currentNode->data; }
-    T *operator->() { return &currentNode->data; }
+    T *operator->() const{ return &currentNode->data; }
 
   /*Can be incremented (if in a dereferenceable state).*/
     mapIterator& operator++()  {
@@ -340,7 +344,7 @@ class constMapIterator : public ft::iterator<bidirectional_iterator_tag, T>
 
   /*Can be dereferenced as an lvalue (if in a dereferenceable state).*/
     T& operator*() const { return currentNode->data; }
-    T *operator->() { return &currentNode->data; }
+    T *operator->() const { return &currentNode->data; }
 
   /*Can be incremented (if in a dereferenceable state).*/
     constMapIterator& operator++() {
@@ -363,7 +367,7 @@ class constMapIterator : public ft::iterator<bidirectional_iterator_tag, T>
     constMapIterator operator--(int) {constMapIterator tmp(*this); operator--(); return tmp;}
   
   /*Can be compared for equivalence using the equality/inequality operators*/
-    friend bool operator==(const constMapIterator& lhs, const constMapIterator& rhs) { return lhs.currentNode->data == rhs.currentNode->data; };
+    friend bool operator==(const constMapIterator& lhs, const constMapIterator& rhs) { return lhs.currentNode == rhs.currentNode; };
     friend bool operator!=(const constMapIterator& lhs, const constMapIterator& rhs) { return !operator==(lhs, rhs); };
     
     nodePointer currentNode;

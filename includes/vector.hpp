@@ -68,36 +68,34 @@ class vector {
          * @brief  Constructs the container with count copies of elements with value value.
          */
         explicit vector(size_type count, const T &value = T(), const Allocator &alloc = Allocator())
-            : n_allocator(alloc), currentSize(count), currentCapacity(count) {
+            : n_allocator(alloc), currentSize(0), currentCapacity(0) {
 
-            n = n_allocator.allocate(count);
-            for (size_type i = 0; i < count; i++) {
-                n_allocator.construct(&n[i], value);
-            }
+            assign(count, value);
         };
         /**
          * @brief Constructs the container with the contents of the range [first, last) 
          */
         template <class InputIt>
         vector(InputIt first, InputIt last, const Allocator &alloc = Allocator(),
-        typename ft::enable_if<!ft::is_integral<InputIt>::value>::type* = 0) {
-
-            size_type counter = 0;
-            InputIt it = first;
-            while (it != last){
-                counter++;
-                it++;
-            }
-            n_allocator = alloc;
-            currentCapacity = counter;
-            currentSize = counter;
-            n = n_allocator.allocate(currentCapacity);
-            size_type i = 0;
-            while (i < counter) {
-                n_allocator.construct(n + i, *first);
-                ++first;
-                ++i;
-            }
+        typename ft::enable_if<!ft::is_integral<InputIt>::value>::type* = 0) 
+            : n_allocator(alloc), currentSize(0), currentCapacity(0) {
+            assign(first, last);
+            // size_type counter = 0;
+            // InputIt it = first;
+            // while (it != last){
+            //     counter++;
+            //     it++;
+            // }
+            // n_allocator = alloc;
+            // currentCapacity = counter;
+            // currentSize = counter;
+            // n = n_allocator.allocate(currentCapacity);
+            // size_type i = 0;
+            // while (i < counter) {
+            //     n_allocator.construct(n + i, *first);
+            //     ++first;
+            //     ++i;
+            // }
         };
         /**
          * @brief Copy Construct
@@ -110,9 +108,9 @@ class vector {
          *
          */
         ~vector(){
-            n_allocator.destroy(n);
-            if (n && capacity() > 0)
-                n_allocator.deallocate(n, capacity()); 
+            clear();
+            if (n)
+                n_allocator.deallocate(n, currentCapacity); 
         };
     /*
      * Functions needed for deep copying in operator=
@@ -207,21 +205,26 @@ class vector {
          * @brief Replaces the contents with count copies of value value
          */
         void assign( size_type count, const T& value ){
-            n_allocator.destroy(n);
+            // n_allocator.destroy(n);
+            //std::cout << "Count: " << count << " CurrentCap: " << currentCapacity << std::endl;
+            size_type index = 0;
             if (count > currentCapacity){
                 T *tmp_n = n_allocator.allocate(count);
-                size_type index = 0;
                 while (index < count){
                     n_allocator.construct(tmp_n + index, value);
                     ++index;
                 }
-                n_allocator.deallocate(n, currentCapacity);
+                if (currentCapacity > 0){
+                    // clear();
+                    n_allocator.deallocate(n, currentCapacity);
+                }
                 currentCapacity = count;
                 n = tmp_n;
             }
             else {
-                size_type index = 0;
                 while (index < count){
+                    // std::cout << "INDEX: " << index << " Value: " << value << std::endl;
+                    // n[index] = value;
                     n_allocator.construct(n + index, value);
                     ++index;
                 }
@@ -236,23 +239,26 @@ class vector {
         void assign( InputIt first, InputIt last,
         typename ft::enable_if<!ft::is_integral<InputIt>::value>::type* = 0) {
             size_type count = _distance(first, last);
-            n_allocator.destroy(n);
-            if (count > currentCapacity){
+                // n_allocator.destroy(n);
+            if (count >= currentCapacity){
                 T *tmp_n = n_allocator.allocate(count);
                 size_type index = 0;
-                while (index < count){
-                    n_allocator.construct(tmp_n + index, *(first + index));
+                while (first != last){
+                    n_allocator.construct(&tmp_n[index], *first);
+                    ++first;
                     ++index;
                 }
-                n_allocator.deallocate(n, currentCapacity);
+                if (currentCapacity > 0)
+                    n_allocator.deallocate(n, currentCapacity);
                 currentCapacity = count;
                 n = tmp_n;
             }
             else {
                 size_type index = 0;
-                while (index < count){
-                    n_allocator.construct(n + index, *(first + index));
+                while (first != last){
+                    n_allocator.construct(n + index, *first);
                     ++index;
+                    ++first;
                 }
             }
             currentSize = count;
@@ -339,8 +345,8 @@ class vector {
          */
         void clear(){
 
-            while (0 < currentSize) {
-                n_allocator.destroy(&n[--currentSize]);
+            for (size_t index = 0; index < currentSize; index++) {
+                n_allocator.destroy(&n[index]);
             }
             currentSize = 0;
         };
@@ -386,24 +392,43 @@ class vector {
             else while (currentSize + count > currentCapacity)
                 currentCapacity *= 2;
             try {
-                T *tmp_n = n_allocator.allocate(currentCapacity);
                 size_type index = 0;
                 size_type d1 = _distance<iterator>(begin(), pos);
                 size_type d2 = _distance<iterator>(pos, end());
-                while (index < d1){
-                    n_allocator.construct(tmp_n + index, n[index]);
-                    index++;
+                // 21 21 42 - d1 = 1 | d2 = 2 | count = 1 | value = 42
+                // 21 42 21 42 
+                if (savedCapacity == currentCapacity){
+                // std::cout << "Cap | Size: "<< currentCapacity << "|" << currentSize << " SavedCap: " << savedCapacity << " Value | Count: " << value << "|" << count << "\n";
+                // std::cout << "d1 | d2 : " << d1 << "|" << d2 << std::endl;
+                    index = 1;
+                    while (index <= d2){
+                        n_allocator.construct(&n[currentSize - index + count], n[currentSize - index]);
+                        index++;
+                    }
+                    index = d1;
+                    while (index < d1 + count){
+                        n_allocator.construct(n + index, value);
+                        ++index;
+                    }
                 }
-                while (index < d1 + count){
-                    n_allocator.construct(tmp_n + index, value);
-                    index++;
+                else {
+
+                    T *tmp_n = n_allocator.allocate(currentCapacity);
+                    while (index < d1){
+                        n_allocator.construct(tmp_n + index, n[index]);
+                        index++;
+                    }
+                    while (index < d1 + count){
+                        n_allocator.construct(tmp_n + index, value);
+                        index++;
+                    }
+                    while (index < d1 + d2 + count){
+                        n_allocator.construct(tmp_n + index, n[index - count]);
+                        index++;
+                    }
+                    n_allocator.deallocate(n, savedCapacity);
+                    n = tmp_n;
                 }
-                while (index < d1 + d2 + count){
-                    n_allocator.construct(tmp_n + index, n[index - count]);
-                    index++;
-                }
-                n_allocator.deallocate(n, savedCapacity);
-                n = tmp_n; 
                 currentSize+= count;
             } catch (...) {
                 currentCapacity = savedCapacity;
@@ -413,8 +438,7 @@ class vector {
         void insert( iterator pos, InputIt first, InputIt last, 
                typename ft::enable_if<!ft::is_integral<InputIt>::value>::type* = 0){
 
-            size_type d_range = _distance<InputIt>(first, last);
-            size_type count = d_range;
+            size_type count = _distance<InputIt>(first, last);
             if (currentSize + count >= max_size())
                 throw std::length_error(NULL);
             size_type savedCapacity = currentCapacity;
@@ -432,9 +456,9 @@ class vector {
                     ++index;
                 }
                 while (index < d1 + count){
-                    n_allocator.construct(tmp_n + index, *(last - d_range));
-                    --d_range;
+                    n_allocator.construct(tmp_n + index, *first);
                     ++index;
+                    ++first;
                 }
                 while (index < d1 + d2 + count){
                     n_allocator.construct(tmp_n + index, n[index - count]);

@@ -3,6 +3,7 @@
 #define red 1
 #define black 0
 #include "pair.hpp"
+#include "utilities.hpp"
 #include <iostream>
 #include <memory>
 #include <string>
@@ -85,7 +86,7 @@ struct mapNode {
       tmp = tmp->right;
     return tmp;
   };
-  // friend bool operator==(const mapNode<T>& lhs, const mapNode<T>& rhs) { return lhs.data == rhs.data; };
+  friend bool operator==(const mapNode<T>& lhs, const mapNode<T>& rhs) { return lhs.data == rhs.data; };
 
 };
 
@@ -180,7 +181,7 @@ template <
   }
   // ! should deallocate 1 by 1 or can it be done in bulk with getNodeCount() ? 
     void _timber(Node *root){
-    if (root == sentinel)
+    if (root->isSentinel)
       return;
     {
         _timber(root->left);
@@ -580,7 +581,7 @@ public:
     return current;
   };
 
-  Node *getSuccessor(const key_value_pair &data) {
+  Node *getSuccessor(const key_value_pair &data) const{
     Node *nodeProcessed;
     if ((nodeProcessed = _searchTree(root, data)) == sentinel)
       return sentinel;
@@ -595,7 +596,7 @@ public:
     return searchedParent;
   };
 
-  Node *getPredecessor(const key_value_pair &data){
+  Node *getPredecessor(const key_value_pair &data) const{
     Node *nodeProcessed;
     if ((nodeProcessed = _searchTree(root, data)) == sentinel)
       return sentinel;
@@ -610,7 +611,7 @@ public:
     return searchedParent;
   };
 
-  Node *getLowerBound(const key_value_pair &data){
+  Node *getLowerBound(const key_value_pair &data) const {
     Node *nodeProcessed;
     if ((nodeProcessed = _searchTree(root, data)) == sentinel)
       return sentinel;
@@ -660,6 +661,10 @@ public:
     }
   };
 
+  size_t maxSize() const{
+    return nodeAllocator.max_size();
+  }
+
   Node *_duplicateNode(Node *srcNode){
     Node *dup = nodeAllocator->allocate(1);
     dup->color = srcNode->color;
@@ -668,6 +673,12 @@ public:
     dup->right = srcNode->right;
     dup->parent = srcNode->parent;
     return dup;
+  }
+
+  void treeSwap(RedBlackTree &other){
+    baseSwap(root, other.root);
+    baseSwap(sentinel, other.sentinel);
+    baseSwap(countNode, other.countNode);
   }
 };
 }; //NAMESPACE

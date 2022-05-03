@@ -29,3 +29,4 @@
 * [About Invariant in Code](https://en.wikipedia.org/wiki/Loop_invariant)
 * [Good Post on rebinding an allocator](https://stackoverflow.com/questions/14148756/what-does-template-rebind-do)
 * [On time shell builtin API](https://stackoverflow.com/questions/556405/what-do-real-user-and-sys-mean-in-the-output-of-time1/556411#556411)
+* [An Idiot's guide on template](https://www.codeproject.com/articles/257589/an-idiots-guide-to-cplusplus-templates-part-1)

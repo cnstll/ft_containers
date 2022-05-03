@@ -4,7 +4,8 @@
 #include "pair.hpp"
 #include "rb_tree.hpp"
 #include "iterator.hpp"
-#include "utilities.hpp"
+#include "is_integral.hpp" 
+#include "enable_if.hpp"
 #include <exception>
 #include <functional>
 #include <memory>
@@ -95,12 +96,12 @@ public:
    */
   bool empty() const { return tree.getNodeCount() == 0; };
   size_type size() const { return tree.getNodeCount(); };
-  size_type max_size() const { return tree_allocator.max_size(); };
+  size_type max_size() const { return tree.maxSize(); };
   /**
    * MODIFIERS FUNCTIONS
    */
   void clear(){
-    if (tree.getNodeCount() > 0)
+    // if (tree.getNodeCount() > 0)
       tree.clearTree();
   };
   ft::pair<iterator, bool> insert( const value_type& value ){
@@ -109,12 +110,11 @@ public:
     return ft::make_pair(iterator(tree.getLastInsertedNode()), insertionResult);
   };
 
-  template< class InputIt >
-  void insert( InputIt first, InputIt last ){
-    iterator it = first;
-    while (it != last){
-      tree.insert(*it);
-      ++it;
+  template< typename InputIt >
+  void insert( InputIt first, InputIt last){
+    while (first != last){
+      tree.insert(*first);
+      ++first;
     }
   };
   void erase( iterator pos ){
@@ -140,8 +140,7 @@ public:
   };
   
   void swap(map &other){
-    baseSwap(tree_allocator, other.tree_allocator);
-    baseSwap(tree, other.tree);
+    tree.treeSwap(other.tree);
   };
   /**
    * LOOKUP FUNCTIONS 
