@@ -108,6 +108,7 @@ class vector {
          *
          */
         ~vector(){
+            // std::cout << "CURRENT CAPCITY: " << currentCapacity << " CurrentSize: "<< currentSize << std::endl;
             clear();
             if (n)
                 n_allocator.deallocate(n, currentCapacity); 
@@ -128,8 +129,11 @@ class vector {
 
             if (other.n && other.size())
             {
+                n_allocator.deallocate(n, currentCapacity);
                 this->n = this->n_allocator.allocate(other.capacity());
                 copyElements(this->n, other.n, other.size());
+                currentCapacity = other.capacity();
+                currentSize = other.size();
             }
             else
                 this->n = NULL;
