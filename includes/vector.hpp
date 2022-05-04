@@ -47,9 +47,9 @@ class vector {
         typedef value_type& reference;
         typedef const value_type& const_reference;
         typedef typename ft::vectorIterator<T> iterator;
-        typedef typename ft::constVectorIterator<T> const_iterator;
-        typedef typename ft::reverse_iterator<vectorIterator<T> > reverse_iterator;
-        typedef typename ft::reverse_iterator<constVectorIterator<T> > const_reverse_iterator;
+        typedef typename ft::vectorIterator<const T> const_iterator;
+        typedef typename ft::reverse_iterator<iterator> reverse_iterator;
+        typedef typename ft::reverse_iterator<const_iterator> const_reverse_iterator;
 
         /**
          * Member functions
@@ -80,22 +80,6 @@ class vector {
         typename ft::enable_if<!ft::is_integral<InputIt>::value>::type* = 0) 
             : n_allocator(alloc), currentSize(0), currentCapacity(0) {
             assign(first, last);
-            // size_type counter = 0;
-            // InputIt it = first;
-            // while (it != last){
-            //     counter++;
-            //     it++;
-            // }
-            // n_allocator = alloc;
-            // currentCapacity = counter;
-            // currentSize = counter;
-            // n = n_allocator.allocate(currentCapacity);
-            // size_type i = 0;
-            // while (i < counter) {
-            //     n_allocator.construct(n + i, *first);
-            //     ++first;
-            //     ++i;
-            // }
         };
         /**
          * @brief Copy Construct
