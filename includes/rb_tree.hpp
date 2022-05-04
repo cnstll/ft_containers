@@ -86,9 +86,12 @@ struct mapNode {
       tmp = tmp->right;
     return tmp;
   };
-  friend bool operator==(const mapNode<T>& lhs, const mapNode<T>& rhs) { return lhs.data == rhs.data; };
+  
+  
 
 };
+template <typename T1, typename T2>
+bool operator==(const mapNode<T1>& lhs, const mapNode<T2>& rhs) { return lhs.data == rhs.data; };
 
 template <
     class T,
@@ -174,13 +177,14 @@ template <
     if (node == sentinel || data.first == node->data.first) {
       return node;
     }
+    //If data.first < node->data.first
     if (comp(data.first, node->data.first)) {
       return _searchTree(node->left, data);
     }
     return _searchTree(node->right, data);
   }
-  // ! should deallocate 1 by 1 or can it be done in bulk with getNodeCount() ? 
-    void _timber(Node *root){
+
+  void _timber(Node *root){
     if (root->isSentinel)
       return;
     {
@@ -542,6 +546,7 @@ public:
   
   void clearTree(){
     _timber(root);
+    root = sentinel;
   };
 
   void clearTreeSentinel(){
@@ -581,20 +586,32 @@ public:
     return current;
   };
 
-  Node *getSuccessor(const key_value_pair &data) const{
-    Node *nodeProcessed;
-    if ((nodeProcessed = _searchTree(root, data)) == sentinel)
-      return sentinel;
-    if (!nodeProcessed->right->isSentinel) {
-      return getMin(nodeProcessed->right);
+// Recursive function to find an inorder successor for the given key in a BST.
+// Note that successor `succ` is passed by reference to the function
+  Node *getSuccessor(Node *root, Node *successor, const key_value_pair &key) const
+  {
+    // base case
+    if (root->isSentinel)
+      return successor;
+    // if a node with the desired value is found, the successor is the minimum value
+    // node in its right subtree (if any)
+    if (root->data.first == key.first)
+    {
+      if (!root->right->isSentinel)
+        return getMin(root->right);
     }
-    Node * searchedParent = nodeProcessed->parent;
-    while (!searchedParent->isSentinel && nodeProcessed == searchedParent->right) {
-      nodeProcessed = searchedParent;
-      searchedParent = searchedParent->parent;
+    // if the given key is less than the root node, recur for the left subtree
+    else if (comp(key.first, root->data.first))
+    {
+      // update successor to the current node before recursing in the left subtree
+      successor = root;
+      return getSuccessor(root->left, successor, key);
     }
-    return searchedParent;
-  };
+    // if the given key is more than the root node, recur for the right subtree
+    else
+      return getSuccessor(root->right, successor, key);
+    return successor;
+  }
 
   Node *getPredecessor(const key_value_pair &data) const{
     Node *nodeProcessed;
@@ -613,13 +630,15 @@ public:
 
   Node *getLowerBound(const key_value_pair &data) const {
     Node *nodeProcessed;
-    if ((nodeProcessed = _searchTree(root, data)) == sentinel)
-      return sentinel;
-    if (!comp(nodeProcessed->data.first, nodeProcessed->data.first)){
-      return nodeProcessed;
-    } else {
-      return nodeProcessed;
-    }
+    if ((nodeProcessed = searchTree(data)) == sentinel)
+      if (nodeProcessed == sentinel)
+        nodeProcessed = getSuccessor(root, sentinel, data);
+    return nodeProcessed;
+  }
+
+  Node *getUpperBound(const key_value_pair &data) const {
+    Node *nodeProcessed = getSuccessor(root, sentinel, data);
+    return nodeProcessed;
   }
 
   Node *getRoot() const{

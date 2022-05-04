@@ -109,11 +109,13 @@ public:
     bool insertionResult = tree.insert(value);
     return ft::make_pair(iterator(tree.getLastInsertedNode()), insertionResult);
   };
-
-  template< typename InputIt >
+// candidate template ignored: deduced conflicting types for parameter 'InputIt' ('ft::mapIterator<value_type > >' vs. 'value_type')
+// candidate template ignored: deduced conflicting types for parameter 'InputIt' ('ft::mapIterator<ft::pair<const int, std::basic_string<char> > >' vs. 'ft::pair<const int, std::basic_string<char> >')
+//   void insert( InputIt first, InputIt last){
+  template< class InputIt>
   void insert( InputIt first, InputIt last){
     while (first != last){
-      tree.insert(*first);
+      insert(*first);
       ++first;
     }
   };
@@ -217,14 +219,14 @@ public:
    * @return iterator to the successor node or end() if no successor is found 
    */
   iterator upper_bound(const key_type &key){
-    iterator it(tree.getSuccessor(ft::make_pair(key, mapped_type())));
+    iterator it(tree.getUpperBound(ft::make_pair(key, mapped_type())));
     if (it != tree.getSentinel())
       return it;
     else
       return end();
   }
   const_iterator upper_bound(const key_type &key) const{
-    const_iterator it(tree.getSuccessor(ft::make_pair(key, mapped_type())));
+    const_iterator it(tree.getUpperBound(ft::make_pair(key, mapped_type())));
     if (it != tree.getSentinel())
       return it;
     else
