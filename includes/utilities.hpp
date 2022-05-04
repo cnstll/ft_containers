@@ -1,3 +1,5 @@
+#ifndef UTILITIES_HPP
+#define UTILITIES_HPP 
 namespace ft
 {
   template <typename T>
@@ -8,3 +10,4 @@ namespace ft
     b = temp;
   };
 }; // NAMESPACE
+#endif

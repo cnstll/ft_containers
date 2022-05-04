@@ -26,8 +26,8 @@ template<> struct is_integral_base<unsigned int>: ft::true_type {};
 template<> struct is_integral_base<unsigned long int>: ft::true_type {};
 template<> struct is_integral_base<unsigned long long int>: ft::true_type {};
 
-//template<typename T> struct is_integral: is_integral_base<T> {};
-template<typename T> struct is_integral: is_integral_base<typename ft::remove_cv<T>::type> {};
+template<typename T> struct is_integral: is_integral_base<T> {};
+//template<typename T> struct is_integral: is_integral_base<typename ft::remove_cv<T>::type> {};
 
 }; //namespace
 #endif
