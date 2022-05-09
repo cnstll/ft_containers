@@ -43,15 +43,15 @@ template <class T>
     typedef	random_access_iterator_tag iterator_category;
   };
 
-template <class T>
-  struct iterator_traits<const T*>{
+// template <class T>
+//   struct iterator_traits<const T*>{
 
-    typedef	std::ptrdiff_t difference_type;
-    typedef T value_type;
-    typedef const T* pointer;
-    typedef const T& reference;
-    typedef	random_access_iterator_tag iterator_category;
-  };
+//     typedef	std::ptrdiff_t difference_type;
+//     typedef T value_type;
+//     typedef const T* pointer;
+//     typedef const T& reference;
+//     typedef	random_access_iterator_tag iterator_category;
+//   };
 
 template <class T> 
 class vectorIterator : public ft::iterator<random_access_iterator_tag, T>
@@ -134,25 +134,31 @@ class mapIterator : public ft::iterator<bidirectional_iterator_tag, T>
   public:
     typedef bidirectional_iterator_tag iterator_category;
     typedef std::ptrdiff_t difference_type;
-    typedef typename ft::mapNode<T>* nodePointer;
     typedef T value_type;
     typedef T* pointer;
     typedef T& reference;
-  /* Is default-constructible, copy-constructible, copy-assignable and destructible */
+    typedef typename ft::mapNode<value_type> node;
+ //ft::mapIterator<ft::pair<const char, foo<float> > >::node *const'
+//  (aka 'mapNode<ft::pair<const char, foo<float> > > *const')
+//  to 'ft::mapIterator<const ft::pair<const char, foo<float> > >::node *'
+//  (aka 'mapNode<const ft::pair<const char, foo<float> > > *') for 1st argument
+//   /* Is default-constructible, copy-constructible, copy-assignable and destructible */
     mapIterator() : currentNode(){}
-    mapIterator(nodePointer someMapNode) : currentNode(someMapNode){}
-    mapIterator(const mapIterator& other) : currentNode(other.currentNode){}
+    mapIterator(node* someMapNode) : currentNode(someMapNode){}
+    mapIterator(mapIterator const& other) : currentNode(other.currentNode){}
     mapIterator &operator=(const mapIterator& rhs){ 
       if (this != &rhs)
         this->currentNode = rhs.currentNode;
       return *this;
     }
-    ~mapIterator(void) {}
+    ~mapIterator() {}
 
   /*Can be dereferenced as an lvalue (if in a dereferenceable state).*/
     T& operator*() const { return currentNode->data; }
     T *operator->() const{ return &currentNode->data; }
 
+//'ft::mapIterator<ft::pair<const char, int> >::node *' (aka 'mapNode<ft::pair<const char, int> > *')
+//to 'mapIterator<const ft::pair<const char, int> >'
   /*Can be incremented (if in a dereferenceable state).*/
     mapIterator& operator++()  {
       if (currentNode->isSentinel)
@@ -174,30 +180,32 @@ class mapIterator : public ft::iterator<bidirectional_iterator_tag, T>
     }
     mapIterator operator--(int) {mapIterator tmp(*this); operator--(); return tmp;}
   
-    operator mapIterator<const T>() const{
-      return mapIterator<const T>(currentNode);
-    }
-    nodePointer currentNode;
+    /*Convert constant type*/
+    // operator mapIterator<const T>() const {
+    //   return mapIterator<const T>(currentNode);
+    // }
+    // friend bool operator==(const mapIterator& lhs, const mapIterator& rhs) { return lhs.currentNode == rhs.currentNode; };
+    // friend bool operator!=(const mapIterator& lhs, const mapIterator& rhs) { return !operator==(lhs, rhs); };
+    node* currentNode;
 };
-  /*Can be compared for equivalence using the equality/inequality operators*/
+
   template <typename T1, typename T2>
   bool operator==(const mapIterator<T1>& lhs, const mapIterator<T2>& rhs) { return lhs.currentNode == rhs.currentNode; };
   template <typename T1, typename T2>
   bool operator!=(const mapIterator<T1>& lhs, const mapIterator<T2>& rhs) { return !operator==(lhs, rhs); };
-
 template <class T> 
 class constMapIterator : public ft::iterator<bidirectional_iterator_tag, T>
 {
   public:
     typedef bidirectional_iterator_tag iterator_category;
     typedef std::ptrdiff_t difference_type;
-    typedef typename ft::mapNode<T>* nodePointer;
     typedef const T value_type;
     typedef const T* pointer;
     typedef const T& reference;
+    typedef typename ft::mapNode<T> node;
   /* Is default-constructible, copy-constructible, copy-assignable and destructible */
     constMapIterator() : currentNode(){}
-    constMapIterator(nodePointer someMapNode) : currentNode(someMapNode){}
+    constMapIterator(node * someMapNode) : currentNode(someMapNode){}
     constMapIterator(const constMapIterator& other) : currentNode(other.currentNode){}
     constMapIterator(const mapIterator<T>& other) : currentNode(other.currentNode){}
     constMapIterator &operator=(const constMapIterator& rhs){ 
@@ -230,13 +238,31 @@ class constMapIterator : public ft::iterator<bidirectional_iterator_tag, T>
       return *this;
     }
     constMapIterator operator--(int) {constMapIterator tmp(*this); operator--(); return tmp;}
-  
-  /*Can be compared for equivalence using the equality/inequality operators*/
-    friend bool operator==(const constMapIterator& lhs, const constMapIterator& rhs) { return lhs.currentNode == rhs.currentNode; };
-    friend bool operator!=(const constMapIterator& lhs, const constMapIterator& rhs) { return !operator==(lhs, rhs); };
     
-    nodePointer currentNode;
+    // operator mapIterator<T>() {
+    //   return constMapIterator<T>(currentNode);
+    // }
+
+  /*Can be compared for equivalence using the equality/inequality operators*/
+    // friend bool operator==(const constMapIterator& lhs, const constMapIterator& rhs) { return lhs.currentNode == rhs.currentNode; };
+    // friend bool operator!=(const constMapIterator& lhs, const constMapIterator& rhs) { return !operator==(lhs, rhs); };
+
+    node *currentNode;
 };
+
+  template <typename T1, typename T2>
+  bool operator==(const constMapIterator<T1>& lhs, const constMapIterator<T2>& rhs) { return lhs.currentNode == rhs.currentNode; };
+  template <typename T1, typename T2>
+  bool operator!=(const constMapIterator<T1>& lhs, const constMapIterator<T2>& rhs) { return !operator==(lhs, rhs); };
+  /*Can be compared for equivalence using the equality/inequality operators*/
+  template <typename T1, typename T2>
+  bool operator==(const mapIterator<T1>& lhs, const constMapIterator<T2>& rhs) { return lhs.currentNode == rhs.currentNode; };
+  template <typename T1, typename T2>
+  bool operator!=(const mapIterator<T1>& lhs, const constMapIterator<T2>& rhs) { return !operator==(lhs, rhs); };
+  template <typename T1, typename T2>
+  bool operator==(const constMapIterator<T1>& lhs, const mapIterator<T2>& rhs) { return lhs.currentNode == rhs.currentNode; };
+  template <typename T1, typename T2>
+  bool operator!=(const constMapIterator<T1>& lhs, const mapIterator<T2>& rhs) { return !operator==(lhs, rhs); };
 /**
  * @brief ft::reverse_iterator is an iterator adaptor that reverses the direction of a given iterator,
           which must be at least a LegacyBidirectionalIterator. In other words, when provided with a bidirectional iterator,

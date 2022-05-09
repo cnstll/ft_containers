@@ -4,6 +4,7 @@
 #define black 0
 #include "pair.hpp"
 #include "utilities.hpp"
+#include <functional>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -15,7 +16,8 @@ namespace ft {
  * 
  */
 template <class T>
-struct mapNode {
+class mapNode {
+  public:
   T data;
   mapNode<T> *parent;
   mapNode<T> *left;
@@ -25,9 +27,11 @@ struct mapNode {
   mapNode<T> *lastUpdatedRoot; // Only valid for the sentinel node
 
   mapNode() : data(), parent(NULL), left(NULL), right(NULL), color(black), isSentinel(true), lastUpdatedRoot(NULL){}
+  mapNode(const T& d) : data(d), parent(NULL), left(NULL), right(NULL), color(black), isSentinel(true), lastUpdatedRoot(NULL){}
   mapNode(const T& d, mapNode<T> *p, mapNode<T> *l, mapNode<T>* r, bool c, bool s, mapNode<T>* lastRoot) : data(d), parent(p), left(l), right(r), color(c), isSentinel(s), lastUpdatedRoot(lastRoot){}
   mapNode(const mapNode& other) : data(other.data), parent(other.parent), left(other.left), right(other.right), color(other.color), isSentinel(other.isSentinel), lastUpdatedRoot(other.lastUpdatedRoot){}
   ~mapNode(){}
+  
   mapNode &operator=(const mapNode& other){
     if (this != &other){
       data = other.data;
@@ -54,16 +58,6 @@ struct mapNode {
     return searchedParent;
   };
 
-  mapNode<T> *getMin() {
-    mapNode<T> *tmp = this;
-    if (tmp->isSentinel){
-      tmp = tmp->lastUpdatedRoot;
-    }
-    while (!tmp->left->isSentinel)
-      tmp = tmp->left;
-    return tmp;
-  };
-
   mapNode<T> *getPredecessor() {
     if (!left->isSentinel)
       return left->getMax();
@@ -86,7 +80,25 @@ struct mapNode {
       tmp = tmp->right;
     return tmp;
   };
-  
+
+  mapNode<T> *getMin() {
+    mapNode<T> *tmp = this;
+    if (tmp->isSentinel){
+      tmp = tmp->lastUpdatedRoot;
+    }
+    while (!tmp->left->isSentinel)
+      tmp = tmp->left;
+    return tmp;
+  };
+
+    // operator mapNode<const T>() const{
+      // return mapNode<const T>(this->d, this->p, this->l, this->r, this->c, this->s, this->lastRoot);
+    // }
+
+    operator mapNode<const T>() const{
+      return mapNode<const T>(data);
+    }
+
   
 
 };
@@ -95,25 +107,25 @@ bool operator==(const mapNode<T1>& lhs, const mapNode<T2>& rhs) { return lhs.dat
 
 template <
     class T,
-    class Compare,
-    class Allocator
+    class Compare = std::less<T>,
+    class Allocator = std::allocator<ft::mapNode<T> >
 > class RedBlackTree {
   
   typedef T key_value_pair;
-  typedef mapNode<key_value_pair> Node;
+  typedef typename ft::mapNode<T> node;
   typedef Compare key_compare;
   typedef std::size_t size_type;
   typedef Allocator tree_allocator_type;
-  typedef typename tree_allocator_type::template rebind<Node>::other node_allocator_type;
+  typedef typename tree_allocator_type::template rebind<node>::other node_allocator_type;
 
-  Node *root;
-  Node *sentinel;
-  Node *lastInsertedNode;
+  node *root;
+  node *sentinel;
+  node *lastInsertedNode;
   node_allocator_type nodeAllocator;
   key_compare comp;
   std::size_t countNode;
 
-  void _preOrderTraversal(Node * node) {
+  void _preOrderTraversal(node * node) {
     if (node != sentinel) {
       std::cout << node->data.first << " ";
       _preOrderTraversal(node->left);
@@ -121,7 +133,7 @@ template <
     }
   }
 
-  void _inOrderTraversal(Node * node) {
+  void _inOrderTraversal(node * node) {
     if (node != sentinel) {
       _inOrderTraversal(node->left);
       std::cout << node->data << " ";
@@ -129,7 +141,7 @@ template <
     }
   }
 
-  void _postOrderTraversal(Node * node) {
+  void _postOrderTraversal(node * node) {
     if (node != sentinel) {
       _postOrderTraversal(node->left);
       _postOrderTraversal(node->right);
@@ -137,31 +149,31 @@ template <
     }
   }
 
-  bool _isRed(Node *current){
+  bool _isRed(node *current){
     return (current->color == red);
   };
 
-  bool _isBlack(Node *current){
+  bool _isBlack(node *current){
     return (current->color == black);
   };
 
-  bool _hasLeftChild(Node *current){
+  bool _hasLeftChild(node *current){
     return (current->left != sentinel);
   };
 
-  bool _hasRightChild(Node *current){
+  bool _hasRightChild(node *current){
     return (current->right != sentinel);
   };
 
-  void _setColor(Node *current, bool redOrBlack){
+  void _setColor(node *current, bool redOrBlack){
       current->color = redOrBlack;
   };
 
-  bool _isLeftChild(Node *current, Node *parent){
+  bool _isLeftChild(node *current, node *parent){
     return (current == parent->left);
   };
 
-  bool _isRightChild(Node *current, Node *parent){
+  bool _isRightChild(node *current, node *parent){
     return (current == parent->right);
   };
 
@@ -173,7 +185,7 @@ template <
    * @return address of the node found 
    */
   
-  Node *_searchTree(Node * node,  key_value_pair data) const {
+  node *_searchTree(node * node,  key_value_pair data) const {
     if (node == sentinel || data.first == node->data.first) {
       return node;
     }
@@ -184,7 +196,7 @@ template <
     return _searchTree(node->right, data);
   }
 
-  void _timber(Node *root){
+  void _timber(node *root){
     if (root->isSentinel)
       return;
     {
@@ -196,7 +208,7 @@ template <
     }
   };
 
-  void _printTree(const std::string& padding, Node* current, bool hasRight){ 
+  void _printTree(const std::string& padding, node* current, bool hasRight){ 
     if(!current->isSentinel)
     {
       std::cerr << padding << (hasRight ? "|__" : "└──" );
@@ -212,8 +224,8 @@ template <
   /* 
    *  INSERTION SECTION
    */
-  void _recolorAndBalanceTreeAfterInsert(Node * current) {
-    Node *u;
+  void _recolorAndBalanceTreeAfterInsert(node * current) {
+    node *u;
     while (_isRed(current->parent)) {
       if (_isRightChild(current->parent, current->parent->parent)) {
         u = current->parent->parent->left;
@@ -255,8 +267,8 @@ template <
     root->color = black;
   }
 
-  void _leftRotate(Node * rotatedParent) {
-    Node * rotatedChild = rotatedParent->right;
+  void _leftRotate(node * rotatedParent) {
+    node * rotatedChild = rotatedParent->right;
     rotatedParent->right = rotatedChild->left;
     if (rotatedChild->left != sentinel) {
       rotatedChild->left->parent = rotatedParent;
@@ -273,8 +285,8 @@ template <
     rotatedParent->parent = rotatedChild;
   }
 
-  void _rightRotate(Node * rotatedParent) {
-    Node * rotatedChild = rotatedParent->left;
+  void _rightRotate(node * rotatedParent) {
+    node * rotatedChild = rotatedParent->left;
     rotatedParent->left = rotatedChild->right;
     if (rotatedChild->right != sentinel) {
       rotatedChild->right->parent = rotatedParent;
@@ -291,24 +303,28 @@ template <
     rotatedParent->parent = rotatedChild;
   }
 
-  bool _insert(const key_value_pair& data){
+  bool _insert(const key_value_pair& data, node *hint){
       try {
-        Node *insertedNode = _nodeCreationHelper(data);
-        Node *savedParent = sentinel;
-        Node *savedRoot = this->root;
+        node *insertedNode = _nodeCreationHelper(data);
+        node *savedParent = sentinel;
+        node *savedRoot = hint;
 
-        while (!savedRoot->isSentinel) {
+        if (hint != root){
+          savedRoot = root;
+        }  
+        while (!savedRoot->isSentinel)
+        {
           savedParent = savedRoot;
-          if (insertedNode->data.first == savedRoot->data.first){
+          if (insertedNode->data.first == savedRoot->data.first)
+          {
             lastInsertedNode = savedRoot;
             _nodeDeletionHelper(insertedNode);
             return false;
           }
-          else if (comp(insertedNode->data.first, savedRoot->data.first)) {
+          else if (comp(insertedNode->data.first, savedRoot->data.first))
             savedRoot = savedRoot->left;
-          } else {
+          else
             savedRoot = savedRoot->right;
-          }
         }
         insertedNode->parent = savedParent;
         if (savedParent->isSentinel) {
@@ -341,8 +357,8 @@ template <
   /* 
    *  REMOVE SECTION
    */  
-  void _recolorAndBalanceTreeAfterDelete(Node * current){
-    Node * s;
+  void _recolorAndBalanceTreeAfterDelete(node * current){
+    node * s;
     while (current != root && current->color == black) {
       if (current == current->parent->left) {
         s = current->parent->right;
@@ -407,7 +423,7 @@ template <
    * @param deletedNode node being replaced by relinkdeNode 
    * @param relinkedNode node that need to be reconnected to the parent of deletedNode
    */
-  void relinkNode(Node *deletedNode, Node *relinkedNode) {
+  void relinkNode(node *deletedNode, node *relinkedNode) {
     if (deletedNode->parent->isSentinel) {
       root = relinkedNode;
     } else if (deletedNode == deletedNode->parent->left) {
@@ -418,10 +434,10 @@ template <
     relinkedNode->parent = deletedNode->parent;
   }
 
-  bool _deleteNode(Node * current, key_value_pair data) {
-    Node *deletedNode = sentinel;
-    Node *replacingNode; 
-    Node *successorOfDeletedNode;
+  bool _deleteNode(node * current, key_value_pair data) {
+    node *deletedNode = sentinel;
+    node *replacingNode; 
+    node *successorOfDeletedNode;
     deletedNode = _searchTree(current, data);
     if (deletedNode->isSentinel) {
       return 0;
@@ -459,27 +475,27 @@ template <
     return 1;
   }
 
-  Node *_nodeCreationHelper(const key_value_pair& data){
-    Node *newNode;
+  node *_nodeCreationHelper(const key_value_pair& data){
+    node *newNode;
     try {
           newNode = nodeAllocator.allocate(1);
-          nodeAllocator.construct(newNode, Node(data, NULL, sentinel, sentinel, red, false, NULL));
+          nodeAllocator.construct(newNode, node(data, NULL, sentinel, sentinel, red, false, NULL));
     } catch (...){
       throw std::bad_alloc();
     }
     return newNode;
   }
 
-  void _nodeDeletionHelper(Node *deletedNode){
+  void _nodeDeletionHelper(node *deletedNode){
       nodeAllocator.destroy(deletedNode);
       nodeAllocator.deallocate(deletedNode, 1);
   }
 
-  void _deepCopyNodes(Node * node) {
+  void _deepCopyNodes(node * node) {
     if (node->isSentinel)
       return;
     {
-      this->_insert(node->data);
+      this->_insert(node->data, root);
       _deepCopyNodes(node->left);
       _deepCopyNodes(node->right);
     }
@@ -491,7 +507,7 @@ public:
 
   RedBlackTree(const key_compare& comp = key_compare()) : comp(comp), countNode(0){
       sentinel = nodeAllocator.allocate(1);
-      nodeAllocator.construct(sentinel, Node());
+      nodeAllocator.construct(sentinel, node());
       root = sentinel;
       lastInsertedNode = root;
   }
@@ -500,7 +516,7 @@ public:
       comp = Compare(other.comp);
       nodeAllocator = Allocator(other.nodeAllocator);
       sentinel = nodeAllocator.allocate(1);
-      nodeAllocator.construct(sentinel, Node());
+      nodeAllocator.construct(sentinel, node());
       root = sentinel;
       lastInsertedNode = root;
       // If other tree is not empty then insert its content in instanciated tree
@@ -518,7 +534,7 @@ public:
         comp = Compare(other.comp);
         nodeAllocator = Allocator(other.nodeAllocator);
         sentinel = nodeAllocator.allocate(1);
-        nodeAllocator.construct(sentinel, Node());
+        nodeAllocator.construct(sentinel, node());
         root = sentinel;
         lastInsertedNode = root;
         // If other tree is not empty then insert its content in instanciated tree
@@ -553,8 +569,8 @@ public:
     _nodeDeletionHelper(sentinel);
   };
 
-  Node *searchTree(key_value_pair data) const {
-    Node *tmp = _searchTree(this->root, data);
+  node *searchTree(key_value_pair data) const {
+    node *tmp = _searchTree(this->root, data);
     if (tmp->isSentinel)
       return sentinel;
     else
@@ -562,7 +578,7 @@ public:
   };
 
   key_value_pair searchTreeWithBoundChecking(key_value_pair &data) const {
-      Node *searchResult = _searchTree(this->root, data);
+      node *searchResult = _searchTree(this->root, data);
       if (searchResult == getSentinel()){
         std::stringstream sstm_err;
         sstm_err << "map::_M_range_check: __n (which is " << data.first << ") >= ";
@@ -572,14 +588,14 @@ public:
       return searchResult->data;
   }
 
-  Node *getMin(Node * current) const {
+  node *getMin(node * current) const {
     while (!current->isSentinel && !current->left->isSentinel) {
       current = current->left;
     }
     return current;
   };
 
-  Node *getMax(Node * current) const {
+  node *getMax(node * current) const {
     while (!current->isSentinel && !current->right->isSentinel) {
       current = current->right;
     }
@@ -588,7 +604,7 @@ public:
 
 // Recursive function to find an inorder successor for the given key in a BST.
 // Note that successor `succ` is passed by reference to the function
-  Node *getSuccessor(Node *root, Node *successor, const key_value_pair &key) const
+  node *getSuccessor(node *root, node *successor, const key_value_pair &key) const
   {
     // base case
     if (root->isSentinel)
@@ -613,14 +629,14 @@ public:
     return successor;
   }
 
-  Node *getPredecessor(const key_value_pair &data) const{
-    Node *nodeProcessed;
+  node *getPredecessor(const key_value_pair &data) const{
+    node *nodeProcessed;
     if ((nodeProcessed = _searchTree(root, data)) == sentinel)
       return sentinel;
     if (!nodeProcessed->left->isSentinel) {
       return getMax(nodeProcessed->left);
     }
-    Node * searchedParent = nodeProcessed->parent;
+    node * searchedParent = nodeProcessed->parent;
     while (!searchedParent->isSentinel && nodeProcessed == searchedParent->left) {
       nodeProcessed = searchedParent;
       searchedParent = searchedParent->parent;
@@ -628,37 +644,41 @@ public:
     return searchedParent;
   };
 
-  Node *getLowerBound(const key_value_pair &data) const {
-    Node *nodeProcessed;
+  node *getLowerBound(const key_value_pair &data) const {
+    node *nodeProcessed;
     if ((nodeProcessed = searchTree(data)) == sentinel)
       if (nodeProcessed == sentinel)
         nodeProcessed = getSuccessor(root, sentinel, data);
     return nodeProcessed;
   }
 
-  Node *getUpperBound(const key_value_pair &data) const {
-    Node *nodeProcessed = getSuccessor(root, sentinel, data);
+  node *getUpperBound(const key_value_pair &data) const {
+    node *nodeProcessed = getSuccessor(root, sentinel, data);
     return nodeProcessed;
   }
 
-  Node *getRoot() const{
+  node *getRoot() const{
     return this->root;
   };
 
-  Node *getSentinel() const {
+  node *getSentinel() const {
     return this->sentinel;
   };
 
-  Node *getLastInsertedNode() const {
+  node *getLastInsertedNode() const {
     return this->lastInsertedNode;
   }
 
-  T getData(Node *current) const {
+  T getData(node *current) const {
     return current->data;
   };
 
   bool insert(const key_value_pair &data) {
-    bool hasBeenInserted = _insert(data);
+    return insert(data, root);
+  };
+
+  bool insert(const key_value_pair &data, node *hint) {
+    bool hasBeenInserted = _insert(data, hint);
     if (hasBeenInserted)
       sentinel->lastUpdatedRoot = getRoot(); 
     return hasBeenInserted;
@@ -684,8 +704,8 @@ public:
     return nodeAllocator.max_size();
   }
 
-  Node *_duplicateNode(Node *srcNode){
-    Node *dup = nodeAllocator->allocate(1);
+  node *_duplicateNode(node *srcNode){
+    node *dup = nodeAllocator->allocate(1);
     dup->color = srcNode->color;
     dup->data = srcNode->data;
     dup->left = srcNode->left;

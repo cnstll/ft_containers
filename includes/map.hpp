@@ -109,6 +109,12 @@ public:
     bool insertionResult = tree.insert(value);
     return ft::make_pair(iterator(tree.getLastInsertedNode()), insertionResult);
   };
+
+  iterator insert( iterator hint, const value_type& value ){
+    tree.insert(value, hint.currentNode);
+    return iterator(tree.getLastInsertedNode());
+
+  };
 // candidate template ignored: deduced conflicting types for parameter 'InputIt' ('ft::mapIterator<value_type > >' vs. 'value_type')
 // candidate template ignored: deduced conflicting types for parameter 'InputIt' ('ft::mapIterator<ft::pair<const int, std::basic_string<char> > >' vs. 'ft::pair<const int, std::basic_string<char> >')
 //   void insert( InputIt first, InputIt last){
@@ -168,14 +174,14 @@ public:
    */
   iterator find(const key_type &key){
     iterator it(tree.searchTree(ft::make_pair(key, mapped_type())));
-    if (it == tree.getSentinel())
+    if (it == iterator(tree.getSentinel()))
       return end();
     else
       return it;
   };
   const_iterator find(const key_type &key) const {
     const_iterator it(tree.searchTree(ft::make_pair(key, mapped_type())));
-    if (it == tree.getSentinel())
+    if (it == const_iterator(tree.getSentinel()))
       return end();
     else
       return it;
@@ -200,14 +206,14 @@ public:
    */
   iterator lower_bound(const key_type &key){
     iterator it(tree.getLowerBound(ft::make_pair(key, mapped_type())));
-    if (it != tree.getSentinel())
+    if (it != iterator(tree.getSentinel()))
       return it;
     else
       return end();
   };
-  const_iterator lower_bound(const key_type &key) const {
+  const_iterator lower_bound(const key_type &key) const{
     const_iterator it(tree.getLowerBound(ft::make_pair(key, mapped_type())));
-    if (it != tree.getSentinel())
+    if (it != const_iterator(tree.getSentinel()))
       return it;
     else
       return end();
@@ -220,14 +226,14 @@ public:
    */
   iterator upper_bound(const key_type &key){
     iterator it(tree.getUpperBound(ft::make_pair(key, mapped_type())));
-    if (it != tree.getSentinel())
+    if (it != iterator(tree.getSentinel()))
       return it;
     else
       return end();
   }
   const_iterator upper_bound(const key_type &key) const{
     const_iterator it(tree.getUpperBound(ft::make_pair(key, mapped_type())));
-    if (it != tree.getSentinel())
+    if (it != const_iterator(tree.getSentinel()))
       return it;
     else
       return end();
