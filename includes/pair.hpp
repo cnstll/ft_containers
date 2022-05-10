@@ -21,9 +21,9 @@ namespace ft {
     second = other.second;
     return *this;
   };
-  operator pair<const T1, T2>() const {
-    return pair<const T1, const T2>(first, second);
-  }
+  // operator pair<const T1, const T2>() const {
+  //   return pair<const T1, const T2>(first, second);
+  // }
 
 };
 

@@ -92,12 +92,12 @@ class mapNode {
   };
 
     // operator mapNode<const T>() const{
-      // return mapNode<const T>(this->d, this->p, this->l, this->r, this->c, this->s, this->lastRoot);
+    //   return mapNode<const T>(this->d, this->p, this->l, this->r, this->c, this->s, this->lastRoot);
     // }
 
-    operator mapNode<const T>() const{
-      return mapNode<const T>(data);
-    }
+    // operator mapNode<const T>() const{
+    //   return mapNode<const T>(data);
+    // }
 
   
 
