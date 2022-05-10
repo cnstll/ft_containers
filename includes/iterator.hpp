@@ -43,15 +43,15 @@ template <class T>
     typedef	random_access_iterator_tag iterator_category;
   };
 
-// template <class T>
-//   struct iterator_traits<const T*>{
+template <class T>
+  struct iterator_traits<const T*>{
 
-//     typedef	std::ptrdiff_t difference_type;
-//     typedef T value_type;
-//     typedef const T* pointer;
-//     typedef const T& reference;
-//     typedef	random_access_iterator_tag iterator_category;
-//   };
+    typedef	std::ptrdiff_t difference_type;
+    typedef T value_type;
+    typedef const T* pointer;
+    typedef const T& reference;
+    typedef	random_access_iterator_tag iterator_category;
+  };
 
 template <class T> 
 class vectorIterator : public ft::iterator<random_access_iterator_tag, T>
@@ -127,6 +127,8 @@ class vectorIterator : public ft::iterator<random_access_iterator_tag, T>
     bool operator<=(const vectorIterator<T1>& lhs, const vectorIterator<T2>& rhs) { return !operator>(lhs, rhs); };
     template <typename T1, typename T2>
     bool operator>=(const vectorIterator<T1>& lhs, const vectorIterator<T2>& rhs) { return !operator<(lhs, rhs); };
+template <class T> 
+class constMapIterator;
 
 template <class T> 
 class mapIterator : public ft::iterator<bidirectional_iterator_tag, T>
@@ -178,8 +180,8 @@ class mapIterator : public ft::iterator<bidirectional_iterator_tag, T>
     mapIterator operator--(int) {mapIterator tmp(*this); operator--(); return tmp;}
   
     /*Convert constant type*/
-    // operator mapIterator<const T>() const {
-    //   return mapIterator<const T>(currentNode);
+    // operator mapIterator<T>() const {
+    //   return constMapIterator<T>(currentNode);
     // }
     // friend bool operator==(const mapIterator& lhs, const mapIterator& rhs) { return lhs.currentNode == rhs.currentNode; };
     // friend bool operator!=(const mapIterator& lhs, const mapIterator& rhs) { return !operator==(lhs, rhs); };
@@ -197,9 +199,9 @@ class constMapIterator : public ft::iterator<bidirectional_iterator_tag, T>
   public:
     typedef bidirectional_iterator_tag iterator_category;
     typedef std::ptrdiff_t difference_type;
-    typedef const T const_value_type;
-    typedef const T* const_pointer;
-    typedef const T& const_reference;
+    typedef const T value_type;
+    typedef const T* pointer;
+    typedef const T& reference;
     typedef typename ft::mapNode<T> const_node;
     typedef typename ft::mapNode<T> node;
   /* Is default-constructible, copy-constructible, copy-assignable and destructible */
@@ -208,15 +210,15 @@ class constMapIterator : public ft::iterator<bidirectional_iterator_tag, T>
     constMapIterator(const mapIterator<T>& other) : currentNode(other.currentNode){}
     constMapIterator(const constMapIterator& other) : currentNode(other.currentNode){}
     constMapIterator &operator=(const mapIterator<T>& rhs){ 
-      if (this != &rhs)
+      //if (this != &rhs)
         this->currentNode = rhs.currentNode;
       return *this;
     }
     ~constMapIterator(void) {}
 
   /*Can be dereferenced as an lvalue (if in a dereferenceable state).*/
-    const_reference operator*() const { return currentNode->data; }
-    const_pointer operator->() const { return &currentNode->data; }
+    reference operator*() const { return currentNode->data; }
+    pointer operator->() const { return &currentNode->data; }
 
   /*Can be incremented (if in a dereferenceable state).*/
     constMapIterator& operator++() {
@@ -271,14 +273,11 @@ class constMapIterator : public ft::iterator<bidirectional_iterator_tag, T>
  */
 template< class Iter >
 class reverse_iterator
-// : public iterator<typename iterator_traits<Iter>::iterator_category,
-//                       typename iterator_traits<Iter>::value_type,
-//                       typename iterator_traits<Iter>::difference_type,
-//                       typename iterator_traits<Iter>::pointer,
-//                       typename iterator_traits<Iter>::reference>
 {
   public:
     typedef Iter iterator_type;
+    typedef typename iterator_traits<Iter>::value_type value_type;
+    typedef typename iterator_traits<Iter>::iterator_category iterator_category;
     typedef typename iterator_traits<Iter>::difference_type difference_type;
     typedef typename iterator_traits<Iter>::pointer pointer;
     typedef typename iterator_traits<Iter>::reference reference;
@@ -286,7 +285,7 @@ class reverse_iterator
     reverse_iterator(): current(){};
     explicit reverse_iterator( iterator_type x ) : current(x) {};
     template< class U >
-    reverse_iterator( const reverse_iterator<U>& other ) { *this = other; };
+    reverse_iterator( const reverse_iterator<U>& other ) : current(other.base()){};
     template< class U >
     reverse_iterator& operator=( const reverse_iterator<U>& other ) { this->current = other.base(); return *this; };
     /**
@@ -294,7 +293,7 @@ class reverse_iterator
      * @return iterator_type 
      */
     iterator_type base() const { return current; };
-    reference operator*() const { iterator_type tmp = current; return *(--tmp);};
+    reference operator*() const { iterator_type tmp = current; return *--tmp;};
     pointer operator->() const { return &(operator*()); };
     reference operator[]( difference_type n ) const { return base()[-n-1]; };
     /**
@@ -310,6 +309,7 @@ class reverse_iterator
     reverse_iterator operator-( difference_type n ) const { return reverse_iterator(base() + n); };
     reverse_iterator& operator+=( difference_type n ){ current = base() - n; return *this; };
     reverse_iterator& operator-=( difference_type n ){ current = base() + n; return *this; };
+
 
   protected:
     iterator_type current;
