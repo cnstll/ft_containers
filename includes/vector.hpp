@@ -57,7 +57,7 @@ class vector {
         /**
          * @brief Default constructor. Constructs an empty container with a default-constructed allocator.
          */
-        vector() : currentSize(0), currentCapacity(0), n() {};
+        vector() : n_allocator(), currentSize(0), currentCapacity(0), n() {};
 
         /**
          * @brief Constructs an empty container with the given allocator alloc.
@@ -84,7 +84,7 @@ class vector {
         /**
          * @brief Copy Construct
          */
-        vector(const vector &other) { *this = other; };
+        vector(const vector &other) { n = NULL; *this = other; };
 
         /**
          * @brief  Destructs the vector. The destructors of the elements are called and the used storage is deallocated.
@@ -93,6 +93,7 @@ class vector {
          */
         ~vector(){
             // std::cout << "CURRENT CAPCITY: " << currentCapacity << " CurrentSize: "<< currentSize << std::endl;
+            
             clear();
             if (n)
                 n_allocator.deallocate(n, currentCapacity); 
@@ -113,7 +114,8 @@ class vector {
 
             if (other.n && other.size())
             {
-                n_allocator.deallocate(n, currentCapacity);
+                if (n)
+                    n_allocator.deallocate(n, currentCapacity);
                 this->n = this->n_allocator.allocate(other.capacity());
                 copyElements(this->n, other.n, other.size());
                 currentCapacity = other.capacity();
@@ -203,7 +205,7 @@ class vector {
                     ++index;
                 }
                 if (currentCapacity > 0){
-                    // clear();
+                    clear();
                     n_allocator.deallocate(n, currentCapacity);
                 }
                 currentCapacity = count;
@@ -332,7 +334,7 @@ class vector {
          *        Any past-the-end iterators are also invalidated. 
          */
         void clear(){
-
+            if (empty()) return;
             for (size_t index = 0; index < currentSize; index++) {
                 n_allocator.destroy(&n[index]);
             }
@@ -383,11 +385,7 @@ class vector {
                 size_type index = 0;
                 size_type d1 = _distance<iterator>(begin(), pos);
                 size_type d2 = _distance<iterator>(pos, end());
-                // 21 21 42 - d1 = 1 | d2 = 2 | count = 1 | value = 42
-                // 21 42 21 42 
                 if (savedCapacity == currentCapacity){
-                // std::cout << "Cap | Size: "<< currentCapacity << "|" << currentSize << " SavedCap: " << savedCapacity << " Value | Count: " << value << "|" << count << "\n";
-                // std::cout << "d1 | d2 : " << d1 << "|" << d2 << std::endl;
                     index = 1;
                     while (index <= d2){
                         n_allocator.construct(&n[currentSize - index + count], n[currentSize - index]);
@@ -507,7 +505,10 @@ class vector {
                         n_allocator.destroy(&n[index]);
                         index++;
                     }
-                    currentSize -= d_range;
+                    if (currentSize - d_range > 0)
+                        currentSize -= d_range;
+                    else
+                        currentSize = 0;
                 } catch (...) {}
             if (endIsLast)
                 return (end());
@@ -532,7 +533,6 @@ class vector {
          * If the current size is less than count, additional copies of value are appended.
         */
         void resize( size_type count, T value = T() ) {
-            (void)value;
             if (count <= currentSize){
                 while (count < currentSize)        
                     pop_back();

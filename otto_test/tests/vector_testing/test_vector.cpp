@@ -51,14 +51,10 @@ int main (void){
 
         std::cout << "Vector is empty ? : " << s1.empty() << std::endl;
 	    std::cout << "Vector size ? : " << s1.size() << std::endl;
-        s1.pop_back();
-	    std::cout << "Vector size after pop ? : " << s1.size() << std::endl;
-
-        std::cout << "Size of allocator ? : " << sizeof(s1.get_allocator()) << std::endl;
-        //s3 = s1;
+    
+        std::cout << "Done" << std::endl;
     }
     {
-        //Testing copyCtor for int
         std::cout << "Testing copy ctor an empty vector" << std::endl;
         NAMESPACE::vector<int> s1;
         NAMESPACE::vector<int> s2(s1);
