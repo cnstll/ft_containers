@@ -4,8 +4,6 @@
 #include "pair.hpp"
 #include "rb_tree.hpp"
 #include "iterator.hpp"
-#include "is_integral.hpp" 
-#include "enable_if.hpp"
 #include <exception>
 #include <functional>
 #include <memory>
@@ -19,7 +17,9 @@ template<
     class Allocator = std::allocator<ft::pair<const Key, T> > 
 > class map {
 public:
-  // types
+    /**
+   * MEMBER TYPES
+   */
   typedef Key                                                           key_type;
   typedef T                                                             mapped_type;
   typedef typename ft::pair<const Key, T>                               value_type;
@@ -115,9 +115,7 @@ public:
     return iterator(tree.getLastInsertedNode());
 
   };
-// candidate template ignored: deduced conflicting types for parameter 'InputIt' ('ft::mapIterator<value_type > >' vs. 'value_type')
-// candidate template ignored: deduced conflicting types for parameter 'InputIt' ('ft::mapIterator<ft::pair<const int, std::basic_string<char> > >' vs. 'ft::pair<const int, std::basic_string<char> >')
-//   void insert( InputIt first, InputIt last){
+
   template< class InputIt>
   void insert( InputIt first, InputIt last){
     while (first != last){
@@ -250,7 +248,7 @@ public:
   friend bool operator==( const ft::map<_Key,_T,_Compare,_Alloc>& lhs, const ft::map<_Key,_T,_Compare,_Alloc>& rhs );
   
   private : 
-    RedBlackTree<value_type, key_compare, allocator_type>        tree;
+    RedBlackTree<value_type, allocator_type, key_compare>        tree;
     allocator_type tree_allocator;
 };
 /**
@@ -283,6 +281,7 @@ bool operator==( const ft::map<Key,T,Compare,Alloc>& lhs, const ft::map<Key,T,Co
     return false;
   return true;
 };
+
 template< class Key, class T, class Compare, class Alloc >
 bool operator!=( const ft::map<Key,T,Compare,Alloc>& lhs, const ft::map<Key,T,Compare,Alloc>& rhs ){
   return !(lhs == rhs);

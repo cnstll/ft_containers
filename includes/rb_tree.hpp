@@ -5,10 +5,9 @@
 #include "pair.hpp"
 #include "utilities.hpp"
 #include <functional>
-#include <iostream>
-#include <memory>
+#include <iostream> 
+#include <memory> // mem allocation
 #include <string>
-#include <sstream>
 
 namespace ft {
   /**
@@ -31,19 +30,6 @@ class mapNode {
   mapNode(const T& d, mapNode<T> *p, mapNode<T> *l, mapNode<T>* r, bool c, bool s, mapNode<T>* lastRoot) : data(d), parent(p), left(l), right(r), color(c), isSentinel(s), lastUpdatedRoot(lastRoot){}
   mapNode(const mapNode& other) : data(other.data), parent(other.parent), left(other.left), right(other.right), color(other.color), isSentinel(other.isSentinel), lastUpdatedRoot(other.lastUpdatedRoot){}
   ~mapNode(){}
-  
-  mapNode &operator=(const mapNode& other){
-    if (this != &other){
-      data = other.data;
-      parent = other.parent;
-      left = other.left;
-      right = other.right;
-      color = other.color;
-      isSentinel = other.isSentinel;
-      lastUpdatedRoot = other.lastUpdatedRoot;
-    }
-    return *this;
-  }
 
   mapNode<T> *getSuccessor() {
     if (!right->isSentinel)
@@ -91,24 +77,26 @@ class mapNode {
     return tmp;
   };
 
-    // operator mapNode<const T>() const{
-    //   return mapNode<const T>(this->d, this->p, this->l, this->r, this->c, this->s, this->lastRoot);
-    // }
-
-    // operator mapNode<const T>() const{
-    //   return mapNode<const T>(data);
-    // }
-
-  
-
 };
+
 template <typename T1, typename T2>
 bool operator==(const mapNode<T1>& lhs, const mapNode<T2>& rhs) { return lhs.data == rhs.data; };
 
+
+/**
+ * @brief Red black tree handling data storing for map container. The tree is self-balancing.
+ *        Search, insert and remove operations are performed in O(log n) time.
+ * 
+ * @param T value_type passed from map
+ * @param Compare comp function passed from map in order to compare keys while operating on the tree. Std::less by default.
+ * @param Allocator tree allocator rebinded to node allocator
+ * @return iterator to the node where key was found or end() if no node with key was found
+ */
+
 template <
     class T,
-    class Compare = std::less<T>,
-    class Allocator = std::allocator<ft::mapNode<T> >
+    class Allocator,
+    class Compare = std::less<T>
 > class RedBlackTree {
   
   typedef T key_value_pair;
@@ -202,7 +190,6 @@ template <
     {
         _timber(root->left);
         _timber(root->right);
-        //std::cout << "deleted key: " << root->data.first << std::endl;
         --countNode;
         _nodeDeletionHelper(root);
     }
@@ -577,27 +564,9 @@ public:
       return tmp;
   };
 
-  key_value_pair searchTreeWithBoundChecking(key_value_pair &data) const {
-      node *searchResult = _searchTree(this->root, data);
-      if (searchResult == getSentinel()){
-        std::stringstream sstm_err;
-        sstm_err << "map::_M_range_check: __n (which is " << data.first << ") >= ";
-        sstm_err << "this->size() (which is " << countNode << ")";
-        throw std::out_of_range(sstm_err.str());
-      }
-      return searchResult->data;
-  }
-
   node *getMin(node * current) const {
     while (!current->isSentinel && !current->left->isSentinel) {
       current = current->left;
-    }
-    return current;
-  };
-
-  node *getMax(node * current) const {
-    while (!current->isSentinel && !current->right->isSentinel) {
-      current = current->right;
     }
     return current;
   };
@@ -629,21 +598,6 @@ public:
     return successor;
   }
 
-  node *getPredecessor(const key_value_pair &data) const{
-    node *nodeProcessed;
-    if ((nodeProcessed = _searchTree(root, data)) == sentinel)
-      return sentinel;
-    if (!nodeProcessed->left->isSentinel) {
-      return getMax(nodeProcessed->left);
-    }
-    node * searchedParent = nodeProcessed->parent;
-    while (!searchedParent->isSentinel && nodeProcessed == searchedParent->left) {
-      nodeProcessed = searchedParent;
-      searchedParent = searchedParent->parent;
-    }
-    return searchedParent;
-  };
-
   node *getLowerBound(const key_value_pair &data) const {
     node *nodeProcessed;
     if ((nodeProcessed = searchTree(data)) == sentinel)
@@ -668,10 +622,6 @@ public:
   node *getLastInsertedNode() const {
     return this->lastInsertedNode;
   }
-
-  T getData(node *current) const {
-    return current->data;
-  };
 
   bool insert(const key_value_pair &data) {
     return insert(data, root);
@@ -702,16 +652,6 @@ public:
 
   size_t maxSize() const{
     return nodeAllocator.max_size();
-  }
-
-  node *_duplicateNode(node *srcNode){
-    node *dup = nodeAllocator->allocate(1);
-    dup->color = srcNode->color;
-    dup->data = srcNode->data;
-    dup->left = srcNode->left;
-    dup->right = srcNode->right;
-    dup->parent = srcNode->parent;
-    return dup;
   }
 
   void treeSwap(RedBlackTree &other){
