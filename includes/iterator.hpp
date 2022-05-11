@@ -1,7 +1,6 @@
 #ifndef ITERATOR_HPP
 #define ITERATOR_HPP
 #include "rb_tree.hpp"
-#include "remove_cv.hpp"
 #include <cstddef> //std::ptrdiff_t | std::size_t
 
 namespace ft {
@@ -89,14 +88,8 @@ class vectorIterator : public ft::iterator<random_access_iterator_tag, T>
     vectorIterator operator--(int) {vectorIterator tmp(*this); operator--(); return tmp;}
   /*Supports the arithmetic operators + and - between an iterator and an integer value, or subtracting an iterator from another.*/
     vectorIterator operator+(difference_type n) {T* tmp = p; return vectorIterator(tmp += n);}
-
-    friend vectorIterator operator+(difference_type n, const vectorIterator& op) {T* tmp = op.p; tmp += n; return vectorIterator(tmp);}
-
     vectorIterator operator-(difference_type n) { vectorIterator it = this->p; return it -= n;}
 
-    friend vectorIterator operator-(difference_type n, const vectorIterator& op) {T* tmp = op.p; tmp -= n; return vectorIterator(tmp);}
-
-    friend difference_type operator-(const vectorIterator &lIt, const vectorIterator &rIt) {return lIt.p - rIt.p;}
   /*Supports compound assignment operations += and -= */
     vectorIterator& operator+=(difference_type n) {
       difference_type m = n;
@@ -113,6 +106,20 @@ class vectorIterator : public ft::iterator<random_access_iterator_tag, T>
   /* The underlying pointer to data hold in the container */
     T* p;
   };
+
+  /*Supports the arithmetic operators + and - between an iterator and an integer value, or subtracting an iterator from another.*/
+    template <typename T>
+    vectorIterator<T> operator+(typename vectorIterator<T>::difference_type n, const vectorIterator<T>& op){
+      T* tmp = op.p; tmp += n; return vectorIterator<T>(tmp);
+    }
+    template <typename T>
+    vectorIterator<T> operator-(typename vectorIterator<T>::difference_type n, const vectorIterator<T>& op){
+      T* tmp = op.p; tmp -= n; return vectorIterator<T>(tmp);
+    }
+    template <typename T1, typename T2>
+    typename vectorIterator<T1>::difference_type operator-(const vectorIterator<T1> &lIt, const vectorIterator<T2> &rIt){
+      return lIt.p - rIt.p;
+    }
     /*Can be compared for equivalence using the equality/inequality operators*/
     template <typename T1, typename T2>
     bool operator==(const vectorIterator<T1>& lhs, const vectorIterator<T2>& rhs) { return lhs.p == rhs.p; };
@@ -127,8 +134,6 @@ class vectorIterator : public ft::iterator<random_access_iterator_tag, T>
     bool operator<=(const vectorIterator<T1>& lhs, const vectorIterator<T2>& rhs) { return !operator>(lhs, rhs); };
     template <typename T1, typename T2>
     bool operator>=(const vectorIterator<T1>& lhs, const vectorIterator<T2>& rhs) { return !operator<(lhs, rhs); };
-template <class T> 
-class constMapIterator;
 
 template <class T> 
 class mapIterator : public ft::iterator<bidirectional_iterator_tag, T>
@@ -156,8 +161,6 @@ class mapIterator : public ft::iterator<bidirectional_iterator_tag, T>
     T& operator*() const { return currentNode->data; }
     T *operator->() const{ return &currentNode->data; }
 
-//'ft::mapIterator<ft::pair<const char, int> >::node *' (aka 'mapNode<ft::pair<const char, int> > *')
-//to 'mapIterator<const ft::pair<const char, int> >'
   /*Can be incremented (if in a dereferenceable state).*/
     mapIterator& operator++()  {
       if (currentNode->isSentinel)
@@ -179,12 +182,6 @@ class mapIterator : public ft::iterator<bidirectional_iterator_tag, T>
     }
     mapIterator operator--(int) {mapIterator tmp(*this); operator--(); return tmp;}
   
-    /*Convert constant type*/
-    // operator mapIterator<T>() const {
-    //   return constMapIterator<T>(currentNode);
-    // }
-    // friend bool operator==(const mapIterator& lhs, const mapIterator& rhs) { return lhs.currentNode == rhs.currentNode; };
-    // friend bool operator!=(const mapIterator& lhs, const mapIterator& rhs) { return !operator==(lhs, rhs); };
     node* currentNode;
 };
 
@@ -240,13 +237,6 @@ class constMapIterator : public ft::iterator<bidirectional_iterator_tag, T>
     }
     constMapIterator operator--(int) {constMapIterator tmp(*this); operator--(); return tmp;}
     
-    // operator mapIterator<T>() {
-    //   return constMapIterator<T>(currentNode);
-    // }
-
-  /*Can be compared for equivalence using the equality/inequality operators*/
-    // friend bool operator==(const constMapIterator& lhs, const constMapIterator& rhs) { return lhs.currentNode == rhs.currentNode; };
-    // friend bool operator!=(const constMapIterator& lhs, const constMapIterator& rhs) { return !operator==(lhs, rhs); };
 
     const_node *currentNode;
 };
