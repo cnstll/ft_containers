@@ -1,7 +1,6 @@
 #ifndef IS_INTEGRAL_HPP
 #define IS_INTEGRAL_HPP
 #include "integral_constant.hpp"
-#include "remove_cv.hpp"
 
 namespace ft {
 
@@ -27,7 +26,6 @@ template<> struct is_integral_base<unsigned long int>: ft::true_type {};
 template<> struct is_integral_base<unsigned long long int>: ft::true_type {};
 
 template<typename T> struct is_integral: is_integral_base<T> {};
-//template<typename T> struct is_integral: is_integral_base<typename ft::remove_cv<T>::type> {};
 
 }; //namespace
 #endif

@@ -5,13 +5,10 @@
 #include "integral_constant.hpp" 
 #include "iterator.hpp"
 #include "lexicographical_compare.hpp" 
-#include "remove_cv.hpp" 
 #include "utilities.hpp"
-#include <cstddef>
-#include <iostream>
+#include <cstddef> // ptrdiff
 #include <memory>
 #include <exception>
-#include <stdexcept>
 #include <sstream>
 
 namespace ft {
