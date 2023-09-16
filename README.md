@@ -1,6 +1,14 @@
 # ft_containers
-
-## Notions
+## Presentation of the project
+* In this project we want to implement containers from the standard library in C++. The implementation relies on templates which ensure a flexible type structure for each container.
+Vectors and maps as well as stacks which is an adaptator of vectors have been implemented. The underlying data structures are respectivelly *dynamic arrays* and *red black trees*. More details can be found in the [official documentation](https://cplusplus.com/reference/stl/).  
+* Each container has been implemented with its corresponding iterator which is a handy abstraction for going over each element of the container. More on iterator [here](https://cplusplus.com/reference/iterator/).  
+* Another big challenge of this project was handling memory allocation efficiently using the allocators for each data structure. More on the allocator class [here](https://cplusplus.com/reference/memory/allocator/).  
+* A ensemble of scripts called "otto_test" has been added to code in a TDD way and avoid regression while going through the dev of the project.    
+## Efficieny and use case for each container (WIP)
+* Vectors are very efficient for insertion and deletion at the beginning or end of the sequence.  
+* Maps
+## Useful Notions
 * Duck typing: "If it walks like a duck and it quacks like a duck, then it must be a duck" In duck type, a data structure is considered of given type if it has the properties and the methods of that type. The duck test can be checked statically or dynamically.
 * Binary Search Trees: "is a rooted binary tree data structure whose internal nodes each store a key greater than all the keys in the node's left subtree and less than those in its right subtree" (wikipedia). Time complexity is bound to the tree height and is usually logarithmic. Though in the worst case, unbalanced tree can become a single linked list with a linear complexity.
 * Red-Black Tree: red-black tree is a self-balancing binary search tree. It's a typical BST whose nodes are labeled as "Red" or "Black" and each node is "recolored" and may rebalanced after the tree is modified (insertion or removal). Balancing the tree is done through these set of rules:
