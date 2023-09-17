@@ -6,16 +6,19 @@ Vectors and maps as well as stacks which is an adaptator of vectors have been im
 * Another big challenge of this project was handling memory allocation efficiently using the allocators for each data structure. More on the allocator class [here](https://cplusplus.com/reference/memory/allocator/).  
 * A ensemble of scripts called "otto_test" has been added to code in a TDD way and avoid regression while going through the dev of the project.    
 ## Efficieny and use case for each container (WIP)
-* Vectors are very efficient for insertion and deletion at the beginning or end of the sequence.  
-* Maps
+* Regarding memory, vectors perform dynamic allocations of memory : the container automatically handles the capacity to provide for more elements in the sequence. The capacity is increased whenever the size of the sequence in the container becomes greater than its capacity. In this implementation we double the capacity of the vectors when it happens, making vectors less memory efficient than arrays for instance.  
+Regarding operations on vectors, insertion and removal of elements can be done in constant time complexity if performed at the end of the sequence. Though when the size of the sequence out grows the memory capacity, a new memory allocation and the copy of all the elements already in the sequence have to be performed. Vectors are efficient at indexing elements in the sequence (constant time), inserting or removing at the end (constant amortized time) but perform worse than list or maps when inserting / removing elements at other positions in the sequence (linear time).  
+* Maps perform in logarithmic time for search / insertion / deletion of elements. Some bits of efficiency is lost over tree reblancing and repainting (RBT) when inserting or deleting elements.  
 ## Useful Notions
 * Duck typing: "If it walks like a duck and it quacks like a duck, then it must be a duck" In duck type, a data structure is considered of given type if it has the properties and the methods of that type. The duck test can be checked statically or dynamically.
 * Binary Search Trees: "is a rooted binary tree data structure whose internal nodes each store a key greater than all the keys in the node's left subtree and less than those in its right subtree" (wikipedia). Time complexity is bound to the tree height and is usually logarithmic. Though in the worst case, unbalanced tree can become a single linked list with a linear complexity.
 * Red-Black Tree: red-black tree is a self-balancing binary search tree. It's a typical BST whose nodes are labeled as "Red" or "Black" and each node is "recolored" and may rebalanced after the tree is modified (insertion or removal). Balancing the tree is done through these set of rules:
-  "1- Each node is either red or black. 
-  2- All NIL nodes (figure 1) are considered black. 
-  3- A red node does not have a red child. 
-  4- Every path from a given node to any of its descendant NIL nodes goes through the same number of black nodes."(wikipedia)   
+"
+  * 1- Each node is either red or black. 
+  * 2- All NIL nodes (figure 1) are considered black. 
+  * 3- A red node does not have a red child. 
+  * 4- Every path from a given node to any of its descendant NIL nodes goes through the same number of black nodes.
+"(wikipedia)   
 
 ## Sources
 * [Google Guide on CPP conventions](https://google.github.io/styleguide/cppguide.html)
@@ -39,3 +42,4 @@ Vectors and maps as well as stacks which is an adaptator of vectors have been im
 * [On time shell builtin API](https://stackoverflow.com/questions/556405/what-do-real-user-and-sys-mean-in-the-output-of-time1/556411#556411)
 * [An Idiot's guide on template](https://www.codeproject.com/articles/257589/an-idiots-guide-to-cplusplus-templates-part-1)
 * [Const correctness FAQ](https://isocpp.org/wiki/faq/const-correctness)
+* [Data struct and algo CS](https://github.com/gibsjose/cpp-cheat-sheet/blob/master/Data%20Structures%20and%20Algorithms.md)
